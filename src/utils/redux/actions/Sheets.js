@@ -1,6 +1,5 @@
 import axios from "axios";
 import {
-  API_SYMBOL,
   API_SHEET,
   ATFXTOKEN,
   GLOBAL_REQUEST_TIMEOUT,
@@ -10,16 +9,13 @@ import {
     GET_SHEET_REQUEST,
     GET_SHEET_SUCCESS,
     GET_SHEET_FAILURE,
-    GET_SYMBOLSUFFIXES_REQUEST,
-    GET_SYMBOLSUFFIXES_SUCCESS,
-    GET_SYMBOLSUFFIXES_FAILURE,
     SEL_REQUEST,
     SEL_SUCCESS,
     SEL_FAILURE,
     ISAUTHENTICATED_FAILURE,
   } from "../ActionTypes";
 
-export const CreateSheet = (formData, symbolSuffixes) => {
+export const CreateSheet = (formData) => {
     return async (dispatch) => {
       try {
         dispatch({ type: SEL_REQUEST });
@@ -29,9 +25,6 @@ export const CreateSheet = (formData, symbolSuffixes) => {
         const authorizationToken = localStorage.getItem(ATFXTOKEN);
         const params = formData;
 
-        params["suffixes"] = symbolSuffixes;
-        params["symbol"] = String(params["symbol"]);
-        params["multiplier"] = parseInt(params["multiplier"]);
         const response = await axios.post(
           `${apiIp}:${apiPort}${API_SHEET}`,
           params,
@@ -43,7 +36,6 @@ export const CreateSheet = (formData, symbolSuffixes) => {
           }
         );
         const status = response.status;
-  
         if (status >= 200 && status < 300) {
           dispatch({ type: SEL_SUCCESS });
         } else if (status === 401) {
@@ -80,7 +72,12 @@ export const CreateSheet = (formData, symbolSuffixes) => {
   
         const status = response.status;
         if (status >= 200 && status < 300) {
-          const data = JSON.parse(response.data);
+          let data;
+          try {
+            data = JSON.parse(response.data);
+          } catch (e) {
+            data = response.data;
+          }
           dispatch({ type: GET_SHEET_SUCCESS, payload: data });
         } else if (status === 401) {
           dispatch({ type: ISAUTHENTICATED_FAILURE });

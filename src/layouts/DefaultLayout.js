@@ -261,7 +261,7 @@ const DefaultLayout = ({ componentName, children }) => {
         <DrawerHeader />
         {children}
       </Box>
-      {loading && <LoadingElement />}
+      {loading && <LoadingElement isDrawerOpen={open} componentName={componentName}/>}
 
       {showSuccess && (
         <Snackbar open={true}>
@@ -272,7 +272,7 @@ const DefaultLayout = ({ componentName, children }) => {
       )}
 
       {showError && (
-        <Snackbar open={true}>
+        <Snackbar open={true} >
           <Alert severity="error" variant="filled" sx={{ width: "100%" }}>
             Failed
           </Alert>

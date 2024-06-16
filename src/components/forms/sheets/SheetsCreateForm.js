@@ -1,113 +1,205 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { VisibilityOff, Visibility } from "@mui/icons-material/";
-import {
-  Button,
-  Typography,
-  FormControl,
-  InputLabel,
-  IconButton,
-  InputAdornment,
-  OutlinedInput,
-  Autocomplete,
-  TextField,
-  FormControlLabel,
-  Switch,
-  Container,
-  Box,
-  Paper,
-} from "@mui/material";
-import TypographyContainer from "../../common/TypographyContainer";
+import { Typography, Box } from "@mui/material";
 import PrimaryButton from "../../buttons/PrimaryButton";
 import SecondaryButton from "../../buttons/SecondaryButton";
 import { goBackFunc, goNextFunc } from "../../../utils/functions/Functions";
-import { Sheet1DataColumns, Sheet2DataColumns } from "../../../utils/constants/Constants";
-
-// Start relative variables
+import {
+  ATFXTOKEN,
+  SheetDataColumns,
+  Sheet2DataColumns,
+  Sheet3DataColumns,
+} from "../../../utils/constants/Constants";
+import HorizontalLinearStepper from "../../common/HorizontalLinearStepper";
+import { transformSheetData } from "../../../utils/functions/Functions";
+import { CreateSheet } from "../../../utils/redux/actions/Sheets";
+import { GetMT5SymbolsConfigurationsAndSuffixes } from "../../../utils/redux/actions/SymbolConfigurations";
+import {
+  transformData,
+  transformCoverageData,
+} from "../../../utils/functions/Functions";
 import Sheets1CreateForm from "./Sheets1CreateForm";
 import Sheets2CreateForm from "./Sheets2CreateForm";
-import Sheets3CreateForm from "./Sheets3CreateForm";
-import Sheets4CreateForm from "./Sheets4CreateForm";
+import AddButton from "../../buttons/AddButton";
+import { cellRenderPercentage } from "../../cellRendering/CellRendering";
+import {jwtDecode} from 'jwt-decode';
 // End relative variables
 
-const SheetsCreateForm = ({ createFormVisibility, refreshPage }) => {
-  const success = useSelector((state) => state.success);
-
-  const [sheetVisibility, setSheetVisibility] = React.useState([
-    true,
-    false,
-    false,
-    false,
-  ]);
-
-  // SHEET 1
-  const columns1 = Sheet1DataColumns;
-  const [formData1, setFormData1] = useState({
-    [columns1[1].dataField]: "",
-    [columns1[2].dataField]: true,
-    [columns1[3].dataField]: "",
-    [columns1[4].dataField]: [],
-    [columns1[5].dataField]: [],
-    [columns1[6].dataField]: 0,
-    [columns1[7].dataField]: [],
-    [columns1[8].dataField]: [],
-  });
-
-  
-  const handleChangeformData1 = (event) => {
-    setFormData1({
-      ...formData1,
-      [event.target.name]: event.target.value,
-    });
-  };
-
-  // SHEET 2
+const SheetsCreateForm = () => {
+  const dispatch = useDispatch();
+  const stepperRef = useRef();
+  const mt5SymbolConfigurations = useSelector((state) => state.mt5SymbolConfigurations);
+  const MT5SymbolsConfigurationsAndSuffixes = useSelector((state) => state.MT5SymbolsConfigurationsAndSuffixes);
+  const Managers = useSelector((state) => state.Managers);
+  const mt5CoverageAccounts = useSelector((state) => state.CoverageAccounts);
+  const MT5CoverageSymbols = useSelector((state) => state.MT5CoverageSymbols);
+  const [isLastSheet, setIsLastSheet] = useState(false);
+  const [symbolsFormulas, setSymbolsFormulas] = useState([]);
+  const [coverageSymbolsFormulas, setCoverageSymbolsFormulas] = useState([]);
+  const [selectedSymbolsData, setSelectedSymbolsData] = useState([]);
+  const [selectedSymbols, setSelectedSymbols] = useState([]);
   const [columns2, setColumns2] = useState(Sheet2DataColumns);
-  const [formData2Symbols, setFormData2Symbols] = useState([]);
-  const [formData2Suffixes, setFormData2Suffixes] = useState([]);
+  const [columns3, setColumns3] = useState(Sheet3DataColumns);
+  const columns = SheetDataColumns;
+  const [columnsCaption, setColumnsCaption] = useState({});
+  const [coverageAndSymbols, setCoverageAndSymbols] = useState("");
+  const [formData, setFormData] = useState({
+    [columns[1].dataField]: "",
+    [columns[2].dataField]: true,
+    [columns[3].dataField]: "",
+    [columns[4].dataField]: [],
+    [columns[5].dataField]: [],
+    [columns[6].dataField]: 0,
+    [columns[7].dataField]: [],
+    [columns[8].dataField]: [],
+    [columns[9].dataField]: [],
+    [columns[10].dataField]: [],
+});
+  const steps = ["Managers & Coverages", "Formulas"];
+  const isSymbolConfIdChange = formData[columns[5].dataField];
+  const isManagerIdChange = formData[columns[4].dataField];
+  const [sheetVisibility, setSheetVisibility] = React.useState([true, false]);
+  const activeStepIndex = sheetVisibility.findIndex((value) => value === true);
+  const activeStepLabel = activeStepIndex !== -1 ? steps[activeStepIndex] : "";
 
+  const handleChangeFormData = (event) => {
+    let updatedFormData = {
+      ...formData,
+      [event.target.name]: event.target.value,
+    };
 
+    if (event.target.name === columns[5].dataField) {
+      const selectedIds = event.target.value;
+      const selectedSymbols = mt5SymbolConfigurations
+        .filter((item) => selectedIds.includes(item.id))
+        .map((item) => item.symbol);
 
-  const formTitle = "Create Sheet";
-  const handleSubmit = async (e) => {
+      updatedFormData = {
+        ...updatedFormData,
+        [columns[9].dataField]: selectedSymbols,
+      };
+    } else if (event.target.name === columns[4].dataField) {
+      const selectedManagersIds = event.target.value;
+      const selectedManagers = Managers.filter((item) =>
+        selectedManagersIds.includes(item.id)
+      ).map((item) => item.name);
+      updatedFormData = {
+        ...updatedFormData,
+        [columns[10].dataField]: selectedManagers,
+      };
+    }
+    setFormData(updatedFormData);
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
+    const token = localStorage.getItem(ATFXTOKEN);
+    const decodedToken = jwtDecode(token);
+    const transformedData = transformSheetData(decodedToken, formData, symbolsFormulas, coverageSymbolsFormulas, columnsCaption, columns2.length);
+    dispatch(CreateSheet(transformedData));
   };
 
-  const hideForm = () => {
-    createFormVisibility(false);
-  };
+  const handleAddColumn = ()=>{
+    const sheet2ColumnsLength = Sheet2DataColumns.length;
+    if (columns2.length < sheet2ColumnsLength + 4) {
+      const newColumn = {
+        dataField: `#${columns2.length - (sheet2ColumnsLength - 1)}`,
+        caption: `#${columns2.length - (sheet2ColumnsLength - 1)}`,
+        allowUpdating: true,
+        dataType: "number",
+        alignment: "left",
+        cellRender: (cellData) => cellRenderPercentage(cellData),
+      };
+      setColumns2([...columns2, newColumn]);
+      setColumns3([...columns3, newColumn]);
+    }
+  }
 
   const goBack = () => {
+    setIsLastSheet(false);
     goBackFunc(sheetVisibility, setSheetVisibility);
+    if (stepperRef.current) {
+      stepperRef.current.handleBack();
+    }
   };
+
   const goNext = () => {
+    checkLastTrueIndex();
     goNextFunc(sheetVisibility, setSheetVisibility);
+    if (stepperRef.current) {
+      stepperRef.current.handleNext();
+    }
   };
+
+  const checkLastTrueIndex = () => {
+    const index = sheetVisibility.indexOf(true);
+    const isLast = index === sheetVisibility.length - 1;
+    setIsLastSheet(isLast);
+  };
+
+  const handleStepClick = (index) => {
+    const newSheetVisibility = sheetVisibility.map((_, i) => i === index);
+    setSheetVisibility(newSheetVisibility);
+  };
+
+  // KEEP FORMULAS  UPDATED
+  React.useEffect(() => {
+    setColumnsCaption({});
+    dispatch(GetMT5SymbolsConfigurationsAndSuffixes());
+  }, [isSymbolConfIdChange, isManagerIdChange]);
 
   React.useEffect(() => {
-    if (success) {
-      refreshPage();
+    if (MT5SymbolsConfigurationsAndSuffixes) {
+      setSelectedSymbols(
+        mt5SymbolConfigurations
+          .filter((item) => formData[columns[5].dataField].includes(item.id))
+          .map((item) => item.symbol)
+      );
     }
-  }, [success]);
+  }, [MT5SymbolsConfigurationsAndSuffixes]);
+
+  React.useEffect(() => {
+    if (selectedSymbols) {
+      setSelectedSymbolsData(
+        MT5SymbolsConfigurationsAndSuffixes.filter((item) =>
+          selectedSymbols.includes(item.symbol)
+        )
+      );
+    }
+  }, [selectedSymbols]);
+
+  React.useEffect(() => {
+    setSymbolsFormulas(
+      transformData(
+        selectedSymbolsData,
+        formData[columns[10].dataField],
+        formData[columns[4].dataField]
+      )
+    );
+  }, [selectedSymbolsData]);
+
+  React.useEffect(() => {
+    setCoverageSymbolsFormulas(
+      transformCoverageData(
+        coverageAndSymbols,
+        mt5CoverageAccounts,
+        MT5CoverageSymbols,
+        coverageSymbolsFormulas,
+        setCoverageSymbolsFormulas
+      )
+    );
+  }, [coverageAndSymbols]);
+
+  // END OF KEEP FORMULAS  UPDATED
+
+  React.useEffect(() => {
+    checkLastTrueIndex();
+  }, [sheetVisibility]);
+
+
 
   return (
-    <Container
-      maxWidth="sm"
-      sx={{
-        position: "fixed",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        bgcolor: "rgba(255, 255, 255, 1)",
-        p: 3,
-        borderRadius: 1,
-        boxShadow: 3,
-        zIndex: 1200,
-        display: "flex",
-        flexDirection: "column",
-      }}
-      component={Paper}
-    >
+    <div className="">
       <Box
         sx={{
           display: "flex",
@@ -115,32 +207,71 @@ const SheetsCreateForm = ({ createFormVisibility, refreshPage }) => {
           alignItems: "center",
         }}
       >
-        <TypographyContainer>{formTitle}</TypographyContainer>
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-4  min-h-[50vh] flex items-center ">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {sheetVisibility[0] && <Sheets1CreateForm formData={formData1} columns={columns1} handleChangeformData={handleChangeformData1} />}
-              {sheetVisibility[1] && <Sheets2CreateForm  columns1={columns1} columns2={columns2} setColumns2={setColumns2}  formData={formData1} handleChangeformData={handleChangeformData1} />}
-              {sheetVisibility[2] && <Sheets3CreateForm />}
-              {sheetVisibility[3] && <Sheets4CreateForm />}
+          <div className="grid grid-cols-1 gap-4  flex items-center border border-primary rounded px-8 mt-8">
+            <div className="flex flex-col items-center">
+              <div className=" grid grid-cols-3 mt-8">
+                <div className="flex justify-center items-center">
+                  <HorizontalLinearStepper
+                    ref={stepperRef}
+                    steps={steps}
+                    onStepClick={handleStepClick}
+                  />
+                </div>
+                <div className="flex justify-center items-center">
+                  <Typography variant="h5">{activeStepLabel}</Typography>
+                </div>
+                <div className="flex justify-end items-center">
+                  {sheetVisibility[1] && (
+                  <AddButton onClick={handleAddColumn} caption="Formula" />
+                )}
+                </div>
+              </div>
+
+              <div className="min-h-[50vh] flex items-center">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 ">
+                  {sheetVisibility[0] && (
+                    <Sheets1CreateForm
+                      formData={formData}
+                      columns={columns}
+                      handleChangeFormData={handleChangeFormData}
+                      coverageAndSymbols={coverageAndSymbols}
+                      setCoverageAndSymbols={setCoverageAndSymbols}
+                    />
+                  )}
+                  {sheetVisibility[1] && (
+                    <Sheets2CreateForm
+                      columns2={columns2}
+                      setColumns2={setColumns2}
+                      columns3={columns3}
+                      setColumns3={setColumns3}
+                      symbolsFormulas={symbolsFormulas}
+                      setSymbolsFormulas={setSymbolsFormulas}
+                      columnsCaption={columnsCaption}
+                      setColumnsCaption={setColumnsCaption}
+                      coverageSymbolsFormulas={coverageSymbolsFormulas}
+                      setCoverageSymbolsFormulas={setCoverageSymbolsFormulas}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
+            <div></div>
           </div>
         </form>
       </Box>
-      <div className="flex justify-between  w-full">
-        <div>
-          <PrimaryButton caption="Save" type="submit" />
-          <SecondaryButton onClick={hideForm} caption="Cancel" />
-        </div>
+      <div className="flex justify-center  w-full">
         <div className="">
           <SecondaryButton onClick={goBack} caption="Back" />
-          <PrimaryButton onClick={goNext} caption="Next" />
+          {isLastSheet ? (
+            <PrimaryButton caption="Save" onClick={handleSubmit} />
+          ) : (
+            <PrimaryButton onClick={goNext} caption="Next" />
+          )}
         </div>
       </div>
-    </Container>
+    </div>
   );
 };
 
 export default SheetsCreateForm;
-
-

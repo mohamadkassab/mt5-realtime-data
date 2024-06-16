@@ -1,20 +1,26 @@
 import DefaultLayout from "../layouts/DefaultLayout";
-import { Menu, CoreMenu } from "../utils/constants/Constants";
+import { Menu, CoreMenu, SecondaryPages } from "../utils/constants/Constants";
 import React from "react";
 import { useLocation } from "react-router-dom";
 import SheetsDataTable from "../components/tables/SheetsDataTable";
+import SheetsCreateForm from "../components/forms/sheets/SheetsCreateForm";
 
 const ControlCenter = () => {
   const location = useLocation();
   const [pageName, setPageName] = React.useState("");
 
   const checkPathName = () => {
-    Menu.map((page) => {
+    Menu.forEach((page) => {
       if (location.pathname === page.path) {
         setPageName(page.name);
       }
     });
-    CoreMenu.map((page) => {
+    CoreMenu.forEach((page) => {
+      if (location.pathname === page.path) {
+        setPageName(page.name);
+      }
+    });
+    SecondaryPages.forEach((page) => {
       if (location.pathname === page.path) {
         setPageName(page.name);
       }
@@ -27,6 +33,7 @@ const ControlCenter = () => {
   return (
     <DefaultLayout componentName={pageName}>
       {location.pathname === "/sheets" ? <SheetsDataTable /> : <></>}
+      {location.pathname === "/createSheet" ? <SheetsCreateForm /> : <></>}
     </DefaultLayout>
   );
 };

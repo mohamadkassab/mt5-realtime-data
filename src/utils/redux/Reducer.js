@@ -9,24 +9,43 @@ import {
   SEL_REQUEST,
   SEL_SUCCESS,
   SEL_FAILURE,
-  GET_MT5MANAGER_REQUEST,
-  GET_MT5MANAGER_SUCCESS,
-  GET_MT5MANAGER_FAILURE,
+  GET_MANAGER_REQUEST,
+  GET_MANAGER_SUCCESS,
+  GET_MANAGER_FAILURE,
   GET_MT5SYMBOLCONFIGURATIONS_REQUEST,
   GET_MT5SYMBOLCONFIGURATIONS_SUCCESS,
   GET_MT5SYMBOLCONFIGURATIONS_FAILURE,
   GET_MT5SUFFIX_REQUEST,
   GET_MT5SUFFIX_SUCCESS,
   GET_MT5SUFFIX_FAILURE,
+  GET_MT5SymbolsConfigurationsAndSuffixes_REQUEST,
+  GET_MT5SymbolsConfigurationsAndSuffixes_SUCCESS,
+  GET_MT5SymbolsConfigurationsAndSuffixes_FAILURE,
+  GET_COVERAGEACCOUNTS_REQUEST,
+  GET_COVERAGEACCOUNTS_SUCCESS,
+  GET_COVERAGEACCOUNTS_FAILURE,
+  GET_SERVERS_REQUEST,
+  GET_SERVERS_SUCCESS,
+  GET_SERVERS_FAILURE,
+  GET_MT5COVERAGESYMBOLS_REQUEST,
+  GET_MT5COVERAGESYMBOLS_SUCCESS,
+  GET_MT5COVERAGESYMBOLS_FAILURE,
+
+  
+
 } from "./ActionTypes";
-import produce from "immer";
+import {produce} from "immer";
 import { ATFXTOKEN } from "../constants/Constants";
 
 const initialState = {
 
-  mt5Managers: [],
+  Managers: [],
   mt5SymbolConfigurations: [],
   mt5Suffixes: [],
+  MT5SymbolsConfigurationsAndSuffixes:[],
+  CoverageAccounts:[],
+  Servers:[],
+  MT5CoverageSymbols:[],
   isAuthenticated: localStorage.getItem(ATFXTOKEN) || false,
   blur: false,
   loading: false,
@@ -78,18 +97,18 @@ const reducer = produce((draft, action) => {
       break;
 
     // MT5 MANAGER
-    case GET_MT5MANAGER_REQUEST:
-      draft.mt5Managers= [];
+    case GET_MANAGER_REQUEST:
+      draft.Managers= [];
       draft.error = false;
       draft.loading = true;
       break;
-    case GET_MT5MANAGER_SUCCESS:
-      draft.mt5Managers = action.payload.map((item) => item);
+    case GET_MANAGER_SUCCESS:
+      draft.Managers = action.payload.map((item) => item);
       draft.error = false;
       draft.loading = false;
       break;
-    case GET_MT5MANAGER_FAILURE:
-      draft.mt5Managers = [];
+    case GET_MANAGER_FAILURE:
+      draft.Managers = [];
       draft.error = true;
       draft.loading = false;
       break;
@@ -129,6 +148,73 @@ const reducer = produce((draft, action) => {
       draft.loading = false;
       break;
 
+     // MT5SymbolsConfigurationsAndSuffixes
+     case GET_MT5SymbolsConfigurationsAndSuffixes_REQUEST:
+      draft.MT5SymbolsConfigurationsAndSuffixes= [];
+      draft.error = false;
+      draft.loading = true;
+      break;
+    case GET_MT5SymbolsConfigurationsAndSuffixes_SUCCESS:
+      draft.MT5SymbolsConfigurationsAndSuffixes = action.payload.map((item) => item);
+      draft.error = false;
+      draft.loading = false;
+      break;
+    case GET_MT5SymbolsConfigurationsAndSuffixes_FAILURE:
+      draft.MT5SymbolsConfigurationsAndSuffixes = [];
+      draft.error = true;
+      draft.loading = false;
+      break;
+
+    // COVERAGEACCOUNTS
+    case GET_COVERAGEACCOUNTS_REQUEST:
+      draft.CoverageAccounts= [];
+      draft.error = false;
+      draft.loading = true;
+      break;
+    case GET_COVERAGEACCOUNTS_SUCCESS:
+      draft.CoverageAccounts = action.payload.map((item) => item);
+      draft.error = false;
+      draft.loading = false;
+      break;
+    case GET_COVERAGEACCOUNTS_FAILURE:
+      draft.CoverageAccounts = [];
+      draft.error = true;
+      draft.loading = false;
+      break;
+    
+      // SERVERS
+    case GET_SERVERS_REQUEST:
+      draft.Servers= [];
+      draft.error = false;
+      draft.loading = true;
+      break;
+    case GET_SERVERS_SUCCESS:
+      draft.Servers = action.payload.map((item) => item);
+      draft.error = false;
+      draft.loading = false;
+      break;
+    case GET_SERVERS_FAILURE:
+      draft.Servers = [];
+      draft.error = true;
+      draft.loading = false;
+      break;
+
+    // SERVERS
+    case GET_MT5COVERAGESYMBOLS_REQUEST:
+      draft.MT5CoverageSymbols= [];
+      draft.error = false;
+      draft.loading = true;
+      break;
+    case GET_MT5COVERAGESYMBOLS_SUCCESS:
+      draft.MT5CoverageSymbols = action.payload.map((item) => item);
+      draft.error = false;
+      draft.loading = false;
+      break;
+    case GET_MT5COVERAGESYMBOLS_FAILURE:
+      draft.MT5CoverageSymbols = [];
+      draft.error = true;
+      draft.loading = false;
+      break;
 
     default:
       break;

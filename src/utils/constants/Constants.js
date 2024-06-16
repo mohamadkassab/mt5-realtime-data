@@ -1,5 +1,6 @@
 import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded";
 import ListAltIcon from "@mui/icons-material/ListAlt";
+import { symbolCellRender, coverageSymbolCellRender } from "../../components/cellRendering/CellRendering";
 
 // Common
 export const ATFXTOKEN = "ATFXTOKEN";
@@ -10,19 +11,28 @@ export const ROWS_PER_PAGE = [10, 15, 30];
 export const API_ADMIN_LOGIN = "/users/login/";
 
 // SHEET
-export const API_SHEET = "/";
+export const API_SHEET = "/users/dealerConfigurationsAndDetails/";
 
 // MANAGER
-export const API_MANAGER = "/admins/MT5ManagersAdmin/";
-
-// MT5MANAGER
-export const API_MT5MANAGER = "/users/MT5AllManagers/";
+export const API_MANAGER = "/users/MT5ManagersAdmin/";
 
 // MT5SYMBOLCONFIGURATION
 export const API_MT5SYMBOLCONFIGURATION = "/users/MT5SymbolsConfigurations/";
 
 // API_MT5SUFFIXES
 export const API_MT5SUFFIXES = "/users/MT5SymbolsSuffixes/";
+
+// API_COVERAGEACCOUNTS
+export const API_COVERAGEACCOUNTS = "/users/MT5CoverageAdmin/";
+
+// API_MT5SymbolsConfigurationsAndSuffixes
+export const API_MT5SymbolsConfigurationsAndSuffixes = "/admins/MT5SymbolsConfigurationsAndSuffixes/";
+
+// API_Servers
+export const API_SERVER = "/users/configurations/minimal/";
+
+// API_MT5COVERAGESYMBOLS
+export const API_MT5COVERAGESYMBOLS = "/users/MT5CoverageSymbols/";
 
 // API_401_RES
 export const API_401_RES = "Request failed with status code 401";
@@ -43,53 +53,60 @@ export const CoreMenu = [
   },
 ];
 
-export const Sheet1DataColumns = [
+export const SecondaryPages = [
+  {
+    name: "Create Sheet",
+    path: "/createSheet",
+
+  },
+];
+
+export const SheetDataColumns = [
   {
     dataField: "id",
     caption: "Id",
-    alignment: "left",
-    hideColumn: true,
   },
   {
     dataField: "sheet_name",
     caption: "Sheet Name",
-    alignment: "center",
   },
   {
     dataField: "visibility",
-    caption: "Visibility",
-    alignment: "center",
+    caption: "visibility",
   },
   {
     dataField: "server_id",
     caption: "Server",
-    alignment: "center",
   },
   {
     dataField: "manager_id",
     caption: "Manager",
-    alignment: "center",
   },
   {
     dataField: "symbol_configuration_id",
     caption: "Symbol Configuration",
-    alignment: "center",
   },
   {
     dataField: "dealer_id",
     caption: "Dealer Id",
-    alignment: "center",
   },
   {
     dataField: "dealer_manager_symbols_formulas",
     caption: "Dealer manager symbols formulas",
-    alignment: "center",
   },
   {
     dataField: "dealer_configuration_symbol_formula",
     caption: "Dealer configuration symbol formula",
-    alignment: "center",
   },
+  {
+    dataField: "symbol_configuration_name",
+    caption: "Symbol Configuration Name",
+  },
+  {
+    dataField: "managers_name",
+    caption: "managers Name",
+  },
+
 ];
 export const dealer_manager_symbols_formulas = [
   {
@@ -107,7 +124,7 @@ export const dealer_manager_symbols_formulas = [
 export const dealer_configuration_symbol_formula = [
   {
     dataField: "coverage_id",
-    caption: "Coverage Id ",
+    caption: "Coverage Account ",
     alignment: "left",
   },
   {
@@ -129,15 +146,52 @@ export const dealer_configuration_symbol_formula = [
 
 export const Sheet2DataColumns = [
   {
-    dataField: "configuration",
+    dataField: "name",
     caption: "Configuration",
     alignment: "left",
-    allowUpdating:false
+    allowUpdating:false,
+    sortable:true
+  },
+  {
+    dataField: "manager",
+    caption: "Manager",
+    alignment: "left",
+    allowUpdating:false,
+    sortable:true
   },
   {
     dataField: "symbol",
     caption: "Symbol",
     alignment: "left",
-    allowUpdating:false
+    allowUpdating:false,
+    sortable:true,
+    cellRender: (data) => symbolCellRender(data)
+    
   },
 ];
+
+export const Sheet3DataColumns = [
+  {
+    dataField: "empty",
+    caption: "",
+    alignment: "left",
+    allowUpdating:false,
+    sortable:true
+  },
+  {
+    dataField: "coverage",
+    caption: "Coverage",
+    alignment: "left",
+    allowUpdating:false,
+    sortable:true
+  },
+  {
+    dataField: "symbol",
+    caption: "Symbol",
+    alignment: "left",
+    allowUpdating:false,
+    sortable:true,
+    cellRender: (data) => coverageSymbolCellRender(data)
+  },
+];
+

@@ -27,7 +27,7 @@ function App() {
           <Route path="/" element={<SignIn />} />
           <Route element={<ProtectedRoute />}>
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="sheets" element={<ControlCenter />} />
+            <Route path="*" element={<ControlCenter />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -33,7 +33,7 @@ code {
 }
 
 .formulaGridContainer{
-  max-height: 34vh; 
+  max-height: 70vh; 
 }
 
 .dx-overlay-content {
@@ -41,4 +41,14 @@ code {
 }
 
 
+.data-grid-table th {
+  font-weight: bold;
+}
+
+.formulaGridContainer td {
+  cursor: default;
+}
+.always-visible-scrollbar .dx-scrollable {
+  overflow-y: scroll !important; /* Always show vertical scrollbar */
+}
 
