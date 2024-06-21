@@ -6,7 +6,11 @@ import { useDispatch, useSelector } from "react-redux";
 import AddButton from "../buttons/AddButton";
 import DataGridTable from "../common/DataGridTable";
 import { GetSheets, DeleteSheet } from "../../utils/redux/actions/Sheets";
-import { SheetDataColumns, ROWS_PER_PAGE } from "../../utils/constants/Constants";
+import {
+  SheetDataColumns,
+  ROWS_PER_PAGE,
+} from "../../utils/constants/Constants";
+import ConfigurationList from "../common/SheetDataDisplay";
 
 const SheetsDataTable = () => {
   const navigate = useNavigate();
@@ -22,14 +26,200 @@ const SheetsDataTable = () => {
   const [refresh, setRefresh] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
+  const sheets = 
+[
+      {
+        sheet_id: 1,
+        sheet_name: "sheet 1",
+        dealer_configuration_id: 121,
+        dealer_configurations: [
+          {
+            Dealer_Conf_Manager_id: 674,
+            server_name: "Dev",
+            Login: 1000,
+            SymbolSuffix: "XAUUSD",
+            MainSymbol: "XAUUSD",
+            Rules: [
+              {
+                name: "#1-col1",
+                value: "10",
+              },
+              {
+                name: "#2-col2",
+                value: "11",
+              },
+            ],
+          },
+          {
+            Dealer_Conf_Manager_id: 675,
+            Name: "Dev",
+            Login: 1000,
+            SymbolSuffix: "XAUUSD.v",
+            MainSymbol: "XAUUSD",
+            Rules: [
+              {
+                name: "#1-col1",
+                value: "12",
+              },
+              {
+                name: "#2-col2",
+                value: "13",
+              },
+            ],
+          },   
+          {
+            Dealer_Conf_Manager_id: 676,
+            server_name: "Dev",
+            Login: 1000,
+            SymbolSuffix: "EURUSD",
+            MainSymbol: "EURUSD",
+            Rules: [
+              {
+                name: "#1-col1",
+                value: "10",
+              },
+              {
+                name: "#2-col2",
+                value: "11",
+              },
+            ],
+          },
+          {
+            Dealer_Conf_Manager_id: 675,
+            Name: "Dev",
+            Login: 1000,
+            SymbolSuffix: "EURUSD.v",
+            MainSymbol: "EURUSD",
+            Rules: [
+              {
+                name: "#1-col1",
+                value: "12",
+              },
+              {
+                name: "#2-col2",
+                value: "13",
+              },
+            ],
+          },
+        ],
+        COVERAGE_DETAILS: [
+          {
+            Dealer_Conf_coverage_id: 675,
+            server_name: "Dev",
+            Coverage: "coverage account",
+            Symbol: "XAUUSD",
+            Rules: [
+              {
+                name: "#1-col1",
+                value: "12",
+              },
+              {
+                name: "#2-col2",
+                value: "13",
+              },
+            ],
+          },
+          {
+            Dealer_Conf_coverage_id: 675,
+            server_name: "Dev",
+            Login: 1000,
+            Symbol: "XAUUSD",
+            Rules: [
+              {
+                name: "#1-col1",
+                value: "12",
+              },
+              {
+                name: "#2-col2",
+                value: "13",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        sheet_id: 2,
+        sheet_name: "sheet 2",
+        dealer_configuration_id: 121,
+        dealer_configurations: [
+          {
+            Dealer_Conf_Manager_id: 674,
+            server_name: "Dev",
+            Login: 1001,
+            SymbolSuffix: "XAUUSD",
+            MainSymbol: "XAUUSD",
+            Rules: [
+              {
+                name: "#1-x1",
+                value: "10",
+              },
+              {
+                name: "#2-x2",
+                value: "11",
+              },
+            ],
+          },
+          {
+            Dealer_Conf_Manager_id: 675,
+            Name: "Dev",
+            Login: 1000,
+            SymbolSuffix: "XAUUSD.v",
+            MainSymbol: "XAUUSD",
+            Rules: [
+              {
+                name: "#1-x1",
+                value: "12",
+              },
+              {
+                name: "#2-x2",
+                value: "13",
+              },
+            ],
+          },
+        ],
+        COVERAGE_DETAILS: [
+          {
+            Dealer_Conf_coverage_id: 675,
+            server_name: "Dev",
+            Login: 1000,
+            Symbol: "XAUUSD",
+            Rules: [
+              {
+                name: "#1-x1",
+                value: "12",
+              },
+              {
+                name: "#2-x2",
+                value: "13",
+              },
+            ],
+          },
+          {
+            Dealer_Conf_coverage_id: 675,
+            server_name: "Dev",
+            Login: 1000,
+            Symbol: "XAUUSD",
+            Rules: [
+              {
+                name: "#1-x1",
+                value: "12",
+              },
+              {
+                name: "#2-x2",
+                value: "13",
+              },
+            ],
+          },
+        ],
+      },
+    ];
 
-  const confirmDeleteSentence = "Are you sure you want to delete this sheet account?";
-
-  useEffect(() => {
+  React.useEffect(() => {
     if (!error) {
       dispatch(GetSheets());
     }
   }, [dispatch, refresh, error]);
+
 
   const onDeleting = (data) => {
     if (data && data.id) {
@@ -60,7 +250,6 @@ const SheetsDataTable = () => {
   const onEditing = (data) => {
     if (data) {
       setDataToBeEdited(data);
-
     }
   };
 
@@ -70,24 +259,10 @@ const SheetsDataTable = () => {
 
   return (
     <div>
-      {showConfirmDialog && (
-        <ConfirmDialog
-          confirmDelete={confirmDelete}
-          confirmSentence={confirmDeleteSentence}
-          data={itemToDelete}
-        />
-      )}
       <div>
-        <div className="flex justify-end">
-          <AddButton onClick={onInserting} />
-        </div>
-        <DataGridTable
-          data={data || []}
-          onExporting={onExporting}
-          allowedPageSizes={allowedPageSizes}
-          onEditing={onEditing}
-          onDeleting={onDeleting}
-          columns={SheetDataColumns}
+        <ConfigurationList
+          sheets={sheets}
+          onInserting={onInserting}
         />
       </div>
     </div>
@@ -95,4 +270,3 @@ const SheetsDataTable = () => {
 };
 
 export default SheetsDataTable;
-

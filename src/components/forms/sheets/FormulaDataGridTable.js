@@ -15,8 +15,6 @@ const FormulaDataGridTable = ({
   setColumns3,
   symbolsFormulas,
   setSymbolsFormulas,
-  columnsCaption,
-  setColumnsCaption,
   coverageSymbolsFormulas,
   setCoverageSymbolsFormulas,
 }) => {
@@ -31,14 +29,14 @@ const FormulaDataGridTable = ({
     updatedColumns2.forEach((obj, index) => {
       if (index >= sheet2ColumnsLength) {
         obj.dataField = `#${index + 1 - sheet2ColumnsLength}`;
-        obj.caption = `#${index + 1 - sheet2ColumnsLength}`;
+        obj.caption = `#${index + 1 - sheet2ColumnsLength}-${obj.caption.slice(obj.caption.lastIndexOf('-') + 1).trim()}`;
       }
     });
 
     updatedColumns3.forEach((obj, index) => {
       if (index >= sheet3ColumnsLength) {
         obj.dataField = `#${index + 1 - sheet3ColumnsLength}`;
-        obj.caption = `#${index + 1 - sheet3ColumnsLength}`;
+        obj.caption = `#${index + 1 - sheet3ColumnsLength}-${obj.caption.slice(obj.caption.lastIndexOf('-') + 1).trim()}`;
       }
     });
 
@@ -80,48 +78,9 @@ const FormulaDataGridTable = ({
     setCoverageSymbolsFormulas(updatedData3);
   };
 
-  const handleCaptionChange = (e) => {
-    if (e.parentType === "dataRow") {
-      e.editorElement.onchange = (event) => {
-        const newValue = event.target.value;
-        const dataField = e.dataField;
-        setColumnsCaption({
-          ...columnsCaption,
-          [dataField]: newValue,
-        });
-      };
-    }
-  };
-
-  React.useEffect(()=>{
-    for (let i = 1; i <= columns2.length; i++) {
-      columnsCaption[`note${i}`] = columnsCaption[`note${i}`] || `Note`;
-    }
-  });
 
   return (
     <div className="mt-8">
- 
-      <DataGrid
-        dataSource={[columnsCaption]}
-        showBorders={true}
-        focusedRowEnabled={true}
-        showColumnHeaders={false}
-        onEditorPrepared={handleCaptionChange}
-      >
-        <Editing mode="cell" allowUpdating={true} />
-        {columns2?.map((col, index) => (
-          <Column
-            key={`datagrid0-${index}`}
-            dataField={`note${index + 1}`}
-            caption={`Note ${index + 1}`}
-            alignment={col.alignment}
-            dataType="text"
-          />
-        ))}
-        <Paging enabled={false} />
-      </DataGrid>
-
       <DataGrid
         dataSource={symbolsFormulas}
         className="formulaGridContainer my-2 always-visible-scrollbar"

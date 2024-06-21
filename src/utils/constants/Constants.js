@@ -10,8 +10,11 @@ export const ROWS_PER_PAGE = [10, 15, 30];
 // AUTH
 export const API_ADMIN_LOGIN = "/users/login/";
 
-// SHEET
+// SHEET POST
 export const API_SHEET = "/users/dealerConfigurationsAndDetails/";
+
+// SHEET GET
+export const API_GET_SHEET = "/users/allDealerConfigurationsAndDetails/";
 
 // MANAGER
 export const API_MANAGER = "/users/MT5ManagersAdmin/";

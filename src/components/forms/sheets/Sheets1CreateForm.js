@@ -114,18 +114,16 @@ const Sheets1CreateForm = ({
         value={formData[columns[1].dataField]}
         onChange={handleChangeFormData}
         sx={{
-          "@media (min-width: 1000px)": {
-            width: "300px",
-          },
+          width: "100%",
+          "@media (min-width: 1000px)": {},
         }}
       />
 
       <FormControl
-        sx={{
-          "@media (min-width: 1000px)": {
-            width: "300px",
-          },
-        }}
+            sx={{
+              width: "100%",
+              "@media (min-width: 1000px)": {},
+            }}
         variant="outlined"
       >
         <Autocomplete
@@ -157,11 +155,10 @@ const Sheets1CreateForm = ({
       </FormControl>
 
       <FormControl
-        sx={{
-          "@media (min-width: 1000px)": {
-            width: "300px",
-          },
-        }}
+          sx={{
+            width: "100%",
+            "@media (min-width: 1000px)": {},
+          }}
         variant="outlined"
       >
         <Autocomplete
@@ -199,16 +196,15 @@ const Sheets1CreateForm = ({
               </li>
             );
           }}
-          renderTags={() => null}
+          // renderTags={() => null}
         />
       </FormControl>
 
       <FormControl
-        sx={{
-          "@media (min-width: 1000px)": {
-            width: "300px",
-          },
-        }}
+            sx={{
+              width: "100%",
+              "@media (min-width: 1000px)": {},
+            }}
         variant="outlined"
       >
         <Autocomplete
@@ -246,7 +242,7 @@ const Sheets1CreateForm = ({
               </li>
             );
           }}
-          renderTags={() => null}
+          // renderTags={() => null}
         />
       </FormControl>
 
@@ -395,7 +391,7 @@ const Sheets1CreateForm = ({
                           </li>
                         );
                       }}
-                      renderTags={() => null}
+                      // renderTags={() => null}
                     />
                   </FormControl>
 

@@ -30,6 +30,9 @@ import {
   GET_MT5COVERAGESYMBOLS_REQUEST,
   GET_MT5COVERAGESYMBOLS_SUCCESS,
   GET_MT5COVERAGESYMBOLS_FAILURE,
+  GET_SHEET_REQUEST,
+  GET_SHEET_SUCCESS,
+  GET_SHEET_FAILURE,
 
   
 
@@ -38,7 +41,6 @@ import {produce} from "immer";
 import { ATFXTOKEN } from "../constants/Constants";
 
 const initialState = {
-
   Managers: [],
   mt5SymbolConfigurations: [],
   mt5Suffixes: [],
@@ -46,6 +48,7 @@ const initialState = {
   CoverageAccounts:[],
   Servers:[],
   MT5CoverageSymbols:[],
+  sheets:[],
   isAuthenticated: localStorage.getItem(ATFXTOKEN) || false,
   blur: false,
   loading: false,
@@ -212,6 +215,23 @@ const reducer = produce((draft, action) => {
       break;
     case GET_MT5COVERAGESYMBOLS_FAILURE:
       draft.MT5CoverageSymbols = [];
+      draft.error = true;
+      draft.loading = false;
+      break;
+
+    // SHEETS
+    case GET_SHEET_REQUEST:
+      draft.sheets= [];
+      draft.error = false;
+      draft.loading = true;
+      break;
+    case GET_SHEET_SUCCESS:
+      draft.sheets = action.payload.configurations.map((item) => item);
+      draft.error = false;
+      draft.loading = false;
+      break;
+    case GET_SHEET_FAILURE:
+      draft.sheets = [];
       draft.error = true;
       draft.loading = false;
       break;

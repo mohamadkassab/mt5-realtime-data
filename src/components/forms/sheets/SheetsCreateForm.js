@@ -22,14 +22,19 @@ import Sheets1CreateForm from "./Sheets1CreateForm";
 import Sheets2CreateForm from "./Sheets2CreateForm";
 import AddButton from "../../buttons/AddButton";
 import { cellRenderPercentage } from "../../cellRendering/CellRendering";
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
+import InputDialog from "../../common/InputDialog";
 // End relative variables
 
 const SheetsCreateForm = () => {
   const dispatch = useDispatch();
   const stepperRef = useRef();
-  const mt5SymbolConfigurations = useSelector((state) => state.mt5SymbolConfigurations);
-  const MT5SymbolsConfigurationsAndSuffixes = useSelector((state) => state.MT5SymbolsConfigurationsAndSuffixes);
+  const mt5SymbolConfigurations = useSelector(
+    (state) => state.mt5SymbolConfigurations
+  );
+  const MT5SymbolsConfigurationsAndSuffixes = useSelector(
+    (state) => state.MT5SymbolsConfigurationsAndSuffixes
+  );
   const Managers = useSelector((state) => state.Managers);
   const mt5CoverageAccounts = useSelector((state) => state.CoverageAccounts);
   const MT5CoverageSymbols = useSelector((state) => state.MT5CoverageSymbols);
@@ -38,6 +43,7 @@ const SheetsCreateForm = () => {
   const [coverageSymbolsFormulas, setCoverageSymbolsFormulas] = useState([]);
   const [selectedSymbolsData, setSelectedSymbolsData] = useState([]);
   const [selectedSymbols, setSelectedSymbols] = useState([]);
+  const [showCaptionBox, setShowCaptionBox] = useState(false);
   const [columns2, setColumns2] = useState(Sheet2DataColumns);
   const [columns3, setColumns3] = useState(Sheet3DataColumns);
   const columns = SheetDataColumns;
@@ -54,8 +60,11 @@ const SheetsCreateForm = () => {
     [columns[8].dataField]: [],
     [columns[9].dataField]: [],
     [columns[10].dataField]: [],
-});
+  });
   const steps = ["Managers & Coverages", "Formulas"];
+  const confirmSentece = "Please enter a caption for the new formula";
+  const dataName = "formulaCaption";
+  const titleInputDialog = "Formula column caption";
   const isSymbolConfIdChange = formData[columns[5].dataField];
   const isManagerIdChange = formData[columns[4].dataField];
   const [sheetVisibility, setSheetVisibility] = React.useState([true, false]);
@@ -95,25 +104,41 @@ const SheetsCreateForm = () => {
     e.preventDefault();
     const token = localStorage.getItem(ATFXTOKEN);
     const decodedToken = jwtDecode(token);
-    const transformedData = transformSheetData(decodedToken, formData, symbolsFormulas, coverageSymbolsFormulas, columnsCaption, columns2.length);
+    const transformedData = transformSheetData(
+      decodedToken,
+      formData,
+      symbolsFormulas,
+      coverageSymbolsFormulas,
+      columns2
+    );
+    console.log(transformedData);
     dispatch(CreateSheet(transformedData));
   };
 
-  const handleAddColumn = ()=>{
-    const sheet2ColumnsLength = Sheet2DataColumns.length;
-    if (columns2.length < sheet2ColumnsLength + 4) {
-      const newColumn = {
-        dataField: `#${columns2.length - (sheet2ColumnsLength - 1)}`,
-        caption: `#${columns2.length - (sheet2ColumnsLength - 1)}`,
-        allowUpdating: true,
-        dataType: "number",
-        alignment: "left",
-        cellRender: (cellData) => cellRenderPercentage(cellData),
-      };
-      setColumns2([...columns2, newColumn]);
-      setColumns3([...columns3, newColumn]);
+  const handleAddColumn = (columnCaption) => {
+    setShowCaptionBox(false);
+    if (columnCaption !== "") {
+      const sheet2ColumnsLength = Sheet2DataColumns.length;
+      if (columns2.length < sheet2ColumnsLength + 4) {
+        const newColumn = {
+          dataField: `#${columns2.length - (sheet2ColumnsLength - 1)}`,
+          caption: `#${
+            columns2.length - (sheet2ColumnsLength - 1)
+          }-${columnCaption}`,
+          allowUpdating: true,
+          dataType: "number",
+          alignment: "left",
+          cellRender: (cellData) => cellRenderPercentage(cellData),
+        };
+        setColumns2([...columns2, newColumn]);
+        setColumns3([...columns3, newColumn]);
+      }
     }
-  }
+  };
+
+  const handleShowInputDialog = () => {
+    setShowCaptionBox(true);
+  };
 
   const goBack = () => {
     setIsLastSheet(false);
@@ -196,8 +221,6 @@ const SheetsCreateForm = () => {
     checkLastTrueIndex();
   }, [sheetVisibility]);
 
-
-
   return (
     <div className="">
       <Box
@@ -223,13 +246,24 @@ const SheetsCreateForm = () => {
                 </div>
                 <div className="flex justify-end items-center">
                   {sheetVisibility[1] && (
-                  <AddButton onClick={handleAddColumn} caption="Formula" />
-                )}
+                    <AddButton
+                      onClick={handleShowInputDialog}
+                      caption="Formula"
+                    />
+                  )}
                 </div>
               </div>
 
               <div className="min-h-[50vh] flex items-center">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 ">
+                  {showCaptionBox && (
+                    <InputDialog
+                      title={titleInputDialog}
+                      onSubmit={handleAddColumn}
+                      confirmSentece={confirmSentece}
+                      dataName={dataName}
+                    />
+                  )}
                   {sheetVisibility[0] && (
                     <Sheets1CreateForm
                       formData={formData}
@@ -247,8 +281,6 @@ const SheetsCreateForm = () => {
                       setColumns3={setColumns3}
                       symbolsFormulas={symbolsFormulas}
                       setSymbolsFormulas={setSymbolsFormulas}
-                      columnsCaption={columnsCaption}
-                      setColumnsCaption={setColumnsCaption}
                       coverageSymbolsFormulas={coverageSymbolsFormulas}
                       setCoverageSymbolsFormulas={setCoverageSymbolsFormulas}
                     />

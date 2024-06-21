@@ -12286,6 +12286,9 @@
 .dx-datagrid-headers .dx-datagrid-table .dx-row > td:hover .dx-datagrid-text-content {
   color: #242424;
 }
+.dx-datagrid-headers .dx-datagrid-table .dx-row > td .dx-datagrid-text-content {
+  color: #242424;
+}
 .dx-datagrid-headers .dx-datagrid-table .dx-row > td:hover:not(.dx-command-select):not(.dx-command-expand):not(.dx-editor-cell):not(.dx-command-edit):not(.dx-datagrid-group-space) {
   background-color: #f5f5f5;
 }

@@ -120,10 +120,10 @@ export const transformSheetData = (
   formData,
   symbolsFormulas,
   coverageSymbolsFormulas,
-  columnsCaption,
-  columnsLength
+  columns2
 ) => {
   const Rules = [];
+  const captions = [];
   let maxIndex = 0;
   const rulesStruct = {
     name: "",
@@ -134,34 +134,23 @@ export const transformSheetData = (
   };
 
   function afterMaxIndex() {
-    symbolsFormulas.forEach((item) => {
-      for (const key in item) {
-        if (key.startsWith("#")) {
-          const index = parseInt(key.substring(1));
-          maxIndex = Math.max(maxIndex, index);
-        }
-      }
-    });
-
-    coverageSymbolsFormulas.forEach((item) => {
-      for (const key in item) {
-        if (key.startsWith("#")) {
-          const index = parseInt(key.substring(1));
-          maxIndex = Math.max(maxIndex, index);
-        }
+    columns2.forEach((item, index) => {
+      if ((item.dataField).startsWith("#")) {
+        maxIndex = maxIndex + 1;
+        captions.push(item.caption);
       }
     });
 
     if (maxIndex > 0) {
       for (let i = 0; i < maxIndex; i++) {
-        const index = columnsLength - maxIndex + i + 1;
+        // const index = columns2.length - maxIndex + i + 1;
         const newRule = { ...rulesStruct };
-        newRule.name = columnsCaption[`note${index}`];
+        newRule.name = `${captions[i]}`;
 
         newRule.details = {
           ...newRule.details,
           dealer_manager_symbols_formulas: [],
-          dealer_coverage_symbols_formulas: [],
+          dealer_coverage_symbol_formula: [],
         };
 
         symbolsFormulas.forEach((item) => {
@@ -178,7 +167,7 @@ export const transformSheetData = (
           const newSymbol = {
             symbol: item.symbol,
             coverage_id: item.coverageId,
-            value: item[`#${i}`] || 0,
+            value: item[`#${i + 1}`] || 0,
           };
           newRule.details.dealer_coverage_symbol_formula.push(newSymbol);
         });
@@ -187,12 +176,12 @@ export const transformSheetData = (
       }
     } else {
       const newRule = { ...rulesStruct };
-      newRule.name = `Note`;
+      newRule.name = `Note 1`;
 
       newRule.details = {
         ...newRule.details,
         dealer_manager_symbols_formulas: [],
-        dealer_coverage_symbols_formulas: [],
+        dealer_coverage_symbol_formula: [],
       };
 
       symbolsFormulas.forEach((item) => {
@@ -219,7 +208,6 @@ export const transformSheetData = (
   }
 
   afterMaxIndex();
-
   return {
     sheet_name: formData.sheet_name,
     dealer_id: decodedToken.id,
@@ -228,4 +216,3 @@ export const transformSheetData = (
     Rules: Rules,
   };
 };
-

@@ -1,5 +1,5 @@
 import React from "react";
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 
 export const booleanCellRender = ({ value }) => {
   return (
@@ -20,40 +20,40 @@ export const cellRenderPercentage = (cellData) => {
 };
 
 
-export const headerCellRender = (col, handleRemoveColumn) => {
+export const headerCellRender = (
+  col,
+  handleRemoveColumn,
+) => {
+
   return (headerInfo) => {
-    const { column, columnIndex } = headerInfo; // assuming headerInfo has these properties
+    const { column, columnIndex } = headerInfo;
     return (
-      <div className="header-cell flex items-center ">
+      <div className="header-cell flex items-center justify-center ">
         <span>{col.caption}</span>
         {col.caption.startsWith("#") && (
-        <RemoveCircleOutlineIcon
-        className='md:ml-8 sm:ml-4 hover:cursor-pointer' 
-          onClick={(e) => handleRemoveColumn(e, col)}
-          columnindex={columnIndex} 
-        />    )}
+          <>
+            <RemoveCircleOutlineIcon
+              className="md:ml-8 sm:ml-4 hover:cursor-pointer"
+              onClick={(e) => handleRemoveColumn(e, col)}
+              columnindex={columnIndex}
+            />
+          </>
+        )}
       </div>
     );
   };
 };
 
-export const symbolCellRender = ( data) => {
-  const cellStyle = data.data.isKey ? {color: 'green', fontWeight: 'bold'} : {};
-  
-  return (
-    <div style={cellStyle}>
-      {data.value}
-    </div>
-  );
+export const symbolCellRender = (data) => {
+  const cellStyle = data.data.isKey
+    ? { color: "green", fontWeight: "bold" }
+    : {};
+
+  return <div style={cellStyle}>{data.value}</div>;
 };
 
-export const coverageSymbolCellRender = ( data) => {
-  const cellStyle = {color: 'green', fontWeight: 'bold'} ;
-  
-  return (
-    <div style={cellStyle}>
-      {data.value}
-    </div>
-  );
-};
+export const coverageSymbolCellRender = (data) => {
+  const cellStyle = { color: "green", fontWeight: "bold" };
 
+  return <div style={cellStyle}>{data.value}</div>;
+};
