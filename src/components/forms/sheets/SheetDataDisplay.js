@@ -10,9 +10,9 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import AddButton from "../buttons/AddButton";
-import EditButton from "../buttons/EditButtons";
-import SheetHeaderCell from "./SheetHeaderCell";
+import AddButton from "../../buttons/AddButton";
+import EditButton from "../../buttons/EditButtons";
+import { SheetHeaderCell } from "../../cellRendering/CellRendering";
 
 const ConfigurationSheet = ({ sheet }) => {
   const [ruleNames, setRuleNames] = useState([]);
@@ -55,19 +55,19 @@ const ConfigurationSheet = ({ sheet }) => {
     }
   }, [sheet]);
 
-  React.useEffect(() => {
-    if (sheet?.COVERAGE_DETAILS) {
-      const newTotalsSheet = {
-        coverage_conf: { totalBuySheet: 0, totalSellSheet: 0 },
-      };
+  // React.useEffect(() => {
+  //   if (sheet?.COVERAGE_DETAILS) {
+  //     const newTotalsSheet = {
+  //       coverage_conf: { totalBuySheet: 0, totalSellSheet: 0 },
+  //     };
 
-      sheet.COVERAGE_DETAILS.forEach((config, index) => {
-        newTotalsSheet["coverage_conf"].totalBuySheet += index * index;
-        newTotalsSheet["coverage_conf"].totalSellSheet += (index * index) / 1.6;
-      });
-      setTotalsSheets(newTotalsSheet);
-    }
-  }, [sheet]);
+  //     sheet.COVERAGE_DETAILS.forEach((config, index) => {
+  //       newTotalsSheet["coverage_conf"].totalBuySheet += index * index;
+  //       newTotalsSheet["coverage_conf"].totalSellSheet += (index * index) / 1.6;
+  //     });
+  //     setTotalsSheets(newTotalsSheet);
+  //   }
+  // }, [sheet]);
 
   return (
     <Box elevation={3}>
@@ -87,10 +87,10 @@ const ConfigurationSheet = ({ sheet }) => {
               <SheetHeaderCell caption={`Sell Vol`} />
               <SheetHeaderCell caption={`Net Vol`} />
               {ruleNames.map((name, index) => (
-                <>
+                <React.Fragment key={`header-${index}`}>
                   <SheetHeaderCell caption={name || `formula-${index + 1}`} />
                   <SheetHeaderCell caption={`Result ${index + 1}`} />
-                </>
+                </React.Fragment>
               ))}
             </TableRow>
           </TableHead>
@@ -99,8 +99,8 @@ const ConfigurationSheet = ({ sheet }) => {
             {sheet?.dealer_configurations?.map((config, index) => {
               const nextConfig = sheet?.dealer_configurations?.[index + 1];
               return (
-                <>
-                  <TableRow key={index}>
+                <React.Fragment key={`conf-${index}`}>
+                  <TableRow>
                     <TableCell>{config.Login}</TableCell>
                     <TableCell
                       style={
@@ -118,7 +118,7 @@ const ConfigurationSheet = ({ sheet }) => {
                     </TableCell>
 
                     {config.Rules?.map((rule, ruleIndex) => (
-                      <>
+                      <React.Fragment key={`conf-rule-${ruleIndex}`}>
                         <TableCell>{`${rule.value}%`}</TableCell>
                         <TableCell>
                           {(
@@ -126,13 +126,13 @@ const ConfigurationSheet = ({ sheet }) => {
                             (rule.value / 100)
                           ).toFixed(3)}
                         </TableCell>
-                      </>
+                      </React.Fragment>
                     ))}
                   </TableRow>
 
                   {nextConfig?.MainSymbol !== config.MainSymbol && (
                     <TableRow
-                      key={`total-${sheet.dealer_configurations.MainSymbol}`}
+                      key={`total-symbol-conf-${sheet.dealer_configurations.MainSymbol}`}
                     >
                       <TableCell></TableCell>
                       <TableCell
@@ -142,7 +142,7 @@ const ConfigurationSheet = ({ sheet }) => {
                           fontWeight: "bold",
                         }}
                       >
-                        {`Total`}{" "}
+                        {`Total`}
                       </TableCell>
                       <TableCell>
                         {totalsSymbols[config.MainSymbol]?.totalBuySymbol || 0}
@@ -157,14 +157,14 @@ const ConfigurationSheet = ({ sheet }) => {
                       <TableCell></TableCell>
                     </TableRow>
                   )}
-                </>
+                </React.Fragment>
               );
             })}
 
             {sheet?.dealer_configurations?.length > 0 && (
               <>
                 <TableRow
-                  key={`total-${sheet.dealer_configurations.MainSymbol}`}
+                  key={`total-sheet-conf${sheet.dealer_configurations.MainSymbol}`}
                 >
                   <TableCell></TableCell>
                   <TableCell
@@ -193,8 +193,8 @@ const ConfigurationSheet = ({ sheet }) => {
 
             {sheet?.COVERAGE_DETAILS?.map((config, index) => {
               return (
-                <>
-                  <TableRow key={index}>
+                <React.Fragment key={`coverageConf-${index}`}>
+                  <TableRow>
                     <TableCell>{config.Coverage}</TableCell>
                     <TableCell>{config.Symbol}</TableCell>
                     <TableCell>{index * index}</TableCell>
@@ -204,7 +204,7 @@ const ConfigurationSheet = ({ sheet }) => {
                     </TableCell>
 
                     {config.Rules?.map((rule, ruleIndex) => (
-                      <>
+                      <React.Fragment key={`coverageConfRule-${ruleIndex}`}>
                         <TableCell>{`${rule.value}%`}</TableCell>
                         <TableCell>
                           {(
@@ -212,17 +212,17 @@ const ConfigurationSheet = ({ sheet }) => {
                             (rule.value / 100)
                           ).toFixed(3)}
                         </TableCell>
-                      </>
+                      </React.Fragment>
                     ))}
                   </TableRow>
-                </>
+                </React.Fragment>
               );
             })}
 
             {sheet?.COVERAGE_DETAILS?.length > 0 && (
               <>
                 <TableRow
-                  key={`total-${sheet.dealer_configurations.MainSymbol}`}
+                  key={`total-sheet-coverage-conf-${sheet.dealer_configurations.MainSymbol}`}
                 >
                   <TableCell></TableCell>
                   <TableCell
@@ -249,7 +249,9 @@ const ConfigurationSheet = ({ sheet }) => {
               </>
             )}
 
-            <TableRow key={`total-${sheet.dealer_configurations.MainSymbol}`}>
+            <TableRow
+              key={`total-covered-${sheet.dealer_configurations.MainSymbol}`}
+            >
               <TableCell></TableCell>
               <TableCell
                 sx={{
@@ -275,12 +277,14 @@ const ConfigurationSheet = ({ sheet }) => {
   );
 };
 
-const ConfigurationList = ({ sheets, onInserting }) => {
+const ConfigurationList = ({ sheets, onInserting, onEditing, selectSheetId }) => {
   const [selectedTab, setSelectedTab] = useState(0);
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
+    selectSheetId(sheets[newValue].sheet_id);
   };
+  
   return (
     <Box>
       <div className="flex items-center justify-between">
@@ -295,13 +299,13 @@ const ConfigurationList = ({ sheets, onInserting }) => {
           {sheets.map((sheet, index) => (
             <Tab
               label={sheet.sheet_name}
-              key={index}
+              key={sheet.sheet_id}
               sx={{ fontWeight: 700 }}
             />
           ))}
         </Tabs>
         <div className="flex gap-4">
-          <EditButton onClick={onInserting} />
+          <EditButton onClick={onEditing} />
           <AddButton onClick={onInserting} />
         </div>
       </div>

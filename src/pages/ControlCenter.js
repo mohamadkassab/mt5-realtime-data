@@ -4,6 +4,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import SheetsDataTable from "../components/tables/SheetsDataTable";
 import SheetsCreateForm from "../components/forms/sheets/SheetsCreateForm";
+import SheetsEditForm from "../components/forms/sheets/SheetsEditForm";
 
 const ControlCenter = () => {
   const location = useLocation();
@@ -34,6 +35,7 @@ const ControlCenter = () => {
     <DefaultLayout componentName={pageName}>
       {location.pathname === "/sheets" ? <SheetsDataTable /> : <></>}
       {location.pathname === "/createSheet" ? <SheetsCreateForm /> : <></>}
+      {location.pathname === "/editSheet" ? <SheetsEditForm /> : <></>}
     </DefaultLayout>
   );
 };

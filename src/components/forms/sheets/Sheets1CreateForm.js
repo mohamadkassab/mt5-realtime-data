@@ -53,6 +53,10 @@ const Sheets1CreateForm = ({
     dispatch(GetMT5CoverageSymbols());
   }, [dispatch]);
 
+
+
+
+
   React.useEffect(() => {
     try {
       const filteredManager = Managers.filter(

@@ -62,6 +62,11 @@ export const SecondaryPages = [
     path: "/createSheet",
 
   },
+  {
+    name: "Edit Sheet",
+    path: "/editSheet",
+
+  },
 ];
 
 export const SheetDataColumns = [
