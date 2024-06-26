@@ -215,17 +215,17 @@ const ConfigurationSheet = ({ sheet }) => {
                     </TableCell>
                     <TableCell>{config.BuyVol}</TableCell>
                     <TableCell>{config.SellVol}</TableCell>
-                    <TableCell>{isNaN(netVol) ? "0.000" : netVol}</TableCell>
+                    <TableCell>{isNaN(netVol) ? 0 : netVol}</TableCell>
                     {/* Start display rules values and results */}
                     {config.Rules?.map((rule, ruleIndex) => {
                       const ruleValue = `${rule.value}%`;
                       const ruleResult = (
                         (config.BuyVol - config.SellVol) * (rule.value / 100)
-                      ).toFixed(3);
+                      ).toFixed(2);
                       return (
                         <React.Fragment key={`conf-rule-${ruleIndex}`}>
                           <TableCell>{ruleValue}</TableCell>
-                          <TableCell>{isNaN(ruleResult) ? "0.000" : ruleResult}</TableCell>
+                          <TableCell>{isNaN(ruleResult) ? 0 : ruleResult}</TableCell>
                         </React.Fragment>
                       );
                     })}
@@ -258,11 +258,11 @@ const ConfigurationSheet = ({ sheet }) => {
                           ?.totalNetSymbol || 0}
                       </TableCell>
                       {config.Rules?.map((rule, ruleIndex) => {
-                        const totalResult = totalByConf[`${config.MainSymbol}${config.Login}`]?.totalResult[ruleIndex]?.toFixed(3) || "0.000";
+                        const totalResult = totalByConf[`${config.MainSymbol}${config.Login}`]?.totalResult[ruleIndex]?.toFixed(2) || 0;
                         return (
                           <React.Fragment key={`conf-rule-${ruleIndex}`}>
                             <TableCell></TableCell>
-                            <TableCell>{totalResult}</TableCell>
+                            <TableCell>{totalResult === "0.00" ? 0 : totalResult}</TableCell>
                           </React.Fragment>
                         );
                       })}
@@ -291,8 +291,8 @@ const ConfigurationSheet = ({ sheet }) => {
                   <TableCell>{totalByManyConf?.totalNetSheet || 0}</TableCell>
                   {rulesName.map((_, ruleIndex) => {
                     const totalResult = totalByManyConf.totalResult && totalByManyConf.totalResult[ruleIndex]
-                      ? totalByManyConf.totalResult[ruleIndex].toFixed(3)
-                      : "0.000";
+                      ? totalByManyConf.totalResult[ruleIndex].toFixed(2)
+                      : 0;
                     return (
                       <React.Fragment key={`conf-rule-${ruleIndex}`}>
                         <TableCell></TableCell>
@@ -314,16 +314,16 @@ const ConfigurationSheet = ({ sheet }) => {
                     <TableCell>{config.Symbol}</TableCell>
                     <TableCell>{config.BuyVol}</TableCell>
                     <TableCell>{config.SellVol}</TableCell>
-                    <TableCell>{isNaN(netVol) ? "0.000" : netVol}</TableCell>
+                    <TableCell>{isNaN(netVol) ? 0 : netVol}</TableCell>
                     {config.Rules?.map((rule, ruleIndex) => {
                       const ruleValue = `${rule.value}%`;
                       const ruleResult = (
                         (config.BuyVol - config.SellVol) * (rule.value / 100)
-                      ).toFixed(3);
+                      ).toFixed(2);
                       return (
                         <React.Fragment key={`coverageConfRule-${ruleIndex}`}>
                           <TableCell>{ruleValue}</TableCell>
-                          <TableCell>{isNaN(ruleResult) ? "0.000" : ruleResult}</TableCell>
+                          <TableCell>{isNaN(ruleResult) ? 0 : ruleResult}</TableCell>
                         </React.Fragment>
                       );
                     })}
@@ -351,8 +351,8 @@ const ConfigurationSheet = ({ sheet }) => {
                   <TableCell>{totalByManyCoverageConf?.totalNetSheet || 0}</TableCell>
                   {rulesName.map((_, ruleIndex) => {
                     const totalResult = totalByManyCoverageConf.totalResult && totalByManyCoverageConf.totalResult[ruleIndex]
-                      ? totalByManyCoverageConf.totalResult[ruleIndex].toFixed(3)
-                      : "0.000";
+                      ? totalByManyCoverageConf.totalResult[ruleIndex].toFixed(2)
+                      : 0;
                     return (
                       <React.Fragment key={`conf-rule-${ruleIndex}`}>
                         <TableCell></TableCell>
@@ -376,11 +376,11 @@ const ConfigurationSheet = ({ sheet }) => {
               >
                 {"Covered"}
               </TableCell>
-              <TableCell>{totalCovered?.totals?.coveredBuy.toFixed(3)}</TableCell>
-              <TableCell>{totalCovered?.totals?.coveredSell.toFixed(3)}</TableCell>
-              <TableCell>{totalCovered?.totals?.coveredNet.toFixed(3)}</TableCell>
+              <TableCell>{isNaN(totalCovered?.totals?.coveredBuy) ? 0 : totalCovered?.totals?.coveredBuy.toFixed(2)}</TableCell>
+              <TableCell>{isNaN(totalCovered?.totals?.coveredSell) ? 0 : totalCovered?.totals?.coveredSell.toFixed(2)}</TableCell>
+              <TableCell>{isNaN(totalCovered?.totals?.coveredNet) ? 0 : totalCovered?.totals?.coveredNet.toFixed(2)}</TableCell>
               {rulesName.map((_, ruleIndex) => {
-                const coveredResult = totalCovered?.totals?.coveredResult[ruleIndex]?.toFixed(3) || "0.000";
+                const coveredResult = isNaN(totalCovered?.totals?.coveredResult[ruleIndex])? 0 : totalCovered?.totals?.coveredResult[ruleIndex]?.toFixed(2);
                 return (
                   <React.Fragment key={`conf-rule-${ruleIndex}`}>
                     <TableCell></TableCell>
