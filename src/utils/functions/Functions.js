@@ -46,72 +46,135 @@ export const goNextFunc = (prevVisibility, setSheetVisibility) => {
   });
 };
 
-export const transformData = (data, managers, managersIds) => {
-  const newData = [];
-  if (managers && data) {
-    managers.forEach((manager, index) => {
-      const managerName = manager;
-      const managerId = managersIds[index];
+export const transformData = (
+  data,
+  managers,
+  managersIds,
+  sheetToEdit,
+  setSheetToEdit
+) => {
+  if (sheetToEdit && sheetToEdit.sheet_id) {
+    const newData = [];
+    let counter = 1;
+    sheetToEdit?.formulas?.forEach((item) => {
+      const managerIndex = managersIds.findIndex(
+        (id) => id === item.manager_id
+      );
+      const newItem = {
+        name: item.configuration_id,
+        manager: managers[managerIndex] || "",
+        symbol: item.SymbolSuffix,
+        isKey: item.SymbolSuffix === item.MainSymbol ? true : false,
+        symbol_configuration_id: item.configuration_id,
+        manager_id: item.manager_id,
+      };
 
-      data.forEach((item) => {
-        newData.push({
-          name: item.name,
-          manager: managerName,
-          symbol: item.symbol,
-          multiplier: item.multiplier,
-          isKey: true,
-          symbol_configuration_id: item.id,
-          manager_id: managerId,
-        });
-        item.suffixes.forEach((suffix) => {
+      item.values.forEach((valueItem) => {
+        newItem[`#${counter}`] = valueItem.value;
+        counter++;
+      });
+
+      newData.push(newItem);
+    });
+
+    return newData;
+  } else {
+    const newData = [];
+    if (managers && data) {
+      managers.forEach((manager, index) => {
+        const managerName = manager;
+        const managerId = managersIds[index];
+
+        data.forEach((item) => {
           newData.push({
             name: item.name,
             manager: managerName,
-            symbol: suffix.suffix,
-            multiplier: suffix.multiplier,
-            isKey: false,
+            symbol: item.symbol,
+            multiplier: item.multiplier,
+            isKey: true,
             symbol_configuration_id: item.id,
             manager_id: managerId,
           });
+          item.suffixes.forEach((suffix) => {
+            newData.push({
+              name: item.name,
+              manager: managerName,
+              symbol: suffix.suffix,
+              multiplier: suffix.multiplier,
+              isKey: false,
+              symbol_configuration_id: item.id,
+              manager_id: managerId,
+            });
+          });
         });
       });
-    });
+    }
+    return newData;
   }
-  return newData;
 };
 
 export const transformCoverageData = (
   coverageAndSymbols,
   mt5CoverageAccounts,
   MT5CoverageSymbols,
-  coverageSymbolsFormulas,
-  setCoverageSymbolsFormulas
+  sheetToEdit,
+  setSheetToEdit
 ) => {
-  try {
-    const newData = [];
 
-    if (coverageAndSymbols) {
-      coverageAndSymbols.forEach((item, index) => {
+  try {
+    if (sheetToEdit && sheetToEdit.sheet_id) {
+      const newData = [];
+      let counter = 1;
+      sheetToEdit.coverage_formulas.forEach((item, index) => {
         const selectedCoverage = mt5CoverageAccounts.find(
-          (coverage) => coverage.id === item.coverageId
+          (coverage) => coverage.id === item.coverage_id
         );
-        if (item.coverageId && item.symbols) {
-          item.symbols.forEach((symbol, index) => {
-            const selectedSymbol = MT5CoverageSymbols.find(
-              (mt5Symbol) => mt5Symbol.Symbol_ID === symbol
-            );
-            newData.push({
-              coverageId: selectedCoverage.id,
-              coverageLogin: selectedCoverage.login,
-              coverage: selectedCoverage.name,
-              symbolId: selectedSymbol.Symbol_ID,
-              symbol: selectedSymbol.Symbol,
-            });
+        if (item.values) {
+          const selectedSymbol = MT5CoverageSymbols.find(
+            (mt5Symbol) => mt5Symbol.Symbol_ID === item.symbol_id
+          );
+          const newItem = {
+            coverageId: selectedCoverage.id,
+            coverageLogin: selectedCoverage.login,
+            coverage: selectedCoverage.name,
+            symbolId: selectedSymbol.Symbol_ID,
+            symbol: selectedSymbol.Symbol,
+          };
+
+          item.values.forEach((itemValue, index) => {
+            newItem[`#${counter}`] = itemValue.value;
+            counter++;
           });
+          newData.push(newItem);
         }
       });
+
+      return newData;
+    } else {
+      const newData = [];
+      if (coverageAndSymbols) {
+        coverageAndSymbols.forEach((item, index) => {
+          const selectedCoverage = mt5CoverageAccounts.find(
+            (coverage) => coverage.id === item.coverageId
+          );
+          if (item.coverageId && item.symbols) {
+            item.symbols.forEach((symbol, index) => {
+              const selectedSymbol = MT5CoverageSymbols.find(
+                (mt5Symbol) => mt5Symbol.Symbol_ID === symbol
+              );
+              newData.push({
+                coverageId: selectedCoverage.id,
+                coverageLogin: selectedCoverage.login,
+                coverage: selectedCoverage.name,
+                symbolId: selectedSymbol.Symbol_ID,
+                symbol: selectedSymbol.Symbol,
+              });
+            });
+          }
+        });
+      }
+      return newData;
     }
-    return newData;
   } catch (e) {}
 };
 
@@ -135,7 +198,7 @@ export const transformSheetData = (
 
   function afterMaxIndex() {
     columns2.forEach((item, index) => {
-      if ((item.dataField).startsWith("#")) {
+      if (item.dataField.startsWith("#")) {
         maxIndex = maxIndex + 1;
         captions.push(item.caption);
       }
@@ -153,7 +216,7 @@ export const transformSheetData = (
           dealer_coverage_symbol_formula: [],
         };
 
-        symbolsFormulas.forEach((item) => {
+        symbolsFormulas?.forEach((item) => {
           const newSymbol = {
             symbol: item.symbol,
             value: item[`#${i + 1}`] || 0,
@@ -163,7 +226,7 @@ export const transformSheetData = (
 
           newRule.details.dealer_manager_symbols_formulas.push(newSymbol);
         });
-        coverageSymbolsFormulas.forEach((item) => {
+        coverageSymbolsFormulas?.forEach((item) => {
           const newSymbol = {
             symbol: item.symbol,
             coverage_id: item.coverageId,
@@ -184,7 +247,7 @@ export const transformSheetData = (
         dealer_coverage_symbol_formula: [],
       };
 
-      symbolsFormulas.forEach((item) => {
+      symbolsFormulas?.forEach((item) => {
         const newSymbol = {
           symbol: item.symbol,
           value: 0,
@@ -194,7 +257,7 @@ export const transformSheetData = (
 
         newRule.details.dealer_manager_symbols_formulas.push(newSymbol);
       });
-      coverageSymbolsFormulas.forEach((item) => {
+      coverageSymbolsFormulas?.forEach((item) => {
         const newSymbol = {
           symbol: item.symbol,
           coverage_id: item.coverageId,

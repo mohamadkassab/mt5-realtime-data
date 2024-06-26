@@ -30,11 +30,12 @@ import {
   GET_MT5COVERAGESYMBOLS_REQUEST,
   GET_MT5COVERAGESYMBOLS_SUCCESS,
   GET_MT5COVERAGESYMBOLS_FAILURE,
-  GET_SHEET_REQUEST,
-  GET_SHEET_SUCCESS,
-  GET_SHEET_FAILURE,
-
-  
+  GET_SHEETTOEDITIDS_REQUEST,
+  GET_SHEETTOEDITIDS_SUCCESS,
+  GET_SHEETTOEDITIDS_FAILURE,
+  GET_SHEETS_REQUEST,
+  GET_SHEETS_SUCCESS,
+  GET_SHEETS_FAILURE,
 
 } from "./ActionTypes";
 import {produce} from "immer";
@@ -49,6 +50,7 @@ const initialState = {
   Servers:[],
   MT5CoverageSymbols:[],
   sheets:[],
+  sheetToEditIds:[],
   isAuthenticated: localStorage.getItem(ATFXTOKEN) || false,
   blur: false,
   loading: false,
@@ -220,18 +222,36 @@ const reducer = produce((draft, action) => {
       break;
 
     // SHEETS
-    case GET_SHEET_REQUEST:
+    case GET_SHEETS_REQUEST:
       draft.sheets= [];
       draft.error = false;
       draft.loading = true;
       break;
-    case GET_SHEET_SUCCESS:
-      draft.sheets = action.payload.configurations.map((item) => item);
+    case GET_SHEETS_SUCCESS:
+      draft.sheets = action.payload.map((item) => item);
       draft.error = false;
       draft.loading = false;
       break;
-    case GET_SHEET_FAILURE:
+    case GET_SHEETS_FAILURE:
       draft.sheets = [];
+      draft.error = true;
+      draft.loading = false;
+      break;
+
+    
+    // SHEETTOEDITIDS
+    case GET_SHEETTOEDITIDS_REQUEST:
+      draft.sheetToEditIds= [];
+      draft.error = false;
+      draft.loading = true;
+      break;
+    case GET_SHEETTOEDITIDS_SUCCESS:
+      draft.sheetToEditIds = action.payload;
+      draft.error = false;
+      draft.loading = false;
+      break;
+    case GET_SHEETTOEDITIDS_FAILURE:
+      draft.sheetToEditIds = [];
       draft.error = true;
       draft.loading = false;
       break;

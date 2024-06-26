@@ -4,7 +4,7 @@ import { symbolCellRender, coverageSymbolCellRender } from "../../components/cel
 
 // Common
 export const ATFXTOKEN = "ATFXTOKEN";
-export const GLOBAL_REQUEST_TIMEOUT = 10000;
+export const GLOBAL_REQUEST_TIMEOUT = 20000;
 export const ROWS_PER_PAGE = [10, 15, 30];
 
 // AUTH
@@ -13,8 +13,14 @@ export const API_ADMIN_LOGIN = "/users/login/";
 // SHEET POST
 export const API_SHEET = "/users/dealerConfigurationsAndDetails/";
 
-// SHEET GET
-export const API_GET_SHEET = "/users/allDealerConfigurationsAndDetails/";
+// SHEET DELETE
+export const API_DELETE_SHEET = "/users/sheetConfigurationsAndDetails/";
+
+// SHEET UPDATE
+export const API_UPDATE_SHEET = "/users/sheetConfigurationsAndDetails/";
+
+// SHEETTOEDITIDS GET
+export const API_GET_SHEETTOEDITIDS= "/users/sheetConfigurationsAndDetailsForEdit/";
 
 // MANAGER
 export const API_MANAGER = "/users/MT5ManagersAdmin/";

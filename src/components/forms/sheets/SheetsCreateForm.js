@@ -10,6 +10,11 @@ import {
   Sheet2DataColumns,
   Sheet3DataColumns,
 } from "../../../utils/constants/Constants";
+import { GetManagers } from "../../../utils/redux/actions/Managers";
+import { GetMT5SymbolConfigurations } from "../../../utils/redux/actions/SymbolConfigurations";
+import { GetCoverageAccounts } from "../../../utils/redux/actions/CoverageAccounts";
+import { GetServers } from "../../../utils/redux/actions/Servers";
+import { GetMT5CoverageSymbols } from "../../../utils/redux/actions/SymbolConfigurations";
 import HorizontalLinearStepper from "../../common/HorizontalLinearStepper";
 import { transformSheetData } from "../../../utils/functions/Functions";
 import { CreateSheet } from "../../../utils/redux/actions/Sheets";
@@ -47,7 +52,6 @@ const SheetsCreateForm = () => {
   const [columns2, setColumns2] = useState(Sheet2DataColumns);
   const [columns3, setColumns3] = useState(Sheet3DataColumns);
   const columns = SheetDataColumns;
-  const [columnsCaption, setColumnsCaption] = useState({});
   const [coverageAndSymbols, setCoverageAndSymbols] = useState("");
   const [formData, setFormData] = useState({
     [columns[1].dataField]: "",
@@ -167,9 +171,16 @@ const SheetsCreateForm = () => {
     setSheetVisibility(newSheetVisibility);
   };
 
+  React.useEffect(() => {
+    dispatch(GetServers());
+    dispatch(GetManagers());
+    dispatch(GetMT5SymbolConfigurations());
+    dispatch(GetCoverageAccounts());
+    dispatch(GetMT5CoverageSymbols());
+  }, [dispatch]);
+
   // KEEP FORMULAS  UPDATED
   React.useEffect(() => {
-    setColumnsCaption({});
     dispatch(GetMT5SymbolsConfigurationsAndSuffixes());
   }, [isSymbolConfIdChange, isManagerIdChange]);
 
@@ -209,8 +220,6 @@ const SheetsCreateForm = () => {
         coverageAndSymbols,
         mt5CoverageAccounts,
         MT5CoverageSymbols,
-        coverageSymbolsFormulas,
-        setCoverageSymbolsFormulas
       )
     );
   }, [coverageAndSymbols]);

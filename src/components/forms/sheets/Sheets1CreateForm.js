@@ -12,11 +12,6 @@ import {
 } from "@mui/material";
 
 // Start relative variables
-import { GetManagers } from "../../../utils/redux/actions/Managers";
-import { GetMT5SymbolConfigurations } from "../../../utils/redux/actions/SymbolConfigurations";
-import { GetCoverageAccounts } from "../../../utils/redux/actions/CoverageAccounts";
-import { GetServers } from "../../../utils/redux/actions/Servers";
-import { GetMT5CoverageSymbols } from "../../../utils/redux/actions/SymbolConfigurations";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -44,16 +39,6 @@ const Sheets1CreateForm = ({
   const serverId = formData[columns[3].dataField];
 
   // End relative variables
-
-  React.useEffect(() => {
-    dispatch(GetServers());
-    dispatch(GetManagers());
-    dispatch(GetMT5SymbolConfigurations());
-    dispatch(GetCoverageAccounts());
-    dispatch(GetMT5CoverageSymbols());
-  }, [dispatch]);
-
-
 
 
 
@@ -291,13 +276,13 @@ const Sheets1CreateForm = ({
             overflow: "auto",
 
             width: "100%",
-            display: coverageAndSymbols.length > 0 ? "block" : "block",
+            display: coverageAndSymbols?.length > 0 ? "block" : "block",
           }}
         >
           <div className="grid grid-cols-1 mt-1">
             {Array.isArray(coverageAndSymbols) &&
               coverageAndSymbols.map((coverageAccount, rowKey) => {
-                const index = coverageAndSymbols.length - 1 - rowKey;
+                const index = coverageAndSymbols?.length - 1 - rowKey;
                 return (
                   <div className="flex gap-4 mb-4  items-center" key={index}>
                     <FormControl
@@ -368,7 +353,7 @@ const Sheets1CreateForm = ({
                       )}
                       getOptionLabel={(option) => option.Symbol}
                       value={MT5CoverageSymbols.filter((symbol) => 
-                        coverageAndSymbols[index].symbols.includes(symbol.Symbol_ID)
+                        coverageAndSymbols[index]?.symbols?.includes(symbol.Symbol_ID)
                       )}
                       onChange={(event, newValue) => {
                         const selectedItems = newValue.map(

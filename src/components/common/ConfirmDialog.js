@@ -33,23 +33,26 @@ const ConfirmDialog = ({ confirmDelete, confirmSentece, data }) => {
             {"Confirm action"}
           </div>
         </DialogTitle>
-        <DialogContent>
+        <div className="flex items-center justify-center px-6">
+
           <div color="primary" style={{ fontWeight: "bold" }}>
             {confirmSentece}
             <div className="text-error" style={{ fontWeight: "bold" }}>
-              {data}
+              {data} ?
             </div>
           </div>
-        </DialogContent>
-        <DialogActions>
-          <div className="w-full">
-            <div className="flex justify-start px-2">
+
+        </div>
+
+
+          <div className="w-full pb-4">
+            <div className="flex justify-start ">
           
               <PrimaryButton onClick={handleConfirm} caption="Confirm"/>
               <SecondaryButton onClick={handleReject} caption="Cancel"/>
             </div>
           </div>
-        </DialogActions>
+
       </Dialog>
     </>
   );

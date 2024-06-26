@@ -16,6 +16,10 @@ const theme = createTheme({
       main: "#ffffff",
       contrastText: "#020817",
     },
+    complementaryRed: {
+      main: "#d9534f",
+      contrastText: "#ffffff",
+    },
   },
 });
 
