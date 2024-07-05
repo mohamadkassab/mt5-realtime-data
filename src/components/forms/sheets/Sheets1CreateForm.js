@@ -26,7 +26,8 @@ const Sheets1CreateForm = ({
   coverageAndSymbols,
   setCoverageAndSymbols,
 }) => {
-  const dispatch = useDispatch();
+  const [touched, setTouched] = React.useState(false);
+  const [error, setError] = React.useState('');
   const Managers = useSelector((state) => state.Managers);
   const [managers, setManagers] = React.useState(Managers);
   const Servers = useSelector((state) => state.Servers);
@@ -91,6 +92,22 @@ const Sheets1CreateForm = ({
       setCoverageAndSymbols(newCoverageAndSymbols);
     }
   };
+  
+  const handleBlur = () => {
+    setTouched(true);
+    if (!formData[columns[1].dataField]) {
+      setError('This field is required');
+    } else {
+      setError('');
+    }
+  };
+
+  const handleChange = (e) => {
+    handleChangeFormData(e);
+    if (touched && e.target.value) {
+      setError('');
+    }
+  };
 
   return (
     <>
@@ -101,7 +118,10 @@ const Sheets1CreateForm = ({
         name={columns[1].dataField}
         label={columns[1].caption}
         value={formData[columns[1].dataField]}
-        onChange={handleChangeFormData}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        error={!!error}
+        helperText={error}
         sx={{
           width: "100%",
           "@media (min-width: 1000px)": {},

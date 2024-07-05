@@ -1,139 +1,104 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef  } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ConfigurationList from "../forms/sheets/SheetDataDisplay";
 import { GetSheets } from "../../utils/redux/actions/Sheets";
+import { ATFXTOKEN } from "../../utils/constants/Constants";
 
 const SheetsDataTable = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const wsRef = useRef(null);
+  const reconnectAttempts = useRef(0);
+  const maxReconnectAttempts = 4; 
+  const reconnectDelay = 2000;
   const [selectedSheetId, setSelectedSheetId] = useState(0);
   const [selectedSheetName, setSelectedSheetName] = useState("");
+  const [realTimeData, setRealTimeData] = useState({});
   const sheets = useSelector((state) => state.sheets);
+  const authorizationToken = localStorage.getItem('ATFXTOKEN');
 
-  // const [sheets, setSheets] = useState([
-  //   {
-  //     sheet_id: 97,
-  //     sheet_name: "sheet 1",
-  //     dealer_configuration_id: 121,
-  //     dealer_configurations: [
-  //       {
-  //         Dealer_Conf_Manager_id: 674,
-  //         server_name: "Dev",
-  //         Login: 1000,
-  //         SymbolSuffix: "XAUUSD",
-  //         MainSymbol: "XAUUSD",
-  //         BuyVol:1,
-  //         SellVol:2,
-  //         Rules: [
-  //           { name: "#1-col1", value: "10" },
-  //           { name: "#2-col2", value: "11" },
-  //         ],
-  //       },
-  //       {
-  //         Dealer_Conf_Manager_id: 675,
-  //         Name: "Dev",
-  //         Login: 1000,
-  //         SymbolSuffix: "XAUUSD.v",
-  //         MainSymbol: "XAUUSD",
-  //         BuyVol:3,
-  //         SellVol:4,
-  //         Rules: [
-  //           { name: "#1-col1", value: "12" },
-  //           { name: "#2-col2", value: "13" },
-  //         ],
-  //       },
-  //       {
-  //         Dealer_Conf_Manager_id: 676,
-  //         server_name: "Dev",
-  //         Login: 1000,
-  //         SymbolSuffix: "EURUSD",
-  //         MainSymbol: "EURUSD",
-  //         BuyVol:10,
-  //         SellVol:21,
-  //         Rules: [
-  //           { name: "#1-col1", value: "10" },
-  //           { name: "#2-col2", value: "11" },
-  //         ],
-  //       },
-  //       {
-  //         Dealer_Conf_Manager_id: 675,
-  //         Name: "Dev",
-  //         Login: 1000,
-  //         SymbolSuffix: "EURUSD.v",
-  //         MainSymbol: "EURUSD",
-  //         BuyVol:11,
-  //         SellVol:15,
-  //         Rules: [
-  //           { name: "#1-col1", value: "12" },
-  //           { name: "#2-col2", value: "13" },
-  //         ],
-  //       },
-  //     ],
-  //     COVERAGE_DETAILS: [
-  //       {
-  //         Dealer_Conf_coverage_id: 675,
-  //         server_name: "Dev",
-  //         Coverage: "coverage account",
-  //         Symbol: "XAUUSD",
-  //         BuyVol:1,
-  //         SellVol:2,
-  //         Rules: [
-  //           { name: "#1-col1", value: "12" },
-  //           { name: "#2-col2", value: "13" },
-  //         ],
-  //       },
-  //       {
-  //         Dealer_Conf_coverage_id: 675,
-  //         server_name: "Dev",
-  //         Login: 1000,
-  //         Symbol: "EURUSD",
-  //         BuyVol:44,
-  //         SellVol:12,
-  //         Rules: [
-  //           { name: "#1-col1", value: "12" },
-  //           { name: "#2-col2", value: "13" },
-  //         ],
-  //       },
-  //     ],
-  //   }
-  // ]);
+  const connectWebSocket = () => {
+    try{
 
+      wsRef.current = new WebSocket('ws://127.0.0.1:8765');
+    
+      wsRef.current.onopen = () => {
+        console.log(`Connected...`);
+        wsRef.current.send(JSON.stringify({ type: 'auth', authorizationToken }));
+        reconnectAttempts.current = 0; 
+      };
+  
+      wsRef.current.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          if (message && message.type === 'updates') {
+            const newData = message.data;
+  
+              setRealTimeData(prevState => {
+                const updatedData = { ...prevState };
+                const key = newData?.key;
+                const value = newData?.data?.value;
+                updatedData[key] = value;
+    
+                // for (let i = 0; i < newData.length; i++) {
+                //   const key = newData[i].key;
+                //   const value = newData[i].data.value;
+                //   updatedData[key] = value;
+                // }
+    
+                return updatedData;
+              });
+            
+      
+          }
+        } catch (e) {
+          console.error('Error processing message:', e);
+        }
+      };
+  
+      wsRef.current.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+  
+      wsRef.current.onclose = (event) => {
+        console.log('WebSocket closed:', event);
+        if (reconnectAttempts.current < maxReconnectAttempts) {
+          reconnectAttempts.current += 1;
+          setTimeout(() => {
+            console.log(`Reconnecting... (${reconnectAttempts.current}/${maxReconnectAttempts})`);
+            connectWebSocket();
+          }, reconnectDelay);
+        } else {
+          console.error('Max reconnection attempts reached. Connection closed permanently.');
+        }
+      };
+    }catch(e){
+console.log(e)
+    }  
+  };
 
-  // const getRandomInt = (min, max) => {
-  //   return Math.floor(Math.random() * (max - min + 1)) + min;
-  // };
+  React.useEffect(() => {
+    if (sheets && wsRef?.current?.readyState === WebSocket.OPEN) {
+      console.log(sheets)
+      wsRef.current.send(JSON.stringify({ type: 'subscribe', sheets }));
+    }
+  }, [sheets ,wsRef]);
+  
+  
 
-  // const updateData = () => {
-  //   const newSheets = sheets.map(sheet => ({
-  //     ...sheet,
-  //     dealer_configurations: sheet.dealer_configurations.map(config => ({
-  //       ...config,
-  //       BuyVol:getRandomInt(10, 20),
-  //       SellVol:getRandomInt(10, 20),
-  //     })),
-  //     COVERAGE_DETAILS: sheet.COVERAGE_DETAILS.map(detail => ({
-  //       ...detail,
-  //       BuyVol:getRandomInt(10, 20),
-  //       SellVol:getRandomInt(10, 20),
-  //     })),
-  //   }));
-
-  //   setSheets(newSheets);
-  // };
-
-  // useEffect(() => {
-  //   const intervalId = setInterval(updateData, 1000);
-  //   return () => clearInterval(intervalId);
-  // }, [sheets]);
+  React.useEffect(() => {
+    connectWebSocket();
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, []);
 
   React.useEffect(() => {
     dispatch(GetSheets());
   }, [dispatch]);
-
-  React.useEffect(() => {
-    console.log(sheets);
-  }, [sheets]);
 
   const onEditing = () => {
     navigate("/editSheet", { state: { selectedSheetId }});
@@ -154,6 +119,7 @@ const SheetsDataTable = () => {
           setSelectedSheetId={setSelectedSheetId}
           selectedSheetName={selectedSheetName}
           setSelectedSheetName={setSelectedSheetName}
+          realTimeData={realTimeData}
         />
       </div>
     </div>
