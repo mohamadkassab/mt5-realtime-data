@@ -1,5 +1,5 @@
 import React from "react";
-import { styled, useTheme } from "@mui/material/styles";
+import { styled, useTheme, keyframes } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
@@ -97,11 +97,43 @@ const DefaultLayout = ({ componentName, children }) => {
   const dispatch = useDispatch();
   const [showSuccess, setShowSuccess] = React.useState(false);
   const [showError, setShowError] = React.useState(false);
+  const [isConnected, setIsConnected] = React.useState(false);
   const [open, setOpen] = React.useState(true);
+  const sheetStatus = useSelector((state) => state.sheetStatus);
   const loading = useSelector((state) => state.loading);
   const success = useSelector((state) => state.success);
   const error = useSelector((state) => state.error);
   const theme = useTheme();
+
+  // Start Online Tag
+  const pulse = keyframes`
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(0, 255, 0, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
+  }
+`;
+
+  const Circle = styled(({ isConnected, ...other }) => <Box {...other} />)(
+    ({ isConnected }) => ({
+      width: 12,
+      height: 12,
+      borderRadius: "50%",
+      backgroundColor: isConnected ? "green" : "red",
+      animation: isConnected ? `${pulse} 1.5s infinite` : "none",
+    })
+  );
+
+  // End Online Tag
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -117,6 +149,10 @@ const DefaultLayout = ({ componentName, children }) => {
       navigate("/");
     } catch (error) {}
   };
+
+  React.useEffect(()=>{
+    setIsConnected(sheetStatus);
+  },[sheetStatus])
 
   React.useEffect(() => {
     if (success) {
@@ -154,9 +190,30 @@ const DefaultLayout = ({ componentName, children }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            {componentName}
-          </Typography>
+
+          <div className="w-full flex items-center justify-between">
+            <div>
+              <Typography variant="h6" noWrap component="div">
+                {componentName}
+              </Typography>
+            </div>
+            <div>
+              {componentName === "Sheets" && false && (
+                <Box display="flex" alignItems="center">
+                  <Circle isConnected={isConnected} />
+                  <Typography
+                    variant="body1"
+                    style={{
+                      marginLeft: 8,
+                      fontWeight: isConnected ? "bold" : "normal",
+                    }}
+                  >
+                    {isConnected ? "Online" : "Offline"}
+                  </Typography>
+                </Box>
+              )}
+            </div>
+          </div>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
@@ -172,67 +229,67 @@ const DefaultLayout = ({ componentName, children }) => {
         <List>
           {Menu.map((item, index) => (
             <React.Fragment key={index}>
-            <ListItem disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                href={item.path}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
+              <ListItem disablePadding sx={{ display: "block" }}>
+                <ListItemButton
+                  href={item.path}
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.name}
-                  sx={{ opacity: open ? 1 : 0 }}
-                />
-              </ListItemButton>
-            </ListItem>
-            {item.dividerBottom && <Divider sx={{ my: 1 }}/>}
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.name}
+                    sx={{ opacity: open ? 1 : 0 }}
+                  />
+                </ListItemButton>
+              </ListItem>
+              {item.dividerBottom && <Divider sx={{ my: 1 }} />}
             </React.Fragment>
           ))}
         </List>
-        <Divider/>
+        <Divider />
         <List>
           {CoreMenu.map((item, index) => (
             <React.Fragment key={index}>
-            <ListItem  disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                href={item.path}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
+              <ListItem disablePadding sx={{ display: "block" }}>
+                <ListItemButton
+                  href={item.path}
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.name}
-                  sx={{ opacity: open ? 1 : 0 }}
-                />
-              </ListItemButton>
-            </ListItem>
-            {item.dividerBottom && <Divider sx={{ my: 1 }}/>}
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.name}
+                    sx={{ opacity: open ? 1 : 0 }}
+                  />
+                </ListItemButton>
+              </ListItem>
+              {item.dividerBottom && <Divider sx={{ my: 1 }} />}
             </React.Fragment>
           ))}
         </List>
-        <Divider/>
+        <Divider />
         <List>
           <ListItem disablePadding sx={{ display: "block" }}>
             <ListItemButton
@@ -250,7 +307,7 @@ const DefaultLayout = ({ componentName, children }) => {
                   justifyContent: "center",
                 }}
               >
-                <ExitToAppIcon fontSize="large"/>
+                <ExitToAppIcon fontSize="large" />
               </ListItemIcon>
               <ListItemText primary="Sign out" sx={{ opacity: open ? 1 : 0 }} />
             </ListItemButton>
@@ -261,7 +318,9 @@ const DefaultLayout = ({ componentName, children }) => {
         <DrawerHeader />
         {children}
       </Box>
-      {loading && <LoadingElement isDrawerOpen={open} componentName={componentName}/>}
+      {loading && (
+        <LoadingElement isDrawerOpen={open} componentName={componentName} />
+      )}
 
       {showSuccess && (
         <Snackbar open={true}>
@@ -272,7 +331,7 @@ const DefaultLayout = ({ componentName, children }) => {
       )}
 
       {showError && (
-        <Snackbar open={true} >
+        <Snackbar open={true}>
           <Alert severity="error" variant="filled" sx={{ width: "100%" }}>
             Failed
           </Alert>

@@ -29,24 +29,22 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
   const [totalConfFiltered, setTotalConfFiltered] = useState([]);
   
 
-    // Get Every Rule's name
-    React.useEffect(() => {
-      const dealer_configurations = sheet?.dealer_configurations;
+    // Get totalconf identifier
+  React.useEffect(() => {
+    const dealer_configurations = sheet?.dealer_configurations;
 
-      const newArray = dealer_configurations.map((obj, index, arr) => {
-        if (index < arr.length - 1) {
-          if( obj.MainSymbol !== arr[index + 1].MainSymbol){
-            return `${obj.MainSymbol}`;
-          }else{
-            return "";
-          }
+    const newArray = dealer_configurations.map((obj, index, arr) => {
+      if (index < arr.length - 1) {
+        if( obj.MainSymbol !== arr[index + 1].MainSymbol){
+          return `${sheet.sheet_id}${obj.MainSymbol}`;
+        }else{
+          return "";
         }
-        return `${obj.MainSymbol}`; 
-      });
-      setTotalConfFiltered(newArray);
-
-
-    }, [sheet]);
+      }
+      return `${sheet.sheet_id}${obj.MainSymbol}`; 
+    });
+    setTotalConfFiltered(newArray);
+  }, [sheet]);
 
   // Get Every Rule's name
   React.useEffect(() => {
@@ -59,72 +57,94 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
     }
   }, []);
   
-    // Get Conf totals
-    React.useEffect(() => {
-      try{
-        const newTotalByConf = {};
-        Object.entries(realTimeData).forEach(([key, value]) =>{
-          let rule0 = null;
-          let rule1 = null;
-          let rule2 = null;
-          let rule3 = null;
-          const keyParts = key.split(':');
-          const sheetName = keyParts[0];
-          const sheetId = keyParts[1];
-          const serverId = keyParts[2];
-          const loginId = keyParts[3];
-          const managerId = keyParts[4];
-          const suffix = keyParts[5];
-          const mainSymbol = keyParts[6];
-          const transactionType = keyParts[7];
-          const symbolAndLogin = mainSymbol;
-          const buyVol = transactionType === "BUY" ? parseFloat(value) : 0;
-          const sellVol = transactionType === "SELL" ? parseFloat(value) : 0;
-          const netVol = buyVol - sellVol;
+  // Get totalByConf
+  React.useEffect(() => {
+    try{
+      const newTotalByConf = {};
+      const newTotalByManyConf = {};
+      Object.entries(realTimeData).forEach(([key, value]) =>{
+        let rule0 = null;
+        let rule1 = null;
+        let rule2 = null;
+        let rule3 = null;
+        const keyParts = key.split(':');
+        const sheetName = keyParts[0];
+        const sheetId = keyParts[1];
+        const serverId = keyParts[2];
+        const loginId = keyParts[3];
+        const managerId = keyParts[4];
+        const suffix = keyParts[5];
+        const mainSymbol = keyParts[6];
+        const transactionType = keyParts[7];
+        const symbolAndLogin = sheetId +  mainSymbol;
+        const buyVol = transactionType === "buy" ? parseFloat(value) : 0;
+        const sellVol = transactionType === "sell" ? parseFloat(value) : 0;
+        const netVol = buyVol - sellVol;
+        const totalByManyConfIdentifier = sheetId + "tbmc"
 
-          sheet.dealer_configurations.forEach((config, index) => {
-         
 
-            if(String(config.Login )=== loginId && String(config.SymbolSuffix) === suffix && String(config.MainSymbol) === mainSymbol){
-              rule0 = parseInt(config.Rules[0]?.value, 10) / 100 || 0;
-              rule1 = parseInt(config.Rules[1]?.value, 10) / 100 || 0;
-              rule2 = parseInt(config.Rules[2]?.value, 10) / 100 || 0;
-              rule3 = parseInt(config.Rules[3]?.value, 10) / 100 || 0;
-            }
+        if(!newTotalByManyConf[totalByManyConfIdentifier]){
+          newTotalByManyConf[totalByManyConfIdentifier] = {
+            totalBuySheet: 0,
+            totalSellSheet: 0,
+            totalNetSheet: 0,
+            totalResult: [0, 0, 0, 0],
+          };
+        }
+    
 
-          });
+        newTotalByManyConf[totalByManyConfIdentifier].totalBuySheet += buyVol;
+        newTotalByManyConf[totalByManyConfIdentifier].totalSellSheet += sellVol;
+        newTotalByManyConf[totalByManyConfIdentifier].totalNetSheet += netVol;
 
-          if (!newTotalByConf[symbolAndLogin]) {
-            newTotalByConf[symbolAndLogin] = {
-              totalBuySymbol: buyVol,
-              totalSellSymbol: sellVol,
-              totalNetSymbol: netVol,
-              totalResult: [
-                (netVol * rule0),
-                (netVol * rule1),
-                (netVol * rule2),
-                (netVol * rule3),
-              ],
-            };
-          } else {
-            newTotalByConf[symbolAndLogin].totalBuySymbol += buyVol;
-            newTotalByConf[symbolAndLogin].totalSellSymbol += sellVol;
-            newTotalByConf[symbolAndLogin].totalNetSymbol += netVol;
-            newTotalByConf[symbolAndLogin].totalResult[0] += (netVol * rule0);
-            newTotalByConf[symbolAndLogin].totalResult[1] += (netVol * rule1);
-            newTotalByConf[symbolAndLogin].totalResult[2] += (netVol * rule2);
-            newTotalByConf[symbolAndLogin].totalResult[3] += (netVol * rule3);
+
+        sheet.dealer_configurations.forEach((config, index) => {   
+      
+
+          if(String(config.Login ) === loginId && String(config.SymbolSuffix) === suffix && String(config.MainSymbol) === mainSymbol){
+            rule0 = parseInt(config.Rules[0]?.value, 10) / 100 || 0;
+            rule1 = parseInt(config.Rules[1]?.value, 10) / 100 || 0;
+            rule2 = parseInt(config.Rules[2]?.value, 10) / 100 || 0;
+            rule3 = parseInt(config.Rules[3]?.value, 10) / 100 || 0;
+            newTotalByManyConf[totalByManyConfIdentifier].totalResult[0] += (netVol * parseInt(config.Rules[0]?.value, 10)) / 100 || 0;
+            newTotalByManyConf[totalByManyConfIdentifier].totalResult[1] += (netVol * parseInt(config.Rules[1]?.value, 10)) / 100 || 0;
+            newTotalByManyConf[totalByManyConfIdentifier].totalResult[2] += (netVol * parseInt(config.Rules[2]?.value, 10)) / 100 || 0;
+            newTotalByManyConf[totalByManyConfIdentifier].totalResult[3] += (netVol * parseInt(config.Rules[3]?.value, 10)) / 100 || 0;
           }
-          
-
         });
-        setTotalByConf(newTotalByConf);
-      }
-      catch(error){
-        console.log(error);
-      }
-   
-    }, [rulesName, realTimeData, sheet]);
+
+        if (!newTotalByConf[symbolAndLogin]) {
+          newTotalByConf[symbolAndLogin] = {
+            totalBuySymbol: buyVol,
+            totalSellSymbol: sellVol,
+            totalNetSymbol: netVol,
+            totalResult: [
+              (netVol * rule0),
+              (netVol * rule1),
+              (netVol * rule2),
+              (netVol * rule3),
+            ],
+          };
+        } else {
+          newTotalByConf[symbolAndLogin].totalBuySymbol += buyVol;
+          newTotalByConf[symbolAndLogin].totalSellSymbol += sellVol;
+          newTotalByConf[symbolAndLogin].totalNetSymbol += netVol;
+          newTotalByConf[symbolAndLogin].totalResult[0] += (netVol * rule0);
+          newTotalByConf[symbolAndLogin].totalResult[1] += (netVol * rule1);
+          newTotalByConf[symbolAndLogin].totalResult[2] += (netVol * rule2);
+          newTotalByConf[symbolAndLogin].totalResult[3] += (netVol * rule3);
+        }
+        
+
+      });
+      setTotalByConf(newTotalByConf);
+      setTotalByManyConf(newTotalByManyConf);
+    }
+    catch(error){
+      console.log(error);
+    }
+  
+  }, [rulesName, realTimeData, sheet]);
 
   // Get Coverage conf totals
   // React.useEffect(() => {
@@ -224,15 +244,12 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
             {sheet?.dealer_configurations?.map((config, index) => {
               const nextConfig = sheet?.dealer_configurations?.[index + 1];
               const isLast = nextConfig?.MainSymbol !== config.MainSymbol;
-              const buyIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.server_id}:${config.Login}:${config.manager_id}:${config.SymbolSuffix}:${config.MainSymbol}:BUY`;
-              const sellIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.server_id}:${config.Login}:${config.manager_id}:${config.SymbolSuffix}:${config.MainSymbol}:SELL`;
+              const buyIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.server_id}:${config.Login}:${config.manager_id}:${config.SymbolSuffix}:${config.MainSymbol}:buy`;
+              const sellIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.server_id}:${config.Login}:${config.manager_id}:${config.SymbolSuffix}:${config.MainSymbol}:sell`;
               const buyVol = realTimeData[`${buyIdentifier}`] || 0;
               const sellVol = realTimeData[`${sellIdentifier}`] || 0;
               const netVol = (buyVol - sellVol);
-              
-              // const keyIdentifier = `${config.MainSymbol}${config.Login}`;
-              // const totalByConfBuy = totalByConf[keyIdentifier]?.totalBuySymbol ?? 0;
-              // console.log(totalByConfBuy)
+            
               
               return (
                 <React.Fragment key={`conf-${index}`}>
@@ -268,10 +285,6 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
 
                   {/* End rendering dealer configuration */}
                   {/* Start check if next item its the end of the configuration */}
-                  
-                  {/* {console.log(`${config.MainSymbol}${config.Login}`)}
-                  {console.log(totalByConf[`XAUUSD1105`]?.totalBuySymbol)}
-                  {console.log(totalByConf[`${config.MainSymbol}${config.Login}`]?.totalBuySymbol)} */}
 
                   {isLast && (
                     
@@ -326,12 +339,12 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                   >
                     {"Total"}
                   </TableCell>
-                  <TableCell>{totalByManyConf?.totalBuySheet || 0}</TableCell>
-                  <TableCell>{totalByManyConf?.totalSellSheet || 0}</TableCell>
-                  <TableCell>{totalByManyConf?.totalNetSheet || 0}</TableCell>
+                  <TableCell>{totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet || 0}</TableCell>
+                  <TableCell>{totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalSellSheet || 0}</TableCell>
+                  <TableCell>{totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet || 0}</TableCell>
                   {rulesName.map((_, ruleIndex) => {
-                    const totalResult = totalByManyConf?.totalResult && totalByManyConf?.totalResult[ruleIndex]
-                      ? totalByManyConf?.totalResult[ruleIndex].toFixed(2)
+                    const totalResult = totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult && totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult[ruleIndex]
+                      ? totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult[ruleIndex].toFixed(2)
                       : 0;
                     return (
                       <React.Fragment key={`conf-rule-${ruleIndex}`}>
@@ -481,45 +494,6 @@ const ConfigurationList = ({
     }
   }, [sheets]);
 
-  // Start Online Tag
-//   const pulse = keyframes`
-//   0% {
-//     transform: scale(0.95);
-//     box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
-//   }
-
-//   70% {
-//     transform: scale(1);
-//     box-shadow: 0 0 0 10px rgba(0, 255, 0, 0);
-//   }
-
-//   100% {
-//     transform: scale(0.95);
-//     box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
-//   }
-// `;
-
-// const Circle = styled(Box)(({ theme, isConnected }) => ({
-//   width: 12,
-//   height: 12,
-//   borderRadius: '50%',
-//   backgroundColor: isConnected ? 'green' : 'red',
-//   animation: isConnected ? `${pulse} 1.5s infinite` : 'none',
-// }));
-
-// const [isConnected, setIsConnected] = useState(true); 
-
-  // React.useEffect(() => {
-  //   // Simulate connection status change
-  //   const interval = setInterval(() => {
-  //     setIsConnected(prev => !prev);
-  //   }, 1000); // Change status every 5 seconds
-
-  //   return () => clearInterval(interval);
-  // }, []);
-
-// End Online Tag
-
   return (
     <Box>
         {showConfirmDialog && (
@@ -547,15 +521,7 @@ const ConfigurationList = ({
           ))}
         </Tabs>
         <div className="flex gap-4">
-          {/* <Box display="flex" alignItems="center">
-      <Circle isConnected={isConnected} />
-      <Typography variant="body1"   style={{ 
-          marginLeft: 8, 
-          fontWeight: isConnected ? 'bold' : 'normal' 
-        }}>
-        {isConnected ? "Online" : "Offline"}
-      </Typography>
-    </Box> */}
+
         </div>
         <div className="flex gap-4">
         <DeleteButton onClick={onDeleting} caption="Delete" />

@@ -303,10 +303,7 @@ if(Managers && selectedSymbolsData.length > 0){
       symbolsFormulas
     )
   );
-}
-
-
-  }, [isFormDataChanged, selectedSymbolsData, Managers]);
+}}, [isFormDataChanged, selectedSymbolsData, Managers]);
 
   React.useEffect(() => {
     setCoverageSymbolsFormulas(

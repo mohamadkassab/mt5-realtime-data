@@ -20,6 +20,8 @@ import {
   GET_SHEETTOEDITIDS_SUCCESS,
   GET_SHEETTOEDITIDS_FAILURE,
   ISAUTHENTICATED_FAILURE,
+  SHEET_ONLINE,
+  SHEET_OFFLINE
 } from "../ActionTypes";
 
 export const CreateSheet = (formData) => {
@@ -64,7 +66,6 @@ export const CreateSheet = (formData) => {
 export const EditSheet = (formData, sheetId) => {
   return async (dispatch) => {
     try {
-      console.log(formData)
       dispatch({ type: SEL_REQUEST });
 
       const apiIp = process.env.REACT_APP_API_IP;
@@ -232,6 +233,17 @@ export const GetSheetToEditIds = (params) => {
       if (errorPayload.message === API_401_RES) {
         dispatch({ type: ISAUTHENTICATED_FAILURE });
       }
+    }
+  };
+};
+
+export const SheetConnectionState = (sheetState) => {
+  return async (dispatch) => {
+    
+    if(sheetState === true){
+      dispatch({ type: SHEET_ONLINE });
+    }else{
+      dispatch({ type: SHEET_OFFLINE });
     }
   };
 };

@@ -36,6 +36,8 @@ import {
   GET_SHEETS_REQUEST,
   GET_SHEETS_SUCCESS,
   GET_SHEETS_FAILURE,
+  SHEET_ONLINE,
+  SHEET_OFFLINE
 
 } from "./ActionTypes";
 import {produce} from "immer";
@@ -52,6 +54,7 @@ const initialState = {
   sheets:[],
   sheetToEditIds:[],
   isAuthenticated: localStorage.getItem(ATFXTOKEN) || false,
+  sheetStatus: false,
   blur: false,
   loading: false,
   success: false,
@@ -255,6 +258,15 @@ const reducer = produce((draft, action) => {
       draft.error = true;
       draft.loading = false;
       break;
+
+      // SHEET STATUS
+      case SHEET_ONLINE:
+        draft.sheetStatus= true;
+        break;
+      case SHEET_OFFLINE:
+        draft.sheetStatus= false;
+        break;
+
 
     default:
       break;
