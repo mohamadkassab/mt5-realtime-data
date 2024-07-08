@@ -11,12 +11,12 @@ const SheetsDataTable = () => {
   const reconnectAttempts = useRef(0);
   const maxReconnectAttempts = 4;
   const reconnectDelay = 2000;
-  const [selectedSheetId, setSelectedSheetId] = useState(0);
   const [selectedSheetName, setSelectedSheetName] = useState("");
   const [realTimeData, setRealTimeData] = useState({});
   const sheets = useSelector((state) => state.sheets);
   const authorizationToken = localStorage.getItem("ATFXTOKEN");
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [selectedSheetId, setSelectedSheetId] = useState(sheets[0]?.sheet_id || 0);
 
   const connectWebSocket = () => {
     try {
@@ -24,9 +24,9 @@ const SheetsDataTable = () => {
 
       wsRef.current.onopen = () => {
         console.log(`Connected...`);
-        wsRef.current.send(
-          JSON.stringify({ type: "auth", authorizationToken })
-        );
+        wsRef.current.send(JSON.stringify({ type: "auth", authorizationToken }));
+        const stringSelectedSheetId = String(selectedSheetId);
+        wsRef.current.send(JSON.stringify({ type: "subscribe", stringSelectedSheetId }));
         reconnectAttempts.current = 0;
       };
 
@@ -88,6 +88,10 @@ const SheetsDataTable = () => {
       console.log(e);
     }
   };
+
+  const setSelectedSheetIdfunction = (id) =>{
+    setSelectedSheetId(id);
+  }
   
   React.useEffect(() => {
     if( wsRef?.current?.readyState === WebSocket.OPEN){
@@ -105,15 +109,19 @@ const SheetsDataTable = () => {
   }, []); 
 
   React.useEffect(() => {
-    if (
-      selectedSheetId !== 0 &&
-      wsRef?.current?.readyState === WebSocket.OPEN
-    ) {
-      const stringSelectedSheetId = String(selectedSheetId);
-      wsRef.current.send(
-        JSON.stringify({ type: "subscribe", stringSelectedSheetId })
-      );
+    try{
+      if (
+        selectedSheetId !== 0
+      ) { 
+        const stringSelectedSheetId = String(selectedSheetId);
+        wsRef.current.send(
+          JSON.stringify({ type: "subscribe", stringSelectedSheetId })
+        );
+      }
+    }catch(e){
+      console.log(e)
     }
+
   }, [selectedSheetId, wsRef?.current?.readyState, isInitialLoad]);
 
   React.useEffect(() => {
@@ -145,7 +153,7 @@ const SheetsDataTable = () => {
           onInserting={onInserting}
           onEditing={onEditing}
           selectedSheetId={selectedSheetId}
-          setSelectedSheetId={setSelectedSheetId}
+          setSelectedSheetIdfunction={setSelectedSheetIdfunction}
           selectedSheetName={selectedSheetName}
           setSelectedSheetName={setSelectedSheetName}
           realTimeData={realTimeData}

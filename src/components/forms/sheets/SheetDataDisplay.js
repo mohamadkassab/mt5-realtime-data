@@ -455,7 +455,7 @@ const ConfigurationList = ({
   onInserting,
   onEditing,
   selectedSheetId,
-  setSelectedSheetId,
+  setSelectedSheetIdfunction,
   selectedSheetName,
   setSelectedSheetName,
   realTimeData
@@ -466,7 +466,7 @@ const ConfigurationList = ({
   const confirmDeleteSentece = "Are you sure you want to delete ";
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
-    setSelectedSheetId(sheets[newValue]?.sheet_id);
+    setSelectedSheetIdfunction(sheets[newValue]?.sheet_id);
     setSelectedSheetName(sheets[newValue]?.sheet_name);
   };
 
@@ -489,7 +489,7 @@ const ConfigurationList = ({
 
   React.useEffect(() => {
     if (sheets && sheets.length > 0) {
-      setSelectedSheetId(sheets[0]?.sheet_id);
+      setSelectedSheetIdfunction(sheets[0]?.sheet_id);
       setSelectedSheetName(sheets[0]?.sheet_name);
     }
   }, [sheets]);
