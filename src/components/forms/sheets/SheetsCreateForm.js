@@ -29,7 +29,6 @@ import AddButton from "../../buttons/AddButton";
 import { cellRenderPercentage } from "../../cellRendering/CellRendering";
 import { jwtDecode } from "jwt-decode";
 import InputDialog from "../../common/InputDialog";
-// End relative variables
 
 const SheetsCreateForm = () => {
   const dispatch = useDispatch();
@@ -115,8 +114,8 @@ const SheetsCreateForm = () => {
       coverageSymbolsFormulas,
       columns2
     );
-    if(formData[columns[1].dataField] === ""){
-      return
+    if (formData[columns[1].dataField] === "") {
+      return;
     }
     console.log(transformedData);
     dispatch(CreateSheet(transformedData));
@@ -208,34 +207,33 @@ const SheetsCreateForm = () => {
   }, [selectedSymbols]);
 
   React.useEffect(() => {
-    if(Managers && selectedSymbolsData.length > 0){
-    setSymbolsFormulas(
-      transformData(
-        selectedSymbolsData,
-        Managers,
-        formData[columns[10].dataField],
-        formData[columns[4].dataField],
-        [],
-        true,
-        symbolsFormulas
-      )
-    );
-  }
+    if (Managers && selectedSymbolsData.length > 0) {
+      setSymbolsFormulas(
+        transformData(
+          selectedSymbolsData,
+          Managers,
+          formData[columns[10].dataField],
+          formData[columns[4].dataField],
+          [],
+          true,
+          symbolsFormulas
+        )
+      );
+    }
   }, [selectedSymbolsData, Managers]);
 
   React.useEffect(() => {
- 
-      setCoverageSymbolsFormulas(
-        transformCoverageData(
-          coverageAndSymbols,
-          mt5CoverageAccounts,
-          MT5CoverageSymbols,
-          [],
-          true,
-          coverageSymbolsFormulas
-        )
-      );
-    }, [coverageAndSymbols]);
+    setCoverageSymbolsFormulas(
+      transformCoverageData(
+        coverageAndSymbols,
+        mt5CoverageAccounts,
+        MT5CoverageSymbols,
+        [],
+        true,
+        coverageSymbolsFormulas
+      )
+    );
+  }, [coverageAndSymbols]);
 
   // END OF KEEP FORMULAS  UPDATED
 

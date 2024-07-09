@@ -1,10 +1,6 @@
-import {
-    Container,
-    Box,
-    Paper,
-  } from "@mui/material";
-const FormContainer = ({children})=>{
-    return(
+import { Container, Box, Paper } from "@mui/material";
+const FormContainer = ({ children }) => {
+  return (
     <Container
       maxWidth="sm"
       sx={{
@@ -28,9 +24,8 @@ const FormContainer = ({children})=>{
         }}
       >
         {children}
-        
       </Box>
-      </Container>
-    )
-}
-export default FormContainer
+    </Container>
+  );
+};
+export default FormContainer;

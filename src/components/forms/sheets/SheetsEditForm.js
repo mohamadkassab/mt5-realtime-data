@@ -290,8 +290,7 @@ const SheetsEditForm = () => {
   }, [selectedSymbols]);
 
   React.useEffect(() => {
-
-if(Managers && selectedSymbolsData.length > 0){
+  if(Managers && selectedSymbolsData.length > 0){
   setSymbolsFormulas(
     transformData(
       selectedSymbolsData,

@@ -1,8 +1,6 @@
 import React from "react";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import {
-  TableCell,
-} from "@mui/material";
+import { TableCell } from "@mui/material";
 
 export const booleanCellRender = ({ value }) => {
   return (
@@ -22,12 +20,7 @@ export const cellRenderPercentage = (cellData) => {
   return <> {value}%</>;
 };
 
-
-export const headerCellRender = (
-  col,
-  handleRemoveColumn,
-) => {
-
+export const headerCellRender = (col, handleRemoveColumn) => {
   return (headerInfo) => {
     const { column, columnIndex } = headerInfo;
     return (
@@ -61,18 +54,20 @@ export const coverageSymbolCellRender = (data) => {
   return <div style={cellStyle}>{data.value}</div>;
 };
 
-export const SheetHeaderCell = ({caption}) =>{
-  return(<>
-     <TableCell
-              sx={{
-                position: "sticky",
-                top: 0,
-                backgroundColor: "white",
-                zIndex: 1,
-                fontWeight: "bold",
-              }}
-            >
-              {caption}
-            </TableCell>
-  </>)
-}
+export const SheetHeaderCell = ({ caption }) => {
+  return (
+    <>
+      <TableCell
+        sx={{
+          position: "sticky",
+          top: 0,
+          backgroundColor: "white",
+          zIndex: 1,
+          fontWeight: "bold",
+        }}
+      >
+        {caption}
+      </TableCell>
+    </>
+  );
+};

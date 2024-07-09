@@ -55,10 +55,10 @@ export const GetMT5SymbolConfigurations = () => {
       } else {
         throw new Error(`Unexpected status code: ${status}`);
       }
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
       dispatch({
         type: GET_MT5SYMBOLCONFIGURATIONS_FAILURE,
@@ -98,10 +98,10 @@ export const GetMT5Suffixes = () => {
       } else {
         throw new Error(`Unexpected status code: ${status}`);
       }
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
       dispatch({ type: GET_MT5SUFFIX_FAILURE, payload: errorPayload });
       if (errorPayload.message === API_401_RES) {
@@ -139,12 +139,11 @@ export const GetMT5SymbolsConfigurationsAndSuffixes = () => {
       } else {
         throw new Error(`Unexpected status code: ${status}`);
       }
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
-      console.log(error);
       dispatch({
         type: GET_MT5SymbolsConfigurationsAndSuffixes_FAILURE,
         payload: errorPayload,
@@ -187,10 +186,10 @@ export const GetMT5CoverageSymbols = () => {
       } else {
         throw new Error(`Unexpected status code: ${status}`);
       }
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
       dispatch({
         type: GET_MT5COVERAGESYMBOLS_FAILURE,

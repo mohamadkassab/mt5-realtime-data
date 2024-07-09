@@ -1,12 +1,9 @@
 import * as React from "react";
 import {
-  DialogActions,
-  DialogContent,
   DialogTitle,
   useMediaQuery,
   useTheme,
   Dialog,
-  Button,
 } from "@mui/material/";
 import PrimaryButton from "../buttons/PrimaryButton";
 import SecondaryButton from "../buttons/SecondaryButton";
@@ -34,25 +31,20 @@ const ConfirmDialog = ({ confirmDelete, confirmSentece, data }) => {
           </div>
         </DialogTitle>
         <div className="flex items-center justify-center px-6">
-
           <div color="primary" style={{ fontWeight: "bold" }}>
             {confirmSentece}
             <div className="text-error" style={{ fontWeight: "bold" }}>
               {data} ?
             </div>
           </div>
-
         </div>
 
-
-          <div className="w-full pb-4">
-            <div className="flex justify-start ">
-          
-              <PrimaryButton onClick={handleConfirm} caption="Confirm"/>
-              <SecondaryButton onClick={handleReject} caption="Cancel"/>
-            </div>
+        <div className="w-full pb-4">
+          <div className="flex justify-start ">
+            <PrimaryButton onClick={handleConfirm} caption="Confirm" />
+            <SecondaryButton onClick={handleReject} caption="Cancel" />
           </div>
-
+        </div>
       </Dialog>
     </>
   );

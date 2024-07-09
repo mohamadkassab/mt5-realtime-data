@@ -7,7 +7,6 @@ import {
   useTheme,
   Dialog,
   TextField,
-
 } from "@mui/material/";
 import PrimaryButton from "../buttons/PrimaryButton";
 import SecondaryButton from "../buttons/SecondaryButton";
@@ -42,29 +41,28 @@ const InputDialog = ({ title, onSubmit, confirmSentece, dataName }) => {
           <div color="primary" style={{ fontWeight: "bold" }}>
             {confirmSentece}
             <div className="text-error" style={{ fontWeight: "bold" }}>
-            <TextField
-        type="text"
-        variant="outlined"
-        required
-        name={dataName}
-        label={dataName}
-        value={data}
-        onChange={handleChange}
-        sx={{
-          width: "100%",
-          marginTop:"2rem",
-          "@media (min-width: 1000px)": {},
-        }}
-      />
+              <TextField
+                type="text"
+                variant="outlined"
+                required
+                name={dataName}
+                label={dataName}
+                value={data}
+                onChange={handleChange}
+                sx={{
+                  width: "100%",
+                  marginTop: "2rem",
+                  "@media (min-width: 1000px)": {},
+                }}
+              />
             </div>
           </div>
         </DialogContent>
         <DialogActions>
           <div className="w-full">
             <div className="flex justify-start px-2">
-          
-              <PrimaryButton onClick={handleConfirm} caption="Confirm"/>
-              <SecondaryButton onClick={handleReject} caption="Cancel"/>
+              <PrimaryButton onClick={handleConfirm} caption="Confirm" />
+              <SecondaryButton onClick={handleReject} caption="Cancel" />
             </div>
           </div>
         </DialogActions>

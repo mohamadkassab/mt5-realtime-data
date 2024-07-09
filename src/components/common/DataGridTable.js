@@ -1,20 +1,27 @@
 import DataGrid, {
-    Column,
-    Grouping,
-    GroupPanel,
-    ColumnChooser,
-    SearchPanel,
-    Sorting,
-    Export,
-    Selection,
-    Scrolling,
-  } from "devextreme-react/data-grid";
-  
+  Column,
+  Grouping,
+  GroupPanel,
+  ColumnChooser,
+  SearchPanel,
+  Sorting,
+  Export,
+  Selection,
+  Scrolling,
+} from "devextreme-react/data-grid";
+
 import IconButton from "@mui/material/IconButton";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 
-const DataGridTable = ({data, onExporting, allowedPageSizes, onEditing, onDeleting, columns})=>{
+const DataGridTable = ({
+  data,
+  onExporting,
+  allowedPageSizes,
+  onEditing,
+  onDeleting,
+  columns,
+}) => {
   const columnsDiv = columns.map((item, index) => {
     const columnProps = {
       dataField: item.dataField,
@@ -27,17 +34,16 @@ const DataGridTable = ({data, onExporting, allowedPageSizes, onEditing, onDeleti
     if (item.width) {
       columnProps.width = item.width;
     }
-    if(item.groupIndex){
+    if (item.groupIndex) {
       columnProps.groupIndex = item.groupIndex;
     }
-    if(!item.hideColumn){
+    if (!item.hideColumn) {
       return <Column key={index} {...columnProps}></Column>;
     }
-
   });
-    return(
-      <div id="gridContainer">
-        <DataGrid
+  return (
+    <div id="gridContainer">
+      <DataGrid
         id="gridContainer"
         dataSource={data}
         columnHidingEnabled={true}
@@ -53,14 +59,14 @@ const DataGridTable = ({data, onExporting, allowedPageSizes, onEditing, onDeleti
         <Export enabled={true} allowExportSelectedData={true} />
         <SearchPanel visible={true} placeholder="Search..." />
         <Selection mode="multiple" />
-        <Grouping 
-         contextMenuEnabled={true}
-        autoExpandAll={false} 
-        expandMode="rowClick"/>
+        <Grouping
+          contextMenuEnabled={true}
+          autoExpandAll={false}
+          expandMode="rowClick"
+        />
         <GroupPanel visible={true} emptyPanelText="" />
-   
-      
-        <ColumnChooser enabled={false}/>
+
+        <ColumnChooser enabled={false} />
         <Sorting mode="multiple" />
 
         {columnsDiv}
@@ -89,8 +95,8 @@ const DataGridTable = ({data, onExporting, allowedPageSizes, onEditing, onDeleti
           )}
         />
       </DataGrid>
-      </div>
-    )
-}
+    </div>
+  );
+};
 
-export default DataGridTable
+export default DataGridTable;

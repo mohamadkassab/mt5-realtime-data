@@ -198,7 +198,7 @@ const DefaultLayout = ({ componentName, children }) => {
               </Typography>
             </div>
             <div>
-              {componentName === "Sheets" && false && (
+              {componentName === "Sheets"  && (
                 <Box display="flex" alignItems="center">
                   <Circle isConnected={isConnected} />
                   <Typography

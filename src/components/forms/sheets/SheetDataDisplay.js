@@ -9,9 +9,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { DeleteSheet } from "../../../utils/redux/actions/Sheets";
 import AddButton from "../../buttons/AddButton";
 import EditButton from "../../buttons/EditButtons";
@@ -27,21 +26,19 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
   const [totalByManyCoverageConf, setTotalByManyCoverageConf] = useState({});
   const [totalCovered, setTotalCovered] = useState({});
   const [totalConfFiltered, setTotalConfFiltered] = useState([]);
-  
 
-    // Get totalconf identifier
+  // Get totalconf identifier
   React.useEffect(() => {
     const dealer_configurations = sheet?.dealer_configurations;
-
     const newArray = dealer_configurations.map((obj, index, arr) => {
       if (index < arr.length - 1) {
-        if( obj.MainSymbol !== arr[index + 1].MainSymbol){
+        if (obj.MainSymbol !== arr[index + 1].MainSymbol) {
           return `${sheet.sheet_id}${obj.MainSymbol}`;
-        }else{
+        } else {
           return "";
         }
       }
-      return `${sheet.sheet_id}${obj.MainSymbol}`; 
+      return `${sheet.sheet_id}${obj.MainSymbol}`;
     });
     setTotalConfFiltered(newArray);
   }, [sheet]);
@@ -56,18 +53,18 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
       }
     }
   }, []);
-  
+
   // Get totalByConf
   React.useEffect(() => {
-    try{
+    try {
       const newTotalByConf = {};
       const newTotalByManyConf = {};
-      Object.entries(realTimeData).forEach(([key, value]) =>{
+      Object.entries(realTimeData).forEach(([key, value]) => {
         let rule0 = null;
         let rule1 = null;
         let rule2 = null;
         let rule3 = null;
-        const keyParts = key.split(':');
+        const keyParts = key.split(":");
         const sheetName = keyParts[0];
         const sheetId = keyParts[1];
         const serverId = keyParts[2];
@@ -76,14 +73,13 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
         const suffix = keyParts[5];
         const mainSymbol = keyParts[6];
         const transactionType = keyParts[7];
-        const symbolAndLogin = sheetId +  mainSymbol;
+        const symbolAndLogin = sheetId + mainSymbol;
         const buyVol = transactionType === "buy" ? parseFloat(value) : 0;
         const sellVol = transactionType === "sell" ? parseFloat(value) : 0;
         const netVol = buyVol - sellVol;
-        const totalByManyConfIdentifier = sheetId + "tbmc"
+        const totalByManyConfIdentifier = sheetId + "tbmc";
 
-
-        if(!newTotalByManyConf[totalByManyConfIdentifier]){
+        if (!newTotalByManyConf[totalByManyConfIdentifier]) {
           newTotalByManyConf[totalByManyConfIdentifier] = {
             totalBuySheet: 0,
             totalSellSheet: 0,
@@ -91,25 +87,29 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
             totalResult: [0, 0, 0, 0],
           };
         }
-    
 
         newTotalByManyConf[totalByManyConfIdentifier].totalBuySheet += buyVol;
         newTotalByManyConf[totalByManyConfIdentifier].totalSellSheet += sellVol;
         newTotalByManyConf[totalByManyConfIdentifier].totalNetSheet += netVol;
 
-
-        sheet.dealer_configurations.forEach((config, index) => {   
-      
-
-          if(String(config.Login ) === loginId && String(config.SymbolSuffix) === suffix && String(config.MainSymbol) === mainSymbol){
+        sheet.dealer_configurations.forEach((config, index) => {
+          if (
+            String(config.Login) === loginId &&
+            String(config.SymbolSuffix) === suffix &&
+            String(config.MainSymbol) === mainSymbol
+          ) {
             rule0 = parseInt(config.Rules[0]?.value, 10) / 100 || 0;
             rule1 = parseInt(config.Rules[1]?.value, 10) / 100 || 0;
             rule2 = parseInt(config.Rules[2]?.value, 10) / 100 || 0;
             rule3 = parseInt(config.Rules[3]?.value, 10) / 100 || 0;
-            newTotalByManyConf[totalByManyConfIdentifier].totalResult[0] += (netVol * parseInt(config.Rules[0]?.value, 10)) / 100 || 0;
-            newTotalByManyConf[totalByManyConfIdentifier].totalResult[1] += (netVol * parseInt(config.Rules[1]?.value, 10)) / 100 || 0;
-            newTotalByManyConf[totalByManyConfIdentifier].totalResult[2] += (netVol * parseInt(config.Rules[2]?.value, 10)) / 100 || 0;
-            newTotalByManyConf[totalByManyConfIdentifier].totalResult[3] += (netVol * parseInt(config.Rules[3]?.value, 10)) / 100 || 0;
+            newTotalByManyConf[totalByManyConfIdentifier].totalResult[0] +=
+              (netVol * parseInt(config.Rules[0]?.value, 10)) / 100 || 0;
+            newTotalByManyConf[totalByManyConfIdentifier].totalResult[1] +=
+              (netVol * parseInt(config.Rules[1]?.value, 10)) / 100 || 0;
+            newTotalByManyConf[totalByManyConfIdentifier].totalResult[2] +=
+              (netVol * parseInt(config.Rules[2]?.value, 10)) / 100 || 0;
+            newTotalByManyConf[totalByManyConfIdentifier].totalResult[3] +=
+              (netVol * parseInt(config.Rules[3]?.value, 10)) / 100 || 0;
           }
         });
 
@@ -119,31 +119,27 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
             totalSellSymbol: sellVol,
             totalNetSymbol: netVol,
             totalResult: [
-              (netVol * rule0),
-              (netVol * rule1),
-              (netVol * rule2),
-              (netVol * rule3),
+              netVol * rule0,
+              netVol * rule1,
+              netVol * rule2,
+              netVol * rule3,
             ],
           };
         } else {
           newTotalByConf[symbolAndLogin].totalBuySymbol += buyVol;
           newTotalByConf[symbolAndLogin].totalSellSymbol += sellVol;
           newTotalByConf[symbolAndLogin].totalNetSymbol += netVol;
-          newTotalByConf[symbolAndLogin].totalResult[0] += (netVol * rule0);
-          newTotalByConf[symbolAndLogin].totalResult[1] += (netVol * rule1);
-          newTotalByConf[symbolAndLogin].totalResult[2] += (netVol * rule2);
-          newTotalByConf[symbolAndLogin].totalResult[3] += (netVol * rule3);
+          newTotalByConf[symbolAndLogin].totalResult[0] += netVol * rule0;
+          newTotalByConf[symbolAndLogin].totalResult[1] += netVol * rule1;
+          newTotalByConf[symbolAndLogin].totalResult[2] += netVol * rule2;
+          newTotalByConf[symbolAndLogin].totalResult[3] += netVol * rule3;
         }
-        
-
       });
       setTotalByConf(newTotalByConf);
       setTotalByManyConf(newTotalByManyConf);
+    } catch (e) {
+      console.log(e);
     }
-    catch(error){
-      console.log(error);
-    }
-  
   }, [rulesName, realTimeData, sheet]);
 
   // Get Coverage conf totals
@@ -156,7 +152,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
   //         totalNetSheet: 0,
   //         totalResult: [0, 0, 0, 0],
   //       };
-  
+
   //       sheet.COVERAGE_DETAILS.forEach((config, index) => {
   //         let netVol = config.BuyVol - config.SellVol;
   //         newTotalByManyCoverageConf.totalBuySheet += config.BuyVol;
@@ -191,7 +187,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
   //         coveredResult: [0, 0, 0, 0],
   //       },
   //     };
-  
+
   //     newTotalCovered.totals.coveredBuy +=
   //       totalByManyConf?.totalBuySheet - totalByManyCoverageConf?.totalBuySheet;
   //     newTotalCovered.totals.coveredSell +=
@@ -203,13 +199,13 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
   //         totalByManyConf?.totalResult[i] -
   //         totalByManyCoverageConf?.totalResult[i];
   //     }
-  
+
   //     setTotalCovered(newTotalCovered);
   //   }
   //   catch(error){
   //     console.log(error);
   //   }
-   
+
   // }, [totalByManyConf, totalByManyCoverageConf]);
 
   return (
@@ -244,13 +240,20 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
             {sheet?.dealer_configurations?.map((config, index) => {
               const nextConfig = sheet?.dealer_configurations?.[index + 1];
               const isLast = nextConfig?.MainSymbol !== config.MainSymbol;
-              const buyIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.server_id}:${config.Login}:${config.manager_id}:${config.SymbolSuffix}:${config.MainSymbol}:buy`;
-              const sellIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.server_id}:${config.Login}:${config.manager_id}:${config.SymbolSuffix}:${config.MainSymbol}:sell`;
+              const buyIdentifier = `${sheet.sheet_name.toLowerCase()}:${
+                sheet.sheet_id
+              }:${config.server_id}:${config.Login}:${config.manager_id}:${
+                config.SymbolSuffix
+              }:${config.MainSymbol}:buy`;
+              const sellIdentifier = `${sheet.sheet_name.toLowerCase()}:${
+                sheet.sheet_id
+              }:${config.server_id}:${config.Login}:${config.manager_id}:${
+                config.SymbolSuffix
+              }:${config.MainSymbol}:sell`;
               const buyVol = realTimeData[`${buyIdentifier}`] || 0;
               const sellVol = realTimeData[`${sellIdentifier}`] || 0;
-              const netVol = (buyVol - sellVol);
-            
-              
+              const netVol = buyVol - sellVol;
+
               return (
                 <React.Fragment key={`conf-${index}`}>
                   <TableRow>
@@ -271,12 +274,15 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     {config.Rules?.map((rule, ruleIndex) => {
                       const ruleValue = `${rule.value}%`;
                       const ruleResult = (
-                        (buyVol - sellVol) * (rule.value / 100)
+                        (buyVol - sellVol) *
+                        (rule.value / 100)
                       ).toFixed(2);
                       return (
                         <React.Fragment key={`conf-rule-${ruleIndex}`}>
                           <TableCell>{ruleValue}</TableCell>
-                          <TableCell>{isNaN(ruleResult) ? 0 : ruleResult}</TableCell>
+                          <TableCell>
+                            {isNaN(ruleResult) ? 0 : ruleResult}
+                          </TableCell>
                         </React.Fragment>
                       );
                     })}
@@ -287,7 +293,6 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                   {/* Start check if next item its the end of the configuration */}
 
                   {isLast && (
-                    
                     <TableRow key={`total-symbol-conf-${config.MainSymbol}`}>
                       <TableCell></TableCell>
                       <TableCell
@@ -300,21 +305,29 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                         {"Total"}
                       </TableCell>
                       <TableCell>
-                        {totalByConf[`${totalConfFiltered[index]}`]?.totalBuySymbol || 0}
+                        {totalByConf[`${totalConfFiltered[index]}`]
+                          ?.totalBuySymbol || 0}
                       </TableCell>
                       <TableCell>
-                      {totalByConf[`${totalConfFiltered[index]}`]?.totalSellSymbol || 0}
+                        {totalByConf[`${totalConfFiltered[index]}`]
+                          ?.totalSellSymbol || 0}
                       </TableCell>
                       <TableCell>
-                      {totalByConf[`${totalConfFiltered[index]}`]?.totalNetSymbol || 0}
+                        {totalByConf[`${totalConfFiltered[index]}`]
+                          ?.totalNetSymbol || 0}
                       </TableCell>
                       {config.Rules?.map((rule, ruleIndex) => {
-                        const totalResult = totalByConf[`${totalConfFiltered[index]}`]?.totalResult[ruleIndex]?.toFixed(2) || 0;
-                    
+                        const totalResult =
+                          totalByConf[
+                            `${totalConfFiltered[index]}`
+                          ]?.totalResult[ruleIndex]?.toFixed(2) || 0;
+
                         return (
                           <React.Fragment key={`conf-rule-${ruleIndex}`}>
                             <TableCell></TableCell>
-                            <TableCell>{totalResult === "0.00" ? 0 : totalResult}</TableCell>
+                            <TableCell>
+                              {totalResult === "0.00" ? 0 : totalResult}
+                            </TableCell>
                           </React.Fragment>
                         );
                       })}
@@ -324,11 +337,13 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                 </React.Fragment>
               );
             })}
-            
+
             {/* Start Total of all the main configurations */}
             {sheet?.dealer_configurations?.length > 0 && (
               <>
-                <TableRow key={`total-sheet-conf${sheet.dealer_configurations.MainSymbol}`}>
+                <TableRow
+                  key={`total-sheet-conf${sheet.dealer_configurations.MainSymbol}`}
+                >
                   <TableCell></TableCell>
                   <TableCell
                     sx={{
@@ -339,13 +354,28 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                   >
                     {"Total"}
                   </TableCell>
-                  <TableCell>{totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet || 0}</TableCell>
-                  <TableCell>{totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalSellSheet || 0}</TableCell>
-                  <TableCell>{totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet || 0}</TableCell>
+                  <TableCell>
+                    {totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet ||
+                      0}
+                  </TableCell>
+                  <TableCell>
+                    {totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalSellSheet ||
+                      0}
+                  </TableCell>
+                  <TableCell>
+                    {totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet ||
+                      0}
+                  </TableCell>
                   {rulesName.map((_, ruleIndex) => {
-                    const totalResult = totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult && totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult[ruleIndex]
-                      ? totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult[ruleIndex].toFixed(2)
-                      : 0;
+                    const totalResult =
+                      totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult &&
+                      totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult[
+                        ruleIndex
+                      ]
+                        ? totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult[
+                            ruleIndex
+                          ].toFixed(2)
+                        : 0;
                     return (
                       <React.Fragment key={`conf-rule-${ruleIndex}`}>
                         <TableCell></TableCell>
@@ -371,12 +401,15 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     {config.Rules?.map((rule, ruleIndex) => {
                       const ruleValue = `${rule.value}%`;
                       const ruleResult = (
-                        (config.BuyVol - config.SellVol) * (rule.value / 100)
+                        (config.BuyVol - config.SellVol) *
+                        (rule.value / 100)
                       ).toFixed(2);
                       return (
                         <React.Fragment key={`coverageConfRule-${ruleIndex}`}>
                           <TableCell>{ruleValue}</TableCell>
-                          <TableCell>{isNaN(ruleResult) ? 0 : ruleResult}</TableCell>
+                          <TableCell>
+                            {isNaN(ruleResult) ? 0 : ruleResult}
+                          </TableCell>
                         </React.Fragment>
                       );
                     })}
@@ -388,7 +421,9 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
             {/* Start total of the coverage rows */}
             {sheet?.COVERAGE_DETAILS?.length > 0 && (
               <>
-                <TableRow key={`total-sheet-coverage-conf-${sheet.dealer_configurations.MainSymbol}`}>
+                <TableRow
+                  key={`total-sheet-coverage-conf-${sheet.dealer_configurations.MainSymbol}`}
+                >
                   <TableCell></TableCell>
                   <TableCell
                     sx={{
@@ -399,13 +434,23 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                   >
                     {"Total"}
                   </TableCell>
-                  <TableCell>{totalByManyCoverageConf?.totalBuySheet || 0}</TableCell>
-                  <TableCell>{totalByManyCoverageConf?.totalSellSheet || 0}</TableCell>
-                  <TableCell>{totalByManyCoverageConf?.totalNetSheet || 0}</TableCell>
+                  <TableCell>
+                    {totalByManyCoverageConf?.totalBuySheet || 0}
+                  </TableCell>
+                  <TableCell>
+                    {totalByManyCoverageConf?.totalSellSheet || 0}
+                  </TableCell>
+                  <TableCell>
+                    {totalByManyCoverageConf?.totalNetSheet || 0}
+                  </TableCell>
                   {rulesName.map((_, ruleIndex) => {
-                    const totalResult = totalByManyCoverageConf.totalResult && totalByManyCoverageConf.totalResult[ruleIndex]
-                      ? totalByManyCoverageConf.totalResult[ruleIndex].toFixed(2)
-                      : 0;
+                    const totalResult =
+                      totalByManyCoverageConf.totalResult &&
+                      totalByManyCoverageConf.totalResult[ruleIndex]
+                        ? totalByManyCoverageConf.totalResult[
+                            ruleIndex
+                          ].toFixed(2)
+                        : 0;
                     return (
                       <React.Fragment key={`conf-rule-${ruleIndex}`}>
                         <TableCell></TableCell>
@@ -418,7 +463,9 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
             )}
             {/* End total of the coverage rows */}
             {/* start covered total */}
-            <TableRow key={`total-covered-${sheet.dealer_configurations.MainSymbol}`}>
+            <TableRow
+              key={`total-covered-${sheet.dealer_configurations.MainSymbol}`}
+            >
               <TableCell></TableCell>
               <TableCell
                 sx={{
@@ -429,11 +476,27 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
               >
                 {"Covered"}
               </TableCell>
-              <TableCell>{isNaN(totalCovered?.totals?.coveredBuy) ? 0 : totalCovered?.totals?.coveredBuy.toFixed(2)}</TableCell>
-              <TableCell>{isNaN(totalCovered?.totals?.coveredSell) ? 0 : totalCovered?.totals?.coveredSell.toFixed(2)}</TableCell>
-              <TableCell>{isNaN(totalCovered?.totals?.coveredNet) ? 0 : totalCovered?.totals?.coveredNet.toFixed(2)}</TableCell>
+              <TableCell>
+                {isNaN(totalCovered?.totals?.coveredBuy)
+                  ? 0
+                  : totalCovered?.totals?.coveredBuy.toFixed(2)}
+              </TableCell>
+              <TableCell>
+                {isNaN(totalCovered?.totals?.coveredSell)
+                  ? 0
+                  : totalCovered?.totals?.coveredSell.toFixed(2)}
+              </TableCell>
+              <TableCell>
+                {isNaN(totalCovered?.totals?.coveredNet)
+                  ? 0
+                  : totalCovered?.totals?.coveredNet.toFixed(2)}
+              </TableCell>
               {rulesName.map((_, ruleIndex) => {
-                const coveredResult = isNaN(totalCovered?.totals?.coveredResult[ruleIndex])? 0 : totalCovered?.totals?.coveredResult[ruleIndex]?.toFixed(2);
+                const coveredResult = isNaN(
+                  totalCovered?.totals?.coveredResult[ruleIndex]
+                )
+                  ? 0
+                  : totalCovered?.totals?.coveredResult[ruleIndex]?.toFixed(2);
                 return (
                   <React.Fragment key={`conf-rule-${ruleIndex}`}>
                     <TableCell></TableCell>
@@ -458,7 +521,7 @@ const ConfigurationList = ({
   setSelectedSheetIdfunction,
   selectedSheetName,
   setSelectedSheetName,
-  realTimeData
+  realTimeData,
 }) => {
   const dispatch = useDispatch();
   const [selectedTab, setSelectedTab] = useState(0);
@@ -477,7 +540,7 @@ const ConfigurationList = ({
   const confirmDelete = (response) => {
     if (response) {
       onDelete();
-    } 
+    }
     setShowConfirmDialog(false);
   };
 
@@ -485,7 +548,6 @@ const ConfigurationList = ({
     await dispatch(DeleteSheet(selectedSheetId));
     dispatch(GetSheets());
   };
-
 
   React.useEffect(() => {
     if (sheets && sheets.length > 0) {
@@ -496,7 +558,7 @@ const ConfigurationList = ({
 
   return (
     <Box>
-        {showConfirmDialog && (
+      {showConfirmDialog && (
         <ConfirmDialaog
           confirmDelete={confirmDelete}
           confirmSentece={confirmDeleteSentece}
@@ -520,11 +582,9 @@ const ConfigurationList = ({
             />
           ))}
         </Tabs>
+        <div className="flex gap-4"></div>
         <div className="flex gap-4">
-
-        </div>
-        <div className="flex gap-4">
-        <DeleteButton onClick={onDeleting} caption="Delete" />
+          <DeleteButton onClick={onDeleting} caption="Delete" />
           <EditButton onClick={onEditing} />
           <AddButton onClick={onInserting} />
         </div>
@@ -536,7 +596,9 @@ const ConfigurationList = ({
           id={`tabpanel-${index}`}
           key={index}
         >
-          {selectedTab === index && <ConfigurationSheet sheet={sheet} realTimeData={realTimeData} />}
+          {selectedTab === index && (
+            <ConfigurationSheet sheet={sheet} realTimeData={realTimeData} />
+          )}
         </Box>
       ))}
     </Box>

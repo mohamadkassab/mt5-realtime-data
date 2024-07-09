@@ -41,16 +41,15 @@ export const GetManagers = () => {
       } else {
         throw new Error(`Unexpected status code: ${status}`);
       }
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
       dispatch({ type: GET_MANAGER_FAILURE, payload: errorPayload });
       if(errorPayload.message === API_401_RES){
         dispatch({ type: ISAUTHENTICATED_FAILURE });
-      }
-      
+      }  
     }
   };
 };

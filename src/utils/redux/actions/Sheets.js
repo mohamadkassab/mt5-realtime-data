@@ -52,13 +52,15 @@ export const CreateSheet = (formData) => {
       } else {
         throw new Error(`Unexpected status code: ${status}`);
       }
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
-      console.log(errorPayload);
       dispatch({ type: SEL_FAILURE, payload: errorPayload });
+      if (errorPayload.message === API_401_RES) {
+        dispatch({ type: ISAUTHENTICATED_FAILURE });
+      }
     }
   };
 };
@@ -91,13 +93,15 @@ export const EditSheet = (formData, sheetId) => {
       } else {
         throw new Error(`Unexpected status code: ${status}`);
       }
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
-      console.log(errorPayload);
       dispatch({ type: SEL_FAILURE, payload: errorPayload });
+      if (errorPayload.message === API_401_RES) {
+        dispatch({ type: ISAUTHENTICATED_FAILURE });
+      }
     }
   };
 };
@@ -134,10 +138,10 @@ export const GetSheets = () => {
       } else {
         throw new Error(`Unexpected status code: ${status}`);
       }
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
       dispatch({ type: GET_SHEETS_FAILURE, payload: errorPayload });
       if (errorPayload.message === API_401_RES) {
@@ -174,10 +178,10 @@ export const DeleteSheet = (params) => {
       } else {
         throw new Error(`Unexpected status code: ${status}`);
       }
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
       dispatch({ type: SEL_FAILURE, payload: errorPayload });
       if (errorPayload.message === API_401_RES) {
@@ -223,12 +227,11 @@ export const GetSheetToEditIds = (params) => {
         }
       } 
 
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
-      console.log(error)
       dispatch({ type: GET_SHEETTOEDITIDS_FAILURE, payload: errorPayload });
       if (errorPayload.message === API_401_RES) {
         dispatch({ type: ISAUTHENTICATED_FAILURE });
@@ -239,7 +242,6 @@ export const GetSheetToEditIds = (params) => {
 
 export const SheetConnectionState = (sheetState) => {
   return async (dispatch) => {
-    
     if(sheetState === true){
       dispatch({ type: SHEET_ONLINE });
     }else{

@@ -44,10 +44,10 @@ export const SignIn = (credentials) => {
       } else {
         throw new Error(`Unexpected status code: ${status}`);
       }
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
       localStorage.removeItem(ATFXTOKEN);
       dispatch({ type: ISAUTHENTICATED_FAILURE });
@@ -64,10 +64,10 @@ export const SignOut = () => {
       localStorage.removeItem(ATFXTOKEN);
       dispatch({ type: ISAUTHENTICATED_FAILURE });
       dispatch({ type: EL_SUCCESS });
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
 
       dispatch({ type: EL_FAILURE, payload: errorPayload });

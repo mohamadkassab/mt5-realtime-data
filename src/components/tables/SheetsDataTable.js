@@ -23,6 +23,7 @@ const SheetsDataTable = () => {
       wsRef.current = new WebSocket("ws://127.0.0.1:8765");
 
       wsRef.current.onopen = () => {
+        dispatch(SheetConnectionState(true));
         console.log(`Connected...`);
         wsRef.current.send(JSON.stringify({ type: "auth", authorizationToken }));
         const stringSelectedSheetId = String(selectedSheetId);
@@ -43,12 +44,6 @@ const SheetsDataTable = () => {
               return updatedData;
             });
           }
-          //  else if (message && message.type === "subscribe") {
-          //   const stringSelectedSheetId = String(selectedSheetId);
-          //   wsRef.current.send(
-          //     JSON.stringify({ type: "subscribe", stringSelectedSheetId })
-          //   );
-          // } 
           else if(message && message.type === "initial_data"){
             const newData = message.data.reduce((acc, item) => {
               acc[item.key] = item.data.value;
@@ -70,6 +65,7 @@ const SheetsDataTable = () => {
 
       wsRef.current.onclose = (event) => {
         console.log("WebSocket closed:", event);
+        dispatch(SheetConnectionState(false));   
         if (reconnectAttempts.current < maxReconnectAttempts) {
           reconnectAttempts.current += 1;
           setTimeout(() => {
@@ -95,12 +91,10 @@ const SheetsDataTable = () => {
   
   React.useEffect(() => {
     if( wsRef?.current?.readyState === WebSocket.OPEN){
-      console.log("isopen")
       dispatch(SheetConnectionState(true));
     }else{
-      dispatch(SheetConnectionState(false));
-      console.log("isclose")
-    }
+      dispatch(SheetConnectionState(false));   
+     }
   
   }, [wsRef.current]); 
 
@@ -122,7 +116,7 @@ const SheetsDataTable = () => {
       console.log(e)
     }
 
-  }, [selectedSheetId, wsRef?.current?.readyState, isInitialLoad]);
+  }, [selectedSheetId, wsRef?.current?.readyState, isInitialLoad, sheets]);
 
   React.useEffect(() => {
     connectWebSocket();

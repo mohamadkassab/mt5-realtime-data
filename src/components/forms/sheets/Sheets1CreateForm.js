@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   FormControl,
   Autocomplete,
@@ -11,13 +11,12 @@ import {
   Popper,
 } from "@mui/material";
 
-// Start relative variables
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-// End relative variables
+
 
 const Sheets1CreateForm = ({
   formData,
@@ -27,7 +26,7 @@ const Sheets1CreateForm = ({
   setCoverageAndSymbols,
 }) => {
   const [touched, setTouched] = React.useState(false);
-  const [error, setError] = React.useState('');
+  const [error, setError] = React.useState("");
   const Managers = useSelector((state) => state.Managers);
   const [managers, setManagers] = React.useState(Managers);
   const Servers = useSelector((state) => state.Servers);
@@ -38,9 +37,6 @@ const Sheets1CreateForm = ({
   const mt5CoverageAccounts = useSelector((state) => state.CoverageAccounts);
   const MT5CoverageSymbols = useSelector((state) => state.MT5CoverageSymbols);
   const serverId = formData[columns[3].dataField];
-
-  // End relative variables
-
 
 
   React.useEffect(() => {
@@ -53,7 +49,9 @@ const Sheets1CreateForm = ({
       );
       setManagers(filteredManager);
       setSymbolConfigurations(symbols.length ? symbols : []);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e)
+    }
   }, [Managers, serverId, mt5SymbolConfigurations]);
 
   const handleToggle = (event) => {
@@ -92,20 +90,20 @@ const Sheets1CreateForm = ({
       setCoverageAndSymbols(newCoverageAndSymbols);
     }
   };
-  
+
   const handleBlur = () => {
     setTouched(true);
     if (!formData[columns[1].dataField]) {
-      setError('This field is required');
+      setError("This field is required");
     } else {
-      setError('');
+      setError("");
     }
   };
 
   const handleChange = (e) => {
     handleChangeFormData(e);
     if (touched && e.target.value) {
-      setError('');
+      setError("");
     }
   };
 
@@ -129,10 +127,10 @@ const Sheets1CreateForm = ({
       />
 
       <FormControl
-            sx={{
-              width: "100%",
-              "@media (min-width: 1000px)": {},
-            }}
+        sx={{
+          width: "100%",
+          "@media (min-width: 1000px)": {},
+        }}
         variant="outlined"
       >
         <Autocomplete
@@ -164,10 +162,10 @@ const Sheets1CreateForm = ({
       </FormControl>
 
       <FormControl
-          sx={{
-            width: "100%",
-            "@media (min-width: 1000px)": {},
-          }}
+        sx={{
+          width: "100%",
+          "@media (min-width: 1000px)": {},
+        }}
         variant="outlined"
       >
         <Autocomplete
@@ -210,10 +208,10 @@ const Sheets1CreateForm = ({
       </FormControl>
 
       <FormControl
-            sx={{
-              width: "100%",
-              "@media (min-width: 1000px)": {},
-            }}
+        sx={{
+          width: "100%",
+          "@media (min-width: 1000px)": {},
+        }}
         variant="outlined"
       >
         <Autocomplete
@@ -356,53 +354,55 @@ const Sheets1CreateForm = ({
                         )}
                       />
                     </FormControl>
-                    
-                  <FormControl
-                    sx={{
-                      width: "100%",
-                      "@media (min-width: 1000px)": {},
-                    }}
-                    variant="outlined"
-                  >
-                    <Autocomplete
-                      id="outlined-autocomplete"
-                      options={MT5CoverageSymbols.filter(
-                        (symbol) =>
-                          symbol.coverage_id ===
-                        coverageAndSymbols[index].coverageId
-                      )}
-                      getOptionLabel={(option) => option.Symbol}
-                      value={MT5CoverageSymbols.filter((symbol) => 
-                        coverageAndSymbols[index]?.symbols?.includes(symbol.Symbol_ID)
-                      )}
-                      onChange={(event, newValue) => {
-                        const selectedItems = newValue.map(
-                          (option) => option.Symbol_ID
-                        );
-                        updateDataAtIndex(index, selectedItems);
+
+                    <FormControl
+                      sx={{
+                        width: "100%",
+                        "@media (min-width: 1000px)": {},
                       }}
-                      multiple
-                      disableCloseOnSelect
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Coverage symbol configuration"
-                          variant="outlined"
-                          required
-                        />
-                      )}
-                      renderOption={(props, option, { selected }) => {
-                        const { key, ...rest } = props;
-                        return (
-                          <li key={key} {...rest}>
-                            <Checkbox checked={selected} />
-                            {option.Symbol}
-                          </li>
-                        );
-                      }}
-                      // renderTags={() => null}
-                    />
-                  </FormControl>
+                      variant="outlined"
+                    >
+                      <Autocomplete
+                        id="outlined-autocomplete"
+                        options={MT5CoverageSymbols.filter(
+                          (symbol) =>
+                            symbol.coverage_id ===
+                            coverageAndSymbols[index].coverageId
+                        )}
+                        getOptionLabel={(option) => option.Symbol}
+                        value={MT5CoverageSymbols.filter((symbol) =>
+                          coverageAndSymbols[index]?.symbols?.includes(
+                            symbol.Symbol_ID
+                          )
+                        )}
+                        onChange={(event, newValue) => {
+                          const selectedItems = newValue.map(
+                            (option) => option.Symbol_ID
+                          );
+                          updateDataAtIndex(index, selectedItems);
+                        }}
+                        multiple
+                        disableCloseOnSelect
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Coverage symbol configuration"
+                            variant="outlined"
+                            required
+                          />
+                        )}
+                        renderOption={(props, option, { selected }) => {
+                          const { key, ...rest } = props;
+                          return (
+                            <li key={key} {...rest}>
+                              <Checkbox checked={selected} />
+                              {option.Symbol}
+                            </li>
+                          );
+                        }}
+                        // renderTags={() => null}
+                      />
+                    </FormControl>
 
                     <div className="flex w-full max-w-[50px]">
                       <ListItemButton

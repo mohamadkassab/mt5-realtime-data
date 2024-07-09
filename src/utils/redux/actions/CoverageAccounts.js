@@ -44,10 +44,10 @@ export const GetCoverageAccounts = () => {
       } else {
         throw new Error(`Unexpected status code: ${status}`);
       }
-    } catch (error) {
+    } catch (e) {
       const errorPayload = {
-        message: error.message,
-        code: error.code,
+        message: e.message,
+        code: e.code,
       };
       dispatch({ type: GET_COVERAGEACCOUNTS_FAILURE, payload: errorPayload });
       if (errorPayload.message === API_401_RES) {

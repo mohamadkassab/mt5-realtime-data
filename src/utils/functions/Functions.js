@@ -4,20 +4,25 @@ import { saveAs } from "file-saver-es";
 // import jwt_decode from 'jsonwebtoken';
 
 export const ExportXlsx = (e, fileName) => {
-  const workbook = new Workbook();
-  const worksheet = workbook.addWorksheet("Main sheet");
-  exportDataGrid({
-    component: e.component,
-    worksheet,
-    autoFilterEnabled: true,
-  }).then(() => {
-    workbook.xlsx.writeBuffer().then((buffer) => {
-      saveAs(
-        new Blob([buffer], { type: "application/octet-stream" }),
-        `${fileName}.xlsx`
-      );
+  try{
+    const workbook = new Workbook();
+    const worksheet = workbook.addWorksheet("Main sheet");
+    exportDataGrid({
+      component: e.component,
+      worksheet,
+      autoFilterEnabled: true,
+    }).then(() => {
+      workbook.xlsx.writeBuffer().then((buffer) => {
+        saveAs(
+          new Blob([buffer], { type: "application/octet-stream" }),
+          `${fileName}.xlsx`
+        );
+      });
     });
-  });
+
+  }catch(e){
+    console.log(e);
+  }
 };
 
 export const goBackFunc = (prevVisibility, setSheetVisibility) => {
@@ -55,102 +60,106 @@ export const transformData = (
   isFormDataChanged,
   symbolsFormulas
 ) => {
-
-  if (sheetToEdit && sheetToEdit.sheet_id && !isFormDataChanged) {
-    const newData = [];
-    sheetToEdit?.formulas?.forEach((item) => {
-      const selectedManager = managers.find(
-        (manager) => manager.id === item.manager_id
-      );
-      let counter = 1;
-      const newItem = {
-        name: item.dealer_configuration_id,
-        manager: selectedManager?.name,
-        symbol: item.SymbolSuffix,
-        isKey: item.SymbolSuffix === item.MainSymbol ? true : false,
-        symbol_configuration_id: item.symbol_configuration_id,
-        manager_id: item.manager_id,
-      };
-
-      item.values.forEach((valueItem) => {
-        newItem[`#${counter}`] = valueItem.value;
-        counter++;
-      });
-
-      newData.push(newItem);
-    });
-    return newData;
-  } else {
-    const newData = [];
-    if (selectedManagers?.length > 0 && data) {
-      managersIds.forEach((managerId, index) => {
-
+  try{
+    if (sheetToEdit && sheetToEdit.sheet_id && !isFormDataChanged) {
+      const newData = [];
+      sheetToEdit?.formulas?.forEach((item) => {
         const selectedManager = managers.find(
-          (manager) => manager.id === managerId
+          (manager) => manager.id === item.manager_id
         );
-
-        data.forEach((item) => {
-          const newDataItem = {
-            name: item.name,
-            manager: selectedManager?.name,
-            symbol: item.symbol,
-            multiplier: item.multiplier,
-            isKey: true,
-            symbol_configuration_id: item.id,
-            manager_id: managerId,
-          };
-    
-            const oldValueItem = symbolsFormulas.find(
-              oldItem => oldItem.symbol === item.symbol &&
-              oldItem.symbol_configuration_id === item.id &&
-              oldItem.manager_id === managerId
-            );
-
-          
-            if(oldValueItem){
-              Object.entries(oldValueItem).reduce((acc, [key, value]) => {
-                if (key.startsWith('#')) {
-                  newDataItem[`${key}`] = value;
-                }
-              });
-            }
-
-           
-          newData.push(newDataItem);
-
-
-          item.suffixes?.forEach((suffix) => {
+        let counter = 1;
+        const newItem = {
+          name: item.dealer_configuration_id,
+          manager: selectedManager?.name,
+          symbol: item.SymbolSuffix,
+          isKey: item.SymbolSuffix === item.MainSymbol ? true : false,
+          symbol_configuration_id: item.symbol_configuration_id,
+          manager_id: item.manager_id,
+        };
+  
+        item.values.forEach((valueItem) => {
+          newItem[`#${counter}`] = valueItem.value;
+          counter++;
+        });
+  
+        newData.push(newItem);
+      });
+      return newData;
+    } else {
+      const newData = [];
+      if (selectedManagers?.length > 0 && data) {
+        managersIds.forEach((managerId, index) => {
+  
+          const selectedManager = managers.find(
+            (manager) => manager.id === managerId
+          );
+  
+          data.forEach((item) => {
             const newDataItem = {
               name: item.name,
               manager: selectedManager?.name,
-              symbol: suffix.suffix,
-              multiplier: suffix.multiplier,
-              isKey: false,
+              symbol: item.symbol,
+              multiplier: item.multiplier,
+              isKey: true,
               symbol_configuration_id: item.id,
               manager_id: managerId,
             };
-
-            const oldValueItem = symbolsFormulas.find(
-              oldItem => oldItem.symbol === suffix.suffix &&
-              oldItem.symbol_configuration_id === item.id &&
-              oldItem.manager_id === managerId
-            );
-
-          
-            if(oldValueItem){
-              Object.entries(oldValueItem).reduce((acc, [key, value]) => {
-                if (key.startsWith('#')) {
-                  newDataItem[`${key}`] = value;
-                }
-              });
-            }
-
+      
+              const oldValueItem = symbolsFormulas.find(
+                oldItem => oldItem.symbol === item.symbol &&
+                oldItem.symbol_configuration_id === item.id &&
+                oldItem.manager_id === managerId
+              );
+  
+            
+              if(oldValueItem){
+                Object.entries(oldValueItem).reduce((acc, [key, value]) => {
+                  if (key.startsWith('#')) {
+                    newDataItem[`${key}`] = value;
+                  }
+                });
+              }
+  
+             
             newData.push(newDataItem);
+  
+  
+            item.suffixes?.forEach((suffix) => {
+              const newDataItem = {
+                name: item.name,
+                manager: selectedManager?.name,
+                symbol: suffix.suffix,
+                multiplier: suffix.multiplier,
+                isKey: false,
+                symbol_configuration_id: item.id,
+                manager_id: managerId,
+              };
+  
+              const oldValueItem = symbolsFormulas.find(
+                oldItem => oldItem.symbol === suffix.suffix &&
+                oldItem.symbol_configuration_id === item.id &&
+                oldItem.manager_id === managerId
+              );
+  
+            
+              if(oldValueItem){
+                Object.entries(oldValueItem).reduce((acc, [key, value]) => {
+                  if (key.startsWith('#')) {
+                    newDataItem[`${key}`] = value;
+                  }
+                });
+              }
+  
+              newData.push(newDataItem);
+            });
           });
         });
-      });
+      }
+      return newData;
     }
-    return newData;
+  }
+  catch(e){
+    console.log(e)
   }
 };
 
@@ -162,7 +171,6 @@ export const transformCoverageData = (
   isCoverageFormDataChanged,
   coverageSymbolsFormulas
 ) => {
-
 
   try {
     if (sheetToEdit && sheetToEdit.sheet_id && !isCoverageFormDataChanged) {
@@ -206,7 +214,6 @@ export const transformCoverageData = (
                 (mt5Symbol) => mt5Symbol.Symbol_ID === symbol
               );
 
-
               const newDataItem = {
                 coverageId: selectedCoverage.id,
                 coverageLogin: selectedCoverage.login,
@@ -220,8 +227,7 @@ export const transformCoverageData = (
                 oldItem.coverageId === selectedCoverage.id &&
                 oldItem.coverageLogin === selectedCoverage.login
               );
-  
-            
+
               if(oldValueItem){
                 Object.entries(oldValueItem).reduce((acc, [key, value]) => {
                   if (key.startsWith('#')) {
@@ -237,7 +243,9 @@ export const transformCoverageData = (
       }
       return newData;
     }
-  } catch (e) {}
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export const transformSheetData = (
@@ -247,97 +255,100 @@ export const transformSheetData = (
   coverageSymbolsFormulas,
   columns2
 ) => {
-  const Rules = [];
-  const captions = [];
-  let maxIndex = 0;
-  const rulesStruct = {
-    name: "",
-    details: {
-      dealer_manager_symbols_formulas: [],
-      dealer_coverage_symbol_formula: [],
-    },
-  };
+  try{
+    const Rules = [];
+    const captions = [];
+    let maxIndex = 0;
+    const rulesStruct = {
+      name: "",
+      details: {
+        dealer_manager_symbols_formulas: [],
+        dealer_coverage_symbol_formula: [],
+      },
+    };
+  
+    function afterMaxIndex() {
+      columns2.forEach((item, index) => {
+        if (item.dataField.startsWith("#")) {
+          maxIndex = maxIndex + 1;
+          captions.push(item.caption);
+        }
+      });
+  
+      if (maxIndex > 0) {
+        for (let i = 0; i < maxIndex; i++) {
+          // const index = columns2.length - maxIndex + i + 1;
+          const newRule = { ...rulesStruct };
+          newRule.name = `${captions[i]}`;
+  
+          newRule.details = {
+            ...newRule.details,
+            dealer_manager_symbols_formulas: [],
+            dealer_coverage_symbol_formula: [],
+          };
+  
+          symbolsFormulas?.forEach((item) => {
+            const newSymbol = {
+              symbol: item.symbol,
+              value: item[`#${i + 1}`] || 0,
+              symbol_configuration_id: item.symbol_configuration_id,
+              manager_id: item.manager_id,
+            };
+            newRule.details.dealer_manager_symbols_formulas.push(newSymbol);
+          });
 
-  function afterMaxIndex() {
-    columns2.forEach((item, index) => {
-      if (item.dataField.startsWith("#")) {
-        maxIndex = maxIndex + 1;
-        captions.push(item.caption);
-      }
-    });
-
-    if (maxIndex > 0) {
-      for (let i = 0; i < maxIndex; i++) {
-        // const index = columns2.length - maxIndex + i + 1;
+          coverageSymbolsFormulas?.forEach((item) => {
+            const newSymbol = {
+              symbol: item.symbol,
+              coverage_id: item.coverageId,
+              value: item[`#${i + 1}`] || 0,
+            };
+            newRule.details.dealer_coverage_symbol_formula.push(newSymbol);
+          });
+  
+          Rules.push(newRule);
+        }
+      } else {
         const newRule = { ...rulesStruct };
-        newRule.name = `${captions[i]}`;
-
+        newRule.name = `Note 1`;
+  
         newRule.details = {
           ...newRule.details,
           dealer_manager_symbols_formulas: [],
           dealer_coverage_symbol_formula: [],
         };
-
+  
         symbolsFormulas?.forEach((item) => {
           const newSymbol = {
             symbol: item.symbol,
-            value: item[`#${i + 1}`] || 0,
+            value: 0,
             symbol_configuration_id: item.symbol_configuration_id,
             manager_id: item.manager_id,
           };
-
+  
           newRule.details.dealer_manager_symbols_formulas.push(newSymbol);
         });
         coverageSymbolsFormulas?.forEach((item) => {
           const newSymbol = {
             symbol: item.symbol,
             coverage_id: item.coverageId,
-            value: item[`#${i + 1}`] || 0,
+            value: 0,
           };
           newRule.details.dealer_coverage_symbol_formula.push(newSymbol);
         });
-
+  
         Rules.push(newRule);
       }
-    } else {
-      const newRule = { ...rulesStruct };
-      newRule.name = `Note 1`;
-
-      newRule.details = {
-        ...newRule.details,
-        dealer_manager_symbols_formulas: [],
-        dealer_coverage_symbol_formula: [],
-      };
-
-      symbolsFormulas?.forEach((item) => {
-        const newSymbol = {
-          symbol: item.symbol,
-          value: 0,
-          symbol_configuration_id: item.symbol_configuration_id,
-          manager_id: item.manager_id,
-        };
-
-        newRule.details.dealer_manager_symbols_formulas.push(newSymbol);
-      });
-      coverageSymbolsFormulas?.forEach((item) => {
-        const newSymbol = {
-          symbol: item.symbol,
-          coverage_id: item.coverageId,
-          value: 0,
-        };
-        newRule.details.dealer_coverage_symbol_formula.push(newSymbol);
-      });
-
-      Rules.push(newRule);
     }
+    afterMaxIndex();
+    return {
+      sheet_name: formData.sheet_name,
+      dealer_id: decodedToken.id,
+      visibility: formData.visibility.toString(),
+      server_id: formData.server_id,
+      Rules: Rules,
+    };
+  }catch(e){
+    console.log(e);
   }
-
-  afterMaxIndex();
-  return {
-    sheet_name: formData.sheet_name,
-    dealer_id: decodedToken.id,
-    visibility: formData.visibility.toString(),
-    server_id: formData.server_id,
-    Rules: Rules,
-  };
 };

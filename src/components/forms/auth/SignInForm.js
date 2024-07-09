@@ -17,13 +17,12 @@ const SignInForm = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
   const isAuthenticated = useSelector((state) => state.isAuthenticated);
-
   const error = useSelector((state) => state.error);
-
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
+  
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (event) => {

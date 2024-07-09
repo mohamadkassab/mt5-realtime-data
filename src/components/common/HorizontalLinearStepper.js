@@ -1,10 +1,10 @@
-import React, { useImperativeHandle, forwardRef } from 'react';
-import Box from '@mui/material/Box';
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
+import React, { useImperativeHandle, forwardRef } from "react";
+import Box from "@mui/material/Box";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
 
-const HorizontalLinearStepper = forwardRef(({ steps, onStepClick  }, ref) => {
+const HorizontalLinearStepper = forwardRef(({ steps, onStepClick }, ref) => {
   const [activeStep, setActiveStep] = React.useState(0);
 
   const handleNext = () => {
@@ -24,7 +24,7 @@ const HorizontalLinearStepper = forwardRef(({ steps, onStepClick  }, ref) => {
   React.useEffect(() => {
     handleReset();
   }, []);
-  
+
   useImperativeHandle(ref, () => ({
     handleNext,
     handleBack,
@@ -38,24 +38,22 @@ const HorizontalLinearStepper = forwardRef(({ steps, onStepClick  }, ref) => {
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
-    <Stepper activeStep={activeStep}>
-      {steps.map((label, index) => (
-        <Step key={`${label}-${index}`}>
-         
-
-    
-          <StepLabel onClick={() => handleStepClick(index)}>
-          <div className='cursor-pointer transition duration-200 ease-in-out 
-                 hover:font-bold '>
-            {label}
-                 </div>
-          </StepLabel>
-     
-        </Step>
-      ))}
-    </Stepper>
-  </Box>
+    <Box sx={{ width: "100%" }}>
+      <Stepper activeStep={activeStep}>
+        {steps.map((label, index) => (
+          <Step key={`${label}-${index}`}>
+            <StepLabel onClick={() => handleStepClick(index)}>
+              <div
+                className="cursor-pointer transition duration-200 ease-in-out 
+                 hover:font-bold "
+              >
+                {label}
+              </div>
+            </StepLabel>
+          </Step>
+        ))}
+      </Stepper>
+    </Box>
   );
 });
 
