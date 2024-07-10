@@ -31,6 +31,8 @@ import { jwtDecode } from "jwt-decode";
 import InputDialog from "../../common/InputDialog";
 
 const SheetsCreateForm = () => {
+  const MemoizedSheets1CreateForm= React.memo(Sheets1CreateForm)
+  const MemoizedSheets2CreateForm= React.memo(Sheets2CreateForm)
   const dispatch = useDispatch();
   const stepperRef = useRef();
   const mt5SymbolConfigurations = useSelector(
@@ -117,7 +119,6 @@ const SheetsCreateForm = () => {
     if (formData[columns[1].dataField] === "") {
       return;
     }
-    console.log(transformedData);
     dispatch(CreateSheet(transformedData));
   };
 
@@ -285,7 +286,7 @@ const SheetsCreateForm = () => {
                     />
                   )}
                   {sheetVisibility[0] && (
-                    <Sheets1CreateForm
+                    <MemoizedSheets1CreateForm
                       formData={formData}
                       columns={columns}
                       handleChangeFormData={handleChangeFormData}
@@ -294,7 +295,7 @@ const SheetsCreateForm = () => {
                     />
                   )}
                   {sheetVisibility[1] && (
-                    <Sheets2CreateForm
+                    <MemoizedSheets2CreateForm
                       columns2={columns2}
                       setColumns2={setColumns2}
                       columns3={columns3}

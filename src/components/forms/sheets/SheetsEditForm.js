@@ -34,6 +34,8 @@ import InputDialog from "../../common/InputDialog";
 // End relative variables
 
 const SheetsEditForm = () => {
+  const MemoizedSheets1CreateForm= React.memo(Sheets1CreateForm)
+  const MemoizedSheets2CreateForm= React.memo(Sheets2CreateForm)
   const location = useLocation();
   const [sheetId, setSheetId] = useState({});
   const [sheetToEdit, setSheetToEdit] = useState({});
@@ -367,7 +369,7 @@ const SheetsEditForm = () => {
                     />
                   )}
                   {sheetVisibility[0] && (
-                    <Sheets1CreateForm
+                    <MemoizedSheets1CreateForm
                       formData={formData}
                       columns={columns}
                       handleChangeFormData={handleChangeFormData}
@@ -376,7 +378,7 @@ const SheetsEditForm = () => {
                     />
                   )}
                   {sheetVisibility[1] && (
-                    <Sheets2CreateForm
+                    <MemoizedSheets2CreateForm
                       columns2={columns2}
                       setColumns2={setColumns2}
                       columns3={columns3}

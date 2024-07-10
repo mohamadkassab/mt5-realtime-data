@@ -18,6 +18,7 @@ import { SheetHeaderCell } from "../../cellRendering/CellRendering";
 import DeleteButton from "../../buttons/DeleteButton";
 import ConfirmDialaog from "../../common/ConfirmDialog";
 import { GetSheets } from "../../../utils/redux/actions/Sheets";
+import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 
 const ConfigurationSheet = ({ sheet, realTimeData }) => {
   const [rulesName, setRulesName] = useState([]);
@@ -26,35 +27,41 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
   const [totalByManyCoverageConf, setTotalByManyCoverageConf] = useState({});
   const [totalCovered, setTotalCovered] = useState({});
   const [totalConfFiltered, setTotalConfFiltered] = useState([]);
+  const MemoizedTableRow = React.memo(TableRow);
 
   // Get totalconf identifier
   React.useEffect(() => {
     const dealer_configurations = sheet?.dealer_configurations;
     const newArray = dealer_configurations.map((obj, index, arr) => {
       if (index < arr.length - 1) {
-        if (obj.MainSymbol !== arr[index + 1].MainSymbol) {
-          return `${sheet.sheet_id}${obj.MainSymbol}`;
+        if ((obj.MainSymbol !== arr[index + 1].MainSymbol) || (obj.Login !== arr[index + 1].Login)) {
+          return `${sheet.sheet_id}${obj.MainSymbol}${obj.Login}`;
         } else {
           return "";
         }
       }
-      return `${sheet.sheet_id}${obj.MainSymbol}`;
+      return `${sheet.sheet_id}${obj.MainSymbol}${obj.Login}`;
     });
     setTotalConfFiltered(newArray);
+    console.log(newArray)
   }, [sheet]);
 
   // Get Every Rule's name
-  React.useEffect(() => {
+  const ruleNamesArray = React.useMemo(() => {
     if (sheet.dealer_configurations && sheet.dealer_configurations.length > 0) {
       const firstDealerConfig = sheet.dealer_configurations[0];
       if (firstDealerConfig.Rules && firstDealerConfig.Rules.length > 0) {
-        const ruleNamesArray = firstDealerConfig.Rules.map((rule) => rule.name);
-        setRulesName(ruleNamesArray);
+        return firstDealerConfig.Rules.map((rule) => rule.name);
       }
     }
-  }, []);
+    return [];
+  }, [sheet]);
 
-  // Get totalByConf
+  React.useEffect(() => {
+    setRulesName(ruleNamesArray);
+  }, [ruleNamesArray]);
+
+  // Get totalByConf and manyConf
   React.useEffect(() => {
     try {
       const newTotalByConf = {};
@@ -73,7 +80,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
         const suffix = keyParts[5];
         const mainSymbol = keyParts[6];
         const transactionType = keyParts[7];
-        const symbolAndLogin = sheetId + mainSymbol;
+        const symbolAndLogin = sheetId + mainSymbol + loginId;
         const buyVol = transactionType === "buy" ? parseFloat(value) : 0;
         const sellVol = transactionType === "sell" ? parseFloat(value) : 0;
         const netVol = buyVol - sellVol;
@@ -220,7 +227,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
         <Table>
           {/* Start Header columns */}
           <TableHead>
-            <TableRow>
+            <MemoizedTableRow>
               <SheetHeaderCell caption={"Manager / Coverage"} />
               <SheetHeaderCell caption={"Symbol"} />
               <SheetHeaderCell caption={"Buy Vol"} />
@@ -232,14 +239,14 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                   <SheetHeaderCell caption={`Result ${index + 1}`} />
                 </React.Fragment>
               ))}
-            </TableRow>
+            </MemoizedTableRow>
           </TableHead>
           {/* End Header columns */}
           {/* Start rendering dealer configuration */}
           <TableBody>
             {sheet?.dealer_configurations?.map((config, index) => {
               const nextConfig = sheet?.dealer_configurations?.[index + 1];
-              const isLast = nextConfig?.MainSymbol !== config.MainSymbol;
+              const isLast = (nextConfig?.MainSymbol !== config.MainSymbol || nextConfig?.Login !== config.Login);
               const buyIdentifier = `${sheet.sheet_name.toLowerCase()}:${
                 sheet.sheet_id
               }:${config.server_id}:${config.Login}:${config.manager_id}:${
@@ -256,7 +263,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
 
               return (
                 <React.Fragment key={`conf-${index}`}>
-                  <TableRow>
+                  <MemoizedTableRow>
                     <TableCell>{config.Login}</TableCell>
                     <TableCell
                       style={
@@ -287,22 +294,23 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                       );
                     })}
                     {/* End display rules values and results */}
-                  </TableRow>
+                  </MemoizedTableRow>
 
                   {/* End rendering dealer configuration */}
                   {/* Start check if next item its the end of the configuration */}
 
                   {isLast && (
-                    <TableRow key={`total-symbol-conf-${config.MainSymbol}`}>
+                    <MemoizedTableRow key={`total-symbol-conf-${config.MainSymbol}`}>
                       <TableCell></TableCell>
                       <TableCell
                         sx={{
                           background: "#2e7d32",
                           color: "white",
                           fontWeight: "bold",
+                          
                         }}
                       >
-                        {"Total"}
+                        {`Total: ${config.MainSymbol} / ${config.Login}`}
                       </TableCell>
                       <TableCell>
                         {totalByConf[`${totalConfFiltered[index]}`]
@@ -331,7 +339,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                           </React.Fragment>
                         );
                       })}
-                    </TableRow>
+                    </MemoizedTableRow>
                   )}
                   {/* End check if next item its the end of the configuration */}
                 </React.Fragment>
@@ -341,7 +349,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
             {/* Start Total of all the main configurations */}
             {sheet?.dealer_configurations?.length > 0 && (
               <>
-                <TableRow
+                <MemoizedTableRow
                   key={`total-sheet-conf${sheet.dealer_configurations.MainSymbol}`}
                 >
                   <TableCell></TableCell>
@@ -383,7 +391,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                       </React.Fragment>
                     );
                   })}
-                </TableRow>
+                </MemoizedTableRow>
               </>
             )}
             {/* End Total of all the main configurations */}
@@ -392,7 +400,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
               const netVol = (config.BuyVol - config.SellVol).toFixed(3);
               return (
                 <React.Fragment key={`coverageConf-${index}`}>
-                  <TableRow>
+                  <MemoizedTableRow>
                     <TableCell>{config.Coverage}</TableCell>
                     <TableCell>{config.Symbol}</TableCell>
                     <TableCell>{config.BuyVol}</TableCell>
@@ -413,7 +421,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                         </React.Fragment>
                       );
                     })}
-                  </TableRow>
+                  </MemoizedTableRow>
                 </React.Fragment>
               );
             })}
@@ -421,7 +429,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
             {/* Start total of the coverage rows */}
             {sheet?.COVERAGE_DETAILS?.length > 0 && (
               <>
-                <TableRow
+                <MemoizedTableRow
                   key={`total-sheet-coverage-conf-${sheet.dealer_configurations.MainSymbol}`}
                 >
                   <TableCell></TableCell>
@@ -458,12 +466,12 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                       </React.Fragment>
                     );
                   })}
-                </TableRow>
+                </MemoizedTableRow>
               </>
             )}
             {/* End total of the coverage rows */}
             {/* start covered total */}
-            <TableRow
+            <MemoizedTableRow
               key={`total-covered-${sheet.dealer_configurations.MainSymbol}`}
             >
               <TableCell></TableCell>
@@ -504,7 +512,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                   </React.Fragment>
                 );
               })}
-            </TableRow>
+            </MemoizedTableRow>
             {/* End covered total */}
           </TableBody>
         </Table>
@@ -527,12 +535,13 @@ const ConfigurationList = ({
   const [selectedTab, setSelectedTab] = useState(0);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const confirmDeleteSentece = "Are you sure you want to delete ";
+  
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
     setSelectedSheetIdfunction(sheets[newValue]?.sheet_id);
     setSelectedSheetName(sheets[newValue]?.sheet_name);
   };
-
+  
   const onDeleting = () => {
     setShowConfirmDialog(true);
   };
