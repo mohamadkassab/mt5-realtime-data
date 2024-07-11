@@ -18,7 +18,7 @@ import { SheetHeaderCell } from "../../cellRendering/CellRendering";
 import DeleteButton from "../../buttons/DeleteButton";
 import ConfirmDialaog from "../../common/ConfirmDialog";
 import { GetSheets } from "../../../utils/redux/actions/Sheets";
-import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import { KeyboardArrowDown, KeyboardArrowUp, KeyboardArrowUpRounded } from '@mui/icons-material';
 
 const ConfigurationSheet = ({ sheet, realTimeData }) => {
   const [rulesName, setRulesName] = useState([]);
@@ -27,9 +27,26 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
   const [totalByManyCoverageConf, setTotalByManyCoverageConf] = useState({});
   const [totalCovered, setTotalCovered] = useState({});
   const [totalConfFiltered, setTotalConfFiltered] = useState([]);
+  const [totalTopConfFiltered, setTotalTopConfFiltered] = useState([]);
+  const [showCollapseRows, setShowCollapseRows] = useState([]);
   const MemoizedTableRow = React.memo(TableRow);
 
-  // Get totalconf identifier
+
+  const showCollapse = (groupName)=>{
+    const newArray = showCollapseRows.map((item, index)=>{
+      if(item.groupName === groupName){
+        return {
+          ...item,
+          isDisplayed: !(item.isDisplayed)
+        }
+      }
+      else{
+        return {...item}
+      }
+    })
+    setShowCollapseRows(newArray)
+  }
+  // start grouping algorithm
   React.useEffect(() => {
     const dealer_configurations = sheet?.dealer_configurations;
     const newArray = dealer_configurations.map((obj, index, arr) => {
@@ -43,8 +60,35 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
       return `${sheet.sheet_id}${obj.MainSymbol}${obj.Login}`;
     });
     setTotalConfFiltered(newArray);
-    console.log(newArray)
   }, [sheet]);
+  
+   React.useEffect(() => {
+    let currentIndex = 0;
+    const newArray = [...totalConfFiltered]
+    totalConfFiltered.forEach((item, index) =>{
+      if(item !== ""){
+        newArray[currentIndex] = item;
+        newArray[index] = "";
+        currentIndex = index + 1 ;
+      }
+    })
+    setTotalTopConfFiltered(newArray)
+  }, [totalConfFiltered]);
+
+  React.useEffect(() => {
+   let currentIdentifier = "";
+    const newArray = totalTopConfFiltered.map((item, index)=>{
+      if (item !== "") {
+        currentIdentifier = item
+    }
+    return {
+      groupName: currentIdentifier,   
+      isDisplayed : false,
+  };
+    })
+    setShowCollapseRows(newArray);
+  }, [totalTopConfFiltered]);
+  // end grouping algorithm
 
   // Get Every Rule's name
   const ruleNamesArray = React.useMemo(() => {
@@ -245,8 +289,8 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
           {/* Start rendering dealer configuration */}
           <TableBody>
             {sheet?.dealer_configurations?.map((config, index) => {
-              const nextConfig = sheet?.dealer_configurations?.[index + 1];
-              const isLast = (nextConfig?.MainSymbol !== config.MainSymbol || nextConfig?.Login !== config.Login);
+              // const nextConfig = sheet?.dealer_configurations?.[index + 1];
+              // const isLast = (nextConfig?.MainSymbol !== config.MainSymbol || nextConfig?.Login !== config.Login);
               const buyIdentifier = `${sheet.sheet_name.toLowerCase()}:${
                 sheet.sheet_id
               }:${config.server_id}:${config.Login}:${config.manager_id}:${
@@ -263,7 +307,49 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
 
               return (
                 <React.Fragment key={`conf-${index}`}>
-                  <MemoizedTableRow>
+                  {totalTopConfFiltered[index] !== "" && (
+                    <MemoizedTableRow key={`total-symbol-conf-${config.MainSymbol}`}>
+                      <TableCell ><KeyboardArrowDown onClick={() => showCollapse(totalTopConfFiltered[index]) } sx={{ cursor: 'pointer' }}/></TableCell>
+                      <TableCell
+                        sx={{
+                          background: "#2e7d32",
+                          color: "white",
+                          fontWeight: "bold",
+                          
+                        }}
+                      >
+                        {`${config.MainSymbol} / ${config.Login}`}
+                      </TableCell>
+                      <TableCell>
+                        {totalByConf[`${totalTopConfFiltered[index]}`]
+                          ?.totalBuySymbol?.toFixed(2) || 0}
+                      </TableCell>
+                      <TableCell>
+                        {totalByConf[`${totalTopConfFiltered[index]}`]
+                          ?.totalSellSymbol?.toFixed(2) || 0}
+                      </TableCell>
+                      <TableCell>
+                        {totalByConf[`${totalTopConfFiltered[index]}`]
+                          ?.totalNetSymbol?.toFixed(2) || 0}
+                      </TableCell>
+                      {config.Rules?.map((rule, ruleIndex) => {
+                        const totalResult =
+                          totalByConf[
+                            `${totalTopConfFiltered[index]}`
+                          ]?.totalResult[ruleIndex]?.toFixed(2) || 0;
+
+                        return (
+                          <React.Fragment key={`conf-rule-${ruleIndex}`}>
+                            <TableCell></TableCell>
+                            <TableCell>
+                              {totalResult === "0.00" ? 0 : totalResult}
+                            </TableCell>
+                          </React.Fragment>
+                        );
+                      })}
+                    </MemoizedTableRow>
+                  )}
+                  {showCollapseRows[index]?.isDisplayed && (<MemoizedTableRow>
                     <TableCell>{config.Login}</TableCell>
                     <TableCell
                       style={
@@ -283,23 +369,24 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                       const ruleResult = (
                         (buyVol - sellVol) *
                         (rule.value / 100)
-                      ).toFixed(2);
+                      )?.toFixed(2);
                       return (
                         <React.Fragment key={`conf-rule-${ruleIndex}`}>
                           <TableCell>{ruleValue}</TableCell>
                           <TableCell>
-                            {isNaN(ruleResult) ? 0 : ruleResult}
+                            {(isNaN(ruleResult) || ruleResult === "0.00") ? 0 : ruleResult}
                           </TableCell>
                         </React.Fragment>
                       );
                     })}
                     {/* End display rules values and results */}
-                  </MemoizedTableRow>
+                  </MemoizedTableRow>)}
+              
 
                   {/* End rendering dealer configuration */}
                   {/* Start check if next item its the end of the configuration */}
 
-                  {isLast && (
+                  {/* {isLast && (
                     <MemoizedTableRow key={`total-symbol-conf-${config.MainSymbol}`}>
                       <TableCell></TableCell>
                       <TableCell
@@ -340,7 +427,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                         );
                       })}
                     </MemoizedTableRow>
-                  )}
+                  )} */}
                   {/* End check if next item its the end of the configuration */}
                 </React.Fragment>
               );
@@ -363,15 +450,15 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     {"Total"}
                   </TableCell>
                   <TableCell>
-                    {totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet ||
+                    {totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet?.toFixed(2) ||
                       0}
                   </TableCell>
                   <TableCell>
-                    {totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalSellSheet ||
+                    {totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalSellSheet?.toFixed(2) ||
                       0}
                   </TableCell>
                   <TableCell>
-                    {totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet ||
+                    {totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet?.toFixed(2) ||
                       0}
                   </TableCell>
                   {rulesName.map((_, ruleIndex) => {
@@ -382,7 +469,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                       ]
                         ? totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult[
                             ruleIndex
-                          ].toFixed(2)
+                          ]?.toFixed(2)
                         : 0;
                     return (
                       <React.Fragment key={`conf-rule-${ruleIndex}`}>
@@ -405,18 +492,18 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     <TableCell>{config.Symbol}</TableCell>
                     <TableCell>{config.BuyVol}</TableCell>
                     <TableCell>{config.SellVol}</TableCell>
-                    <TableCell>{isNaN(netVol) ? 0 : netVol}</TableCell>
+                    <TableCell>{(isNaN(netVol) || netVol === "0.00") ? 0 : netVol}</TableCell>
                     {config.Rules?.map((rule, ruleIndex) => {
                       const ruleValue = `${rule.value}%`;
                       const ruleResult = (
                         (config.BuyVol - config.SellVol) *
                         (rule.value / 100)
-                      ).toFixed(2);
+                      )?.toFixed(2);
                       return (
                         <React.Fragment key={`coverageConfRule-${ruleIndex}`}>
                           <TableCell>{ruleValue}</TableCell>
                           <TableCell>
-                            {isNaN(ruleResult) ? 0 : ruleResult}
+                            {(isNaN(ruleResult) || ruleResult === "0.00") ? 0 : ruleResult}
                           </TableCell>
                         </React.Fragment>
                       );
@@ -443,13 +530,13 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     {"Total"}
                   </TableCell>
                   <TableCell>
-                    {totalByManyCoverageConf?.totalBuySheet || 0}
+                    {totalByManyCoverageConf?.totalBuySheet?.toFixed(2) || 0}
                   </TableCell>
                   <TableCell>
-                    {totalByManyCoverageConf?.totalSellSheet || 0}
+                    {totalByManyCoverageConf?.totalSellSheet?.toFixed(2) || 0}
                   </TableCell>
                   <TableCell>
-                    {totalByManyCoverageConf?.totalNetSheet || 0}
+                    {totalByManyCoverageConf?.totalNetSheet?.toFixed(2) || 0}
                   </TableCell>
                   {rulesName.map((_, ruleIndex) => {
                     const totalResult =
@@ -457,7 +544,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                       totalByManyCoverageConf.totalResult[ruleIndex]
                         ? totalByManyCoverageConf.totalResult[
                             ruleIndex
-                          ].toFixed(2)
+                          ]?.toFixed(2)
                         : 0;
                     return (
                       <React.Fragment key={`conf-rule-${ruleIndex}`}>
@@ -485,30 +572,30 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                 {"Covered"}
               </TableCell>
               <TableCell>
-                {isNaN(totalCovered?.totals?.coveredBuy)
+                {(isNaN(totalCovered?.totals?.coveredBuy) || totalCovered?.totals?.coveredBuy === "0.00")
+               
                   ? 0
-                  : totalCovered?.totals?.coveredBuy.toFixed(2)}
+                  : totalCovered?.totals?.coveredBuy?.toFixed(2)}
               </TableCell>
               <TableCell>
-                {isNaN(totalCovered?.totals?.coveredSell)
+                {(isNaN(totalCovered?.totals?.coveredSell) || totalCovered?.totals?.coveredSell === "0.00")
                   ? 0
-                  : totalCovered?.totals?.coveredSell.toFixed(2)}
+                  : totalCovered?.totals?.coveredSell?.toFixed(2)}
               </TableCell>
               <TableCell>
-                {isNaN(totalCovered?.totals?.coveredNet)
+                {(isNaN(totalCovered?.totals?.coveredNet) || totalCovered?.totals?.coveredNet === "0.00")
                   ? 0
-                  : totalCovered?.totals?.coveredNet.toFixed(2)}
+                  : totalCovered?.totals?.coveredNet?.toFixed(2)}
               </TableCell>
               {rulesName.map((_, ruleIndex) => {
-                const coveredResult = isNaN(
-                  totalCovered?.totals?.coveredResult[ruleIndex]
-                )
+                const coveredResult = 
+                isNaN( totalCovered?.totals?.coveredResult[ruleIndex]) 
                   ? 0
                   : totalCovered?.totals?.coveredResult[ruleIndex]?.toFixed(2);
                 return (
                   <React.Fragment key={`conf-rule-${ruleIndex}`}>
                     <TableCell></TableCell>
-                    <TableCell>{coveredResult}</TableCell>
+                    <TableCell>{coveredResult === "0.00" ? 0 : coveredResult}</TableCell>
                   </React.Fragment>
                 );
               })}
@@ -555,7 +642,8 @@ const ConfigurationList = ({
 
   const onDelete = async () => {
     await dispatch(DeleteSheet(selectedSheetId));
-    dispatch(GetSheets());
+    await dispatch(GetSheets());
+    handleTabChange("", 0);
   };
 
   React.useEffect(() => {
