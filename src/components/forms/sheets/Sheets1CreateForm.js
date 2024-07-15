@@ -24,9 +24,10 @@ const Sheets1CreateForm = ({
   handleChangeFormData,
   coverageAndSymbols,
   setCoverageAndSymbols,
+  error,
+  setError
 }) => {
   const [touched, setTouched] = React.useState(false);
-  const [error, setError] = React.useState("");
   const Managers = useSelector((state) => state.Managers);
   const [managers, setManagers] = React.useState(Managers);
   const Servers = useSelector((state) => state.Servers);
@@ -100,12 +101,12 @@ const Sheets1CreateForm = ({
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = React.useCallback((e) => {
     handleChangeFormData(e);
     if (touched && e.target.value) {
       setError("");
     }
-  };
+  }, []);
 
   return (
     <>

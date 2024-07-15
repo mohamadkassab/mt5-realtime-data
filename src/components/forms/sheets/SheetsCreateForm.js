@@ -31,8 +31,6 @@ import { jwtDecode } from "jwt-decode";
 import InputDialog from "../../common/InputDialog";
 
 const SheetsCreateForm = () => {
-  const MemoizedSheets1CreateForm= React.memo(Sheets1CreateForm)
-  const MemoizedSheets2CreateForm= React.memo(Sheets2CreateForm)
   const dispatch = useDispatch();
   const stepperRef = useRef();
   const mt5SymbolConfigurations = useSelector(
@@ -70,6 +68,7 @@ const SheetsCreateForm = () => {
   const confirmSentece = "Please enter a caption for the new formula";
   const dataName = "formulaCaption";
   const titleInputDialog = "Formula column caption";
+  const [error, setError] = React.useState("");
   const isSymbolConfIdChange = formData[columns[5].dataField];
   const isManagerIdChange = formData[columns[4].dataField];
   const [sheetVisibility, setSheetVisibility] = React.useState([true, false]);
@@ -156,11 +155,16 @@ const SheetsCreateForm = () => {
   };
 
   const goNext = () => {
-    checkLastTrueIndex();
-    goNextFunc(sheetVisibility, setSheetVisibility);
-    if (stepperRef.current) {
-      stepperRef.current.handleNext();
+    if(formData[columns[1].dataField]){
+      checkLastTrueIndex();
+      goNextFunc(sheetVisibility, setSheetVisibility);
+      if (stepperRef.current) {
+        stepperRef.current.handleNext();
+      }
+    }else{
+      setError("This field is required");
     }
+
   };
 
   const checkLastTrueIndex = () => {
@@ -286,16 +290,18 @@ const SheetsCreateForm = () => {
                     />
                   )}
                   {sheetVisibility[0] && (
-                    <MemoizedSheets1CreateForm
+                    <Sheets1CreateForm
                       formData={formData}
                       columns={columns}
                       handleChangeFormData={handleChangeFormData}
                       coverageAndSymbols={coverageAndSymbols}
                       setCoverageAndSymbols={setCoverageAndSymbols}
+                      error={error}
+                      setError={setError}
                     />
                   )}
                   {sheetVisibility[1] && (
-                    <MemoizedSheets2CreateForm
+                    <Sheets2CreateForm
                       columns2={columns2}
                       setColumns2={setColumns2}
                       columns3={columns3}
