@@ -352,3 +352,17 @@ export const transformSheetData = (
     console.log(e);
   }
 };
+
+export const toFixedIfNeeded = (num, decimals) => {
+  try{
+    if (typeof num !== 'number' || isNaN(num)) return 0;
+    const parts = num.toString().split('.');
+    if (parts.length === 2 && parts[1].length > decimals) {
+      return num.toFixed(decimals);
+    }
+    return num;
+  }catch(e){
+    console.log(e);
+    return 0
+  }
+};

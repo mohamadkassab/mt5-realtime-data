@@ -6,6 +6,7 @@ import { symbolCellRender, coverageSymbolCellRender } from "../../components/cel
 export const ATFXTOKEN = "ATFXTOKEN";
 export const GLOBAL_REQUEST_TIMEOUT = 20000;
 export const ROWS_PER_PAGE = [10, 15, 30];
+export const DECIMAL_POINTS = 2;
 
 // AUTH
 export const API_ADMIN_LOGIN = "/users/login/";

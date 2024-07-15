@@ -19,6 +19,8 @@ import DeleteButton from "../../buttons/DeleteButton";
 import ConfirmDialaog from "../../common/ConfirmDialog";
 import { GetSheets } from "../../../utils/redux/actions/Sheets";
 import { KeyboardArrowDown, KeyboardArrowUp, KeyboardArrowUpRounded } from '@mui/icons-material';
+import {toFixedIfNeeded} from "../../../utils/functions/Functions"
+import { DECIMAL_POINTS } from "../../../utils/constants/Constants";
 
 const ConfigurationSheet = ({ sheet, realTimeData }) => {
   const [rulesName, setRulesName] = useState([]);
@@ -374,28 +376,27 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                         {`${config.MainSymbol} / ${config.Login}`}
                       </TableCell>
                       <TableCell>
-                        {totalByConf[`${totalTopConfFiltered[index]}`]
-                          ?.totalBuySymbol?.toFixed(2) || 0}
+                           {toFixedIfNeeded(totalByConf[`${totalTopConfFiltered[index]}`]?.totalBuySymbol || 0 , DECIMAL_POINTS)}
                       </TableCell>
                       <TableCell>
-                        {totalByConf[`${totalTopConfFiltered[index]}`]
-                          ?.totalSellSymbol?.toFixed(2) || 0}
+                           {toFixedIfNeeded(totalByConf[`${totalTopConfFiltered[index]}`]?.totalSellSymbol || 0 , DECIMAL_POINTS)}
+
                       </TableCell>
                       <TableCell>
-                        {totalByConf[`${totalTopConfFiltered[index]}`]
-                          ?.totalNetSymbol?.toFixed(2) || 0}
+                          {toFixedIfNeeded(totalByConf[`${totalTopConfFiltered[index]}`]?.totalNetSymbol || 0 , DECIMAL_POINTS)}
                       </TableCell>
                       {config.Rules?.map((rule, ruleIndex) => {
                         const totalResult =
                           totalByConf[
                             `${totalTopConfFiltered[index]}`
-                          ]?.totalResult[ruleIndex]?.toFixed(2) || 0;
+                          ]?.totalResult[ruleIndex] || 0;
 
                         return (
                           <React.Fragment key={`conf-rule-${ruleIndex}`}>
                             <TableCell></TableCell>
                             <TableCell>
-                              {totalResult === "0.00" ? 0 : totalResult}
+                            {toFixedIfNeeded(totalResult , DECIMAL_POINTS)}
+
                             </TableCell>
                           </React.Fragment>
                         );
@@ -413,9 +414,9 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     >
                       {config.SymbolSuffix}
                     </TableCell>
-                    <TableCell>{buyVol}</TableCell>
-                    <TableCell>{sellVol}</TableCell>
-                    <TableCell>{isNaN(netVol) ? 0 : netVol}</TableCell>
+                    <TableCell>{toFixedIfNeeded(buyVol , DECIMAL_POINTS)}</TableCell>
+                    <TableCell>{toFixedIfNeeded(sellVol , DECIMAL_POINTS)}</TableCell>
+                    <TableCell>{toFixedIfNeeded(netVol , DECIMAL_POINTS)}</TableCell>
                     {/* Start display rules values and results */}
                     {config.Rules?.map((rule, ruleIndex) => {
                       const ruleValue = `${rule.value}%`;
@@ -427,7 +428,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                         <React.Fragment key={`conf-rule-${ruleIndex}`}>
                           <TableCell>{ruleValue}</TableCell>
                           <TableCell>
-                            {isNaN(ruleResult) ? 0 : ruleResult}
+                            {toFixedIfNeeded(ruleResult , DECIMAL_POINTS)}
                           </TableCell>
                         </React.Fragment>
                       );
@@ -455,13 +456,13 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     {"Total"}
                   </TableCell>
                   <TableCell>
-                    {totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet?.toFixed(2) || 0}
+                  {toFixedIfNeeded(totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet?.toFixed(2) || 0 , DECIMAL_POINTS)}
                   </TableCell>
                   <TableCell>
-                    {totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalSellSheet?.toFixed(2) || 0}
+                    {toFixedIfNeeded(totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalSellSheet?.toFixed(2) || 0 , DECIMAL_POINTS)}
                   </TableCell>
                   <TableCell>
-                    {totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet?.toFixed(2) || 0}
+                    {toFixedIfNeeded(totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet?.toFixed(2) || 0 , DECIMAL_POINTS)}
                   </TableCell>
                   {rulesName.map((_, ruleIndex) => {
                     const totalResult =
@@ -471,12 +472,12 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                       ]
                         ? totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult[
                             ruleIndex
-                          ]?.toFixed(2)
+                          ]
                         : 0;
                     return (
                       <React.Fragment key={`conf-rule-${ruleIndex}`}>
                         <TableCell></TableCell>
-                        <TableCell>{totalResult}</TableCell>
+                        <TableCell>{toFixedIfNeeded(totalResult , DECIMAL_POINTS)}</TableCell>
                       </React.Fragment>
                     );
                   })}
@@ -505,9 +506,9 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                   <MemoizedTableRow>
                     <TableCell>{config.Coverage}</TableCell>
                     <TableCell>{config.Symbol}</TableCell>
-                    <TableCell>{buyVol}</TableCell>
-                    <TableCell>{sellVol}</TableCell>
-                    <TableCell>{(isNaN(netVol) || netVol === "0.00") ? 0 : netVol}</TableCell>
+                    <TableCell>{toFixedIfNeeded(buyVol , DECIMAL_POINTS)}</TableCell>
+                    <TableCell>{toFixedIfNeeded(sellVol , DECIMAL_POINTS)}</TableCell>
+                    <TableCell>{toFixedIfNeeded(netVol , DECIMAL_POINTS)}</TableCell>
                     {config.Rules?.map((rule, ruleIndex) => {
                       const ruleValue = `${rule.value}%`;
                       const ruleResult = (
@@ -518,7 +519,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                         <React.Fragment key={`coverageConfRule-${ruleIndex}`}>
                           <TableCell>{ruleValue}</TableCell>
                           <TableCell>
-                            {isNaN(ruleResult) ? 0 : ruleResult}
+                            {toFixedIfNeeded(ruleResult , DECIMAL_POINTS)}
                           </TableCell>
                         </React.Fragment>
                       );
@@ -545,13 +546,13 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     {"Total"}
                   </TableCell>
                   <TableCell>
-                  {totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalBuySheet?.toFixed(2) || 0}
+                    {toFixedIfNeeded(totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalBuySheet?.toFixed(2) || 0 , DECIMAL_POINTS)}
                   </TableCell>
                   <TableCell>
-                  {totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalSellSheet?.toFixed(2) || 0}
+                    {toFixedIfNeeded(totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalSellSheet?.toFixed(2) || 0 , DECIMAL_POINTS)}
                   </TableCell>
                   <TableCell>
-                  {totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalNetSheet?.toFixed(2) || 0}
+                    {toFixedIfNeeded(totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalNetSheet?.toFixed(2) || 0 , DECIMAL_POINTS)}
                   </TableCell>
                   {rulesName.map((_, ruleIndex) => {
                     const totalResult =
@@ -560,7 +561,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     return (
                       <React.Fragment key={`conf-rule-${ruleIndex}`}>
                         <TableCell></TableCell>
-                        <TableCell>{totalResult}</TableCell>
+                        <TableCell>{toFixedIfNeeded(totalResult , DECIMAL_POINTS)}</TableCell>
                       </React.Fragment>
                     );
                   })}
@@ -583,13 +584,13 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                 {"Covered"}
               </TableCell>
               <TableCell>
-                  {(totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet || 0) - (totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalBuySheet || 0)}
+                {toFixedIfNeeded((totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet || 0) - (totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalBuySheet || 0) , DECIMAL_POINTS)}
               </TableCell>
               <TableCell>
-                     {(totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalSellSheet || 0) - (totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalSellSheet || 0)}
+               {toFixedIfNeeded((totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalSellSheet || 0) - (totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalSellSheet || 0) , DECIMAL_POINTS)}
               </TableCell>
               <TableCell>
-                     {(totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet || 0) - (totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalNetSheet || 0)}
+                {toFixedIfNeeded((totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet || 0) - (totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalNetSheet || 0) , DECIMAL_POINTS)}
               </TableCell>
               {rulesName.map((_, ruleIndex) => {
                 const coveredResult = (totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult[ruleIndex] || 0) - (totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalResult[ruleIndex] || 0)
@@ -597,7 +598,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                 return (
                   <React.Fragment key={`conf-rule-${ruleIndex}`}>
                     <TableCell></TableCell>
-                    <TableCell>{coveredResult === "0.00" ? 0 : coveredResult}</TableCell>
+                    <TableCell>{toFixedIfNeeded(coveredResult , DECIMAL_POINTS)}</TableCell>
                   </React.Fragment>
                 );
               })}
