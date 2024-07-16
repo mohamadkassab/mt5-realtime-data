@@ -393,7 +393,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
 
                         return (
                           <React.Fragment key={`conf-rule-${ruleIndex}`}>
-                            <TableCell></TableCell>
+                            <TableCell>{rule.value}%</TableCell>
                             <TableCell>
                             {toFixedIfNeeded(totalResult , DECIMAL_POINTS)}
 
