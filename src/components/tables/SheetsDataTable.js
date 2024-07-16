@@ -1,12 +1,11 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ConfigurationList from "../forms/sheets/SheetDataDisplay";
 import { GetSheets, SheetConnectionState } from "../../utils/redux/actions/Sheets";
-import { WS_IP } from "../../utils/constants/Constants";
 
 const SheetsDataTable = () => {
-  
+  const WS_IP = process.env.REACT_APP_WS_IP;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const wsRef = useRef(null);
@@ -23,7 +22,6 @@ const SheetsDataTable = () => {
   const connectWebSocket = () => {
     try {
       wsRef.current = new WebSocket(`ws://${WS_IP}:8765`);
-
       wsRef.current.onopen = () => {
         dispatch(SheetConnectionState(true));
         console.log(`Connected...`);

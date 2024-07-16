@@ -12,7 +12,6 @@ import {
   ISAUTHENTICATED_FAILURE,
 } from "../ActionTypes";
 
-
 export const GetManagers = () => {
   return async (dispatch) => {
     try {
