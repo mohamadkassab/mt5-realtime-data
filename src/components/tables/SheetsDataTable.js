@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ConfigurationList from "../forms/sheets/SheetDataDisplay";
 import { GetSheets, SheetConnectionState } from "../../utils/redux/actions/Sheets";
+import { WS_IP } from "../../utils/constants/Constants";
 
 const SheetsDataTable = () => {
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const wsRef = useRef(null);
@@ -20,7 +22,7 @@ const SheetsDataTable = () => {
 
   const connectWebSocket = () => {
     try {
-      wsRef.current = new WebSocket("ws://127.0.0.1:8765");
+      wsRef.current = new WebSocket(`ws://${WS_IP}:8765`);
 
       wsRef.current.onopen = () => {
         dispatch(SheetConnectionState(true));
@@ -105,7 +107,7 @@ const SheetsDataTable = () => {
   React.useEffect(() => {
     try{
       if (
-        selectedSheetId !== 0
+        selectedSheetId !== 0 && wsRef?.current?.readyState
       ) { 
         const stringSelectedSheetId = String(selectedSheetId);
         wsRef.current.send(

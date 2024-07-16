@@ -7,6 +7,8 @@ export const ATFXTOKEN = "ATFXTOKEN";
 export const GLOBAL_REQUEST_TIMEOUT = 20000;
 export const ROWS_PER_PAGE = [10, 15, 30];
 export const DECIMAL_POINTS = 2;
+export const WS_IP = "81.17.102.241";
+
 
 // AUTH
 export const API_ADMIN_LOGIN = "/users/login/";
