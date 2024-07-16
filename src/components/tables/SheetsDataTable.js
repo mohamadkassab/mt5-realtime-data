@@ -105,7 +105,7 @@ const SheetsDataTable = () => {
   React.useEffect(() => {
     try{
       if (
-        selectedSheetId !== 0 && wsRef?.current?.readyState
+        selectedSheetId !== 0 && wsRef?.current?.readyState === WebSocket.OPEN
       ) { 
         const stringSelectedSheetId = String(selectedSheetId);
         wsRef.current.send(

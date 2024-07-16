@@ -102,6 +102,7 @@ const reducer = produce((draft, action) => {
       break;
     case ISAUTHENTICATED_FAILURE:
       draft.isAuthenticated = false;
+      draft.error = false;
       break;
 
     // MT5 MANAGER
