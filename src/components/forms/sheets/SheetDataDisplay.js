@@ -491,8 +491,11 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
               // console.log(config)
               // console.log(sheet)
 
-              const buyIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.server_id}:${config.Login}:${config.coverage_id}:${config.Symbol}:buy:cov`;
-              const sellIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.server_id}:${config.Login}:${config.coverage_id}:${config.Symbol}:sell:cov`;
+              const buyIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.coverage_server_id}:${config.Login}:${config.coverage_account_id}:${config.Symbol}:buy:cov`;
+              const sellIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.coverage_server_id}:${config.Login}:${config.coverage_account_id}:${config.Symbol}:sell:cov`;
+
+              // console.log(`sheet render ${buyIdentifier}`)
+              // console.log(`sheet render ${sellIdentifier}`)
 
               // const buyIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.Login}:${config.Symbol}:buy:cov`;
               // const sellIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.Login}:${config.Symbol}:sell:cov`;

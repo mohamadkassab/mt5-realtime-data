@@ -36,6 +36,7 @@ const SheetsDataTable = () => {
           const message = JSON.parse(event.data);
           if (message && message.type === "updates") {
             const newData = message.data;
+            // console.log(newData)
             setRealTimeData((prevState) => {
               const updatedData = { ...prevState };
               const key = newData?.key;
