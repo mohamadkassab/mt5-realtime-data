@@ -6,6 +6,7 @@ import { GetSheets, SheetConnectionState } from "../../utils/redux/actions/Sheet
 
 const SheetsDataTable = () => {
   const WS_IP = process.env.REACT_APP_WS_IP;
+  const WS_PORT = process.env.REACT_APP_WS_PORT;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const wsRef = useRef(null);
@@ -21,7 +22,7 @@ const SheetsDataTable = () => {
 
   const connectWebSocket = () => {
     try {
-      wsRef.current = new WebSocket(`ws://${WS_IP}:8765`);
+      wsRef.current = new WebSocket(`ws://${WS_IP}:${WS_PORT}`);
       wsRef.current.onopen = () => {
         dispatch(SheetConnectionState(true));
         console.log(`Connected...`);
