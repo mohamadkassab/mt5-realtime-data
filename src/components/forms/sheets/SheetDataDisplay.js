@@ -456,13 +456,13 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     {"Total"}
                   </TableCell>
                   <TableCell>
-                  {toFixedIfNeeded(totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet?.toFixed(2) || 0 , DECIMAL_POINTS)}
+                  {toFixedIfNeeded(totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet || 0 , DECIMAL_POINTS)}
                   </TableCell>
                   <TableCell>
-                    {toFixedIfNeeded(totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalSellSheet?.toFixed(2) || 0 , DECIMAL_POINTS)}
+                    {toFixedIfNeeded(totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalSellSheet|| 0 , DECIMAL_POINTS)}
                   </TableCell>
                   <TableCell>
-                    {toFixedIfNeeded(totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet?.toFixed(2) || 0 , DECIMAL_POINTS)}
+                    {toFixedIfNeeded(totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet || 0 , DECIMAL_POINTS)}
                   </TableCell>
                   {rulesName.map((_, ruleIndex) => {
                     const totalResult =
@@ -549,13 +549,13 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     {"Total"}
                   </TableCell>
                   <TableCell>
-                    {toFixedIfNeeded(totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalBuySheet?.toFixed(2) || 0 , DECIMAL_POINTS)}
+                    {toFixedIfNeeded(totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalBuySheet || 0 , DECIMAL_POINTS)}
                   </TableCell>
                   <TableCell>
-                    {toFixedIfNeeded(totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalSellSheet?.toFixed(2) || 0 , DECIMAL_POINTS)}
+                    {toFixedIfNeeded(totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalSellSheet || 0 , DECIMAL_POINTS)}
                   </TableCell>
                   <TableCell>
-                    {toFixedIfNeeded(totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalNetSheet?.toFixed(2) || 0 , DECIMAL_POINTS)}
+                    {toFixedIfNeeded(totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalNetSheet || 0 , DECIMAL_POINTS)}
                   </TableCell>
                   {rulesName.map((_, ruleIndex) => {
                     const totalResult =

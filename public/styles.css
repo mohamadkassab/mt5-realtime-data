@@ -22121,3 +22121,11 @@ input.dx-hidden {
   border-left:none !important;
   border-right:none !important;
 }
+
+.formulaGridContainer .dx-datagrid-rowsview .dx-row {
+  border-bottom: 1px solid #ccc !important; 
+}
+
+.formulaGridContainer .dx-datagrid-rowsview .dx-row:hover {
+  background-color: #f0f0f0 !important; 
+}
