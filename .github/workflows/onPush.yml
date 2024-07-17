@@ -1,0 +1,23 @@
+name: Deploy to Windows Server
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.5
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: SSH to Windows Server and trigger build script
+        run: |
+          ssh mkarrowtradefx@81.17.102.241 'cd C:\nginx\nginx-1.26.0\apps\riskman-client && ./build_script.sh'
