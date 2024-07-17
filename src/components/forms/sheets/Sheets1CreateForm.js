@@ -101,12 +101,12 @@ const Sheets1CreateForm = ({
     }
   };
 
-  const handleChange = React.useCallback((e) => {
+  const handleChange = (e) => {
     handleChangeFormData(e);
     if (touched && e.target.value) {
       setError("");
     }
-  }, []);
+  };
 
   return (
     <>

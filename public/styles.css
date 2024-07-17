@@ -22115,3 +22115,9 @@ input.dx-hidden {
   background: rgba(0,0,0,.01);
   opacity: .01;
 }
+
+
+.dx-datagrid .dx-column-lines>td {
+  border-left:none !important;
+  border-right:none !important;
+}
