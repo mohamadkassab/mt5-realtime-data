@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
@@ -18,8 +18,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.WINSOWSSERVER_SSH_PRIVATE_KEY }}
 
-      - name: Verify SSH Access
-        run: timeout 30s ssh -o StrictHostKeyChecking=no mkarrowtradefx@81.17.102.241 'echo "SSH connection successful"'
+      - name: SSH to Windows Server
+        run: |
+            ssh kassab@81.17.102.241 'cd C:\nginx\nginx-1.26.0\apps\riskman-client && ./build_script.sh'
+
+      # - name: Verify SSH Access
+      #   run: ssh -o StrictHostKeyChecking=no mkarrowtradefx@81.17.102.241 'echo "SSH connection successful"'
     
       # - name: SSH to Windows Server and trigger build script
       #   run: ssh -o StrictHostKeyChecking=no mkarrowtradefx@81.17.102.241 'cd C:\nginx\nginx-1.26.0\apps\riskman-client && ./build_script.sh'
