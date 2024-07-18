@@ -3,7 +3,7 @@ name: Deploy to Windows Server
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   deploy:
@@ -18,6 +18,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.WINSOWSSERVER_SSH_PRIVATE_KEY }}
 
+      - name: Verify SSH Access
+        run: ssh -v mkarrowtradefx@81.17.102.241 'echo "SSH connection successful"'
+
       - name: SSH to Windows Server and trigger build script
-        run: |
-          ssh mkarrowtradefx@81.17.102.241 'cd C:\nginx\nginx-1.26.0\apps\riskman-client && ./build_script.sh'
+        run: ssh mkarrowtradefx@81.17.102.241 'cd C:\nginx\nginx-1.26.0\apps\riskman-client && ./build_script.sh'
+        # continue-on-error: true  # This will allow the job to proceed even if the SSH command fails, which can be useful for debugging
