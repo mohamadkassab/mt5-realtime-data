@@ -18,10 +18,14 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
   
-      - name: SSH to Windows Server
+      # - name: SSH to Windows Server
+      #   run: |
+      #     ssh-keyscan 81.17.102.241 >> ~/.ssh/known_hosts
+      #     ssh -vvv ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }} 'cd C:\\nginx\\nginx-1.26.0\\apps\\riskman-client && build_script.sh'
+
+      - name: Print repository name
         run: |
-          ssh-keyscan 81.17.102.241 >> ~/.ssh/known_hosts
-          ssh -vvv ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }} 'cd C:\\nginx\\nginx-1.26.0\\apps\\riskman-client && build_script.sh'
+          echo "Repository: ${{ github.repository }}"
       
 
       # - name: Verify SSH Access
