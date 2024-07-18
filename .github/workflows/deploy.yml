@@ -23,7 +23,7 @@ jobs:
   
       - name: SSH to Windows Server
         run: |
-            ssh -o StrictHostKeyChecking=no kassab@81.17.102.241 'cd C:\\nginx\\nginx-1.26.0\\apps\\riskman-client && ./build_script.sh'
+            ssh -o StrictHostKeyChecking=no kassab@81.17.102.241 'cd C:\\nginx\\nginx-1.26.0\\apps\\riskman-client && build_script.sh'
 
       # - name: Verify SSH Access
       #   run: ssh -o StrictHostKeyChecking=no mkarrowtradefx@81.17.102.241 'echo "SSH connection successful"'
