@@ -21,17 +21,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-
 
-      - name: Install dependencies
-        run: npm install
+      # - name: Install dependencies
+      #   run: npm install
 
       - name: Build the app
+        shell: pwsh
         env:
           REACT_APP_API_IP: ${{ secrets.REACT_APP_API_IP }}
           REACT_APP_API_PORT: ${{ secrets.REACT_APP_API_PORT }}
           REACT_APP_WS_IP: ${{ secrets.REACT_APP_WS_IP }}
           REACT_APP_WS_PORT: ${{ secrets.REACT_APP_WS_PORT }}
         run: |
-          export CI=false
+          $env:CI = "false"
           npm run build
 
       - name: Deploy the build
