@@ -52,7 +52,7 @@ const SignInForm = () => {
       <div className="w-full flex flex-col items-center">
         <div className="max-w-3xl sm:min-w-[500px] flex flex-col items-center bg-white flex flex-col py-10 rounded gap-y-12 ">
           <div>
-            <h1 className="text-4xl">Portal</h1>
+            <h1 className="text-4xl">User Portal</h1>
           </div>
 
           <div className="w-full flex flex-col gap-y-4 px-10">
