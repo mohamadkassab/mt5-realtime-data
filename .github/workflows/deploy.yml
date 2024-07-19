@@ -13,27 +13,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
       # - name: Install dependencies
       #   run: npm install
 
       - name: Build the app
-        shell: pwsh
         env:
           REACT_APP_API_IP: ${{ secrets.REACT_APP_API_IP }}
           REACT_APP_API_PORT: ${{ secrets.REACT_APP_API_PORT }}
           REACT_APP_WS_IP: ${{ secrets.REACT_APP_WS_IP }}
           REACT_APP_WS_PORT: ${{ secrets.REACT_APP_WS_PORT }}
-        run: |
-          $env:CI = "false"
-          npm run build
+        run: npm run build
 
       - name: Deploy the build
         env:
