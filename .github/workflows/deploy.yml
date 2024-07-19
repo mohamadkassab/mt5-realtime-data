@@ -31,11 +31,15 @@ jobs:
           REACT_APP_API_PORT: ${{ secrets.REACT_APP_API_PORT }}
           REACT_APP_WS_IP: ${{ secrets.REACT_APP_WS_IP }}
           REACT_APP_WS_PORT: ${{ secrets.REACT_APP_WS_PORT }}
-        run: npm run build
+        run: |
+          npm run lint || true 
+          npm run build
 
       - name: Deploy the build
         env:
+          CI: false
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        if: success()
         run: |
           cp -r build/* $DEPLOY_PATH/
 
