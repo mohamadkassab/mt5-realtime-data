@@ -15,7 +15,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm config set cache C:\npm-cache
           npm install
 
       - name: Build the app
