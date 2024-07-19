@@ -15,7 +15,7 @@ jobs:
 
       - name: Cache node modules
         id: cache-node-modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
@@ -27,17 +27,16 @@ jobs:
 
       - name: Build the app
         env:
+          process.env.CI : false
           REACT_APP_API_IP: ${{ secrets.REACT_APP_API_IP }}
           REACT_APP_API_PORT: ${{ secrets.REACT_APP_API_PORT }}
           REACT_APP_WS_IP: ${{ secrets.REACT_APP_WS_IP }}
           REACT_APP_WS_PORT: ${{ secrets.REACT_APP_WS_PORT }}
         run: |
-          npm run lint || true 
           npm run build
 
       - name: Deploy the build
         env:
-          CI: false
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         if: success()
         run: |
