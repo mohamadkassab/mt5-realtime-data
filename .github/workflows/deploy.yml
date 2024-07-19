@@ -11,21 +11,20 @@ jobs:
 
 
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    # steps:
+    #   - name: Checkout Repository
+    #     uses: actions/checkout@v2
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    #   - name: Set up SSH
+    #     uses: webfactory/ssh-agent@v0.9.0
+    #     with:
+    #       ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
   
-      - name: SSH to Windows Server
-        run: |
-          ssh-keyscan ${{ secrets.SSH_IP }} >> ~/.ssh/known_hosts
-          ssh -vvv ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }} 'cd C:\\nginx\\nginx-1.26.0\\apps\\riskman-client && build_script.sh'
+    #   - name: SSH to Windows Server
+    #     run: |
+    #       ssh-keyscan ${{ secrets.SSH_IP }} >> ~/.ssh/known_hosts
+    #       ssh -vvv ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }} 'cd C:\\nginx\\nginx-1.26.0\\apps\\riskman-client && build_script.sh'
       
 
-      # - name: Verify SSH Access
-      #   run: ssh -o StrictHostKeyChecking=no mkarrowtradefx@81.17.102.241 'echo "SSH connection successful"'
+
     

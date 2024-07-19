@@ -66,7 +66,7 @@ const SheetsCreateForm = () => {
   });
   const steps = ["Managers & Coverages", "Formulas"];
   const confirmSentece = "Please enter a caption for the new formula";
-  const dataName = "formulaCaption";
+  const dataName = "Formula Caption";
   const titleInputDialog = "Formula column caption";
   const [error, setError] = React.useState("");
   const isSymbolConfIdChange = formData[columns[5].dataField];
