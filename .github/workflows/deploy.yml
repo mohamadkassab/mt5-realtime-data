@@ -27,6 +27,7 @@ jobs:
           REACT_APP_WS_PORT: ${{ secrets.REACT_APP_WS_PORT }}
         run: |
           npm run build
+        working-directory: C:\actions-runner-working-dir
 
       - name: Deploy the build
         env:
