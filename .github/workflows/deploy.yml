@@ -31,7 +31,7 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         if: success()
         run: |
-          cp -r build/* $DEPLOY_PATH/
+          powershell -Command "Copy-Item -Path 'build\\*' -Destination 'C:\\nginx\nginx-1.26.0\\apps\\riskman-client\\build' -Recurse -Force"
 
 
 
