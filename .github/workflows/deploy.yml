@@ -9,6 +9,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -18,14 +20,10 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
   
-      # - name: SSH to Windows Server
-      #   run: |
-      #     ssh-keyscan 81.17.102.241 >> ~/.ssh/known_hosts
-      #     ssh -vvv ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }} 'cd C:\\nginx\\nginx-1.26.0\\apps\\riskman-client && build_script.sh'
-
-      - name: Print repository name
+      - name: SSH to Windows Server
         run: |
-          echo "Repository: ${{ github.repository }}"
+          ssh-keyscan ${{ secrets.SSH_IP }} >> ~/.ssh/known_hosts
+          ssh -vvv ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }} 'cd C:\\nginx\\nginx-1.26.0\\apps\\riskman-client && build_script.sh'
       
 
       # - name: Verify SSH Access

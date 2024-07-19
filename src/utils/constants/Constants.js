@@ -36,7 +36,7 @@ export const API_MT5SUFFIXES = "/users/MT5SymbolsSuffixes/";
 export const API_COVERAGEACCOUNTS = "/users/MT5CoverageAdmin/";
 
 // API_MT5SymbolsConfigurationsAndSuffixes
-export const API_MT5SymbolsConfigurationsAndSuffixes = "/admins/MT5SymbolsConfigurationsAndSuffixes/";
+export const API_MT5SymbolsConfigurationsAndSuffixes = "/users/MT5SymbolsConfigurationsAndSuffixes/";
 
 // API_Servers
 export const API_SERVER = "/users/configurations/minimal/";
