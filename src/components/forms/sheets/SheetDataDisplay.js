@@ -248,72 +248,6 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
     }
   }, [rulesName, realTimeData, sheet]);
 
-  // Get Coverage conf totals
-  // React.useEffect(() => {
-  //   try{
-  //     if (sheet?.COVERAGE_DETAILS) {
-  //       const newTotalByManyCoverageConf = {
-  //         totalBuySheet: 0,
-  //         totalSellSheet: 0,
-  //         totalNetSheet: 0,
-  //         totalResult: [0, 0, 0, 0],
-  //       };
-
-  //       sheet.COVERAGE_DETAILS.forEach((config, index) => {
-  //         let netVol = config.BuyVol - config.SellVol;
-  //         newTotalByManyCoverageConf.totalBuySheet += config.BuyVol;
-  //         newTotalByManyCoverageConf.totalSellSheet += config.SellVol;
-  //         newTotalByManyCoverageConf.totalNetSheet += netVol;
-  //         newTotalByManyCoverageConf.totalResult[0] +=
-  //           (netVol * parseInt(config.Rules[0]?.value, 10)) / 100 || 0;
-  //         newTotalByManyCoverageConf.totalResult[1] +=
-  //           (netVol * parseInt(config.Rules[1]?.value, 10)) / 100 || 0;
-  //         newTotalByManyCoverageConf.totalResult[2] +=
-  //           (netVol * parseInt(config.Rules[2]?.value, 10)) / 100 || 0;
-  //         newTotalByManyCoverageConf.totalResult[3] +=
-  //           (netVol * parseInt(config.Rules[3]?.value, 10)) / 100 || 0;
-  //       });
-  //       setTotalByManyCoverageConf(newTotalByManyCoverageConf);
-  //     }
-  //   }
-  //   catch(error){
-  //     console.log(error);
-  //   }
-
-  // }, [sheet]);
-
-  // Get total coverages
-  // React.useEffect(() => {
-  //   try{
-  //     const newTotalCovered = {
-  //       totals: {
-  //         coveredBuy: 0,
-  //         coveredSell: 0,
-  //         coveredNet: 0,
-  //         coveredResult: [0, 0, 0, 0],
-  //       },
-  //     };
-
-  //     newTotalCovered.totals.coveredBuy +=
-  //       totalByManyConf?.totalBuySheet - totalByManyCoverageConf?.totalBuySheet;
-  //     newTotalCovered.totals.coveredSell +=
-  //       totalByManyConf?.totalSellSheet - totalByManyCoverageConf?.totalSellSheet;
-  //     newTotalCovered.totals.coveredNet +=
-  //       totalByManyConf?.totalNetSheet - totalByManyCoverageConf?.totalNetSheet;
-  //     for (let i = 0; i < rulesName.length; i++) {
-  //       newTotalCovered.totals.coveredResult[i] +=
-  //         totalByManyConf?.totalResult[i] -
-  //         totalByManyCoverageConf?.totalResult[i];
-  //     }
-
-  //     setTotalCovered(newTotalCovered);
-  //   }
-  //   catch(error){
-  //     console.log(error);
-  //   }
-
-  // }, [totalByManyConf, totalByManyCoverageConf]);
-
   return (
     <Box elevation={3}>
       <TableContainer
@@ -344,13 +278,13 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
           {/* Start rendering dealer configuration */}
           <TableBody>
             {sheet?.dealer_configurations?.map((config, index) => {
-              const buyIdentifier = `${sheet.sheet_name.toLowerCase()}:${
+              const buyIdentifier = `${sheet.sheet_name}:${
                 sheet.sheet_id
               }:${config.server_id}:${config.Login}:${config.manager_id}:${
                 config.SymbolSuffix
               }:${config.MainSymbol}:buy`;
 
-              const sellIdentifier = `${sheet.sheet_name.toLowerCase()}:${
+              const sellIdentifier = `${sheet.sheet_name}:${
                 sheet.sheet_id
               }:${config.server_id}:${config.Login}:${config.manager_id}:${
                 config.SymbolSuffix
@@ -488,18 +422,8 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
             {/* Start rendering coverage rows */}
             {sheet?.COVERAGE_DETAILS?.map((config, index) => {
 
-              // console.log(config)
-              // console.log(sheet)
-
-              const buyIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.coverage_server_id}:${config.Login}:${config.coverage_account_id}:${config.Symbol}:buy:cov`;
-              const sellIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.coverage_server_id}:${config.Login}:${config.coverage_account_id}:${config.Symbol}:sell:cov`;
-
-              // console.log(`sheet render ${buyIdentifier}`)
-              // console.log(`sheet render ${sellIdentifier}`)
-
-              // const buyIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.Login}:${config.Symbol}:buy:cov`;
-              // const sellIdentifier = `${sheet.sheet_name.toLowerCase()}:${sheet.sheet_id}:${config.Login}:${config.Symbol}:sell:cov`;
-
+              const buyIdentifier = `${sheet.sheet_name}:${sheet.sheet_id}:${config.coverage_server_id}:${config.Login}:${config.coverage_account_id}:${config.Symbol}:buy:cov`;
+              const sellIdentifier = `${sheet.sheet_name}:${sheet.sheet_id}:${config.coverage_server_id}:${config.Login}:${config.coverage_account_id}:${config.Symbol}:sell:cov`;
               const buyVol = realTimeData[`${buyIdentifier}`] || 0;
               const sellVol = realTimeData[`${sellIdentifier}`] || 0;
               const netVol = buyVol - sellVol;

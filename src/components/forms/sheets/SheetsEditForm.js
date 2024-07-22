@@ -141,8 +141,12 @@ const SheetsEditForm = () => {
           alignment: "left",
           cellRender: (cellData) => cellRenderPercentage(cellData),
         };
-        setColumns2([...columns2, newColumn]);
-        setColumns3([...columns3, newColumn]);
+        setColumns2((prevState)=>{
+          return [...prevState, newColumn]
+        });
+        setColumns2((prevState)=>{
+          return [...prevState, newColumn]
+        });
       }
     }
   };
