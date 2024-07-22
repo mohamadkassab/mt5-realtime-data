@@ -427,11 +427,11 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
               const buyVol = realTimeData[`${buyIdentifier}`] || 0;
               const sellVol = realTimeData[`${sellIdentifier}`] || 0;
               const netVol = buyVol - sellVol;
-
+              console.log(config)
               return (
                 <React.Fragment key={`coverageConf-${index}`}>
                   <MemoizedTableRow>
-                    <TableCell>{config.Coverage}</TableCell>
+                    <TableCell>{config.Login}</TableCell>
                     <TableCell>{config.Symbol}</TableCell>
                     <TableCell>{toFixedIfNeeded(buyVol , DECIMAL_POINTS)}</TableCell>
                     <TableCell>{toFixedIfNeeded(sellVol , DECIMAL_POINTS)}</TableCell>
@@ -593,6 +593,7 @@ const ConfigurationList = ({
         />
       )}
       <div className="flex items-center justify-between">
+        <div className="max-w-[500px] md:max-w-[1000px]">
         <Tabs
           value={selectedTab}
           onChange={handleTabChange}
@@ -609,6 +610,8 @@ const ConfigurationList = ({
             />
           ))}
         </Tabs>
+        </div>
+
         <div className="flex gap-4"></div>
         <div className="flex gap-4">
           <DeleteButton onClick={onDeleting} caption="Delete" />

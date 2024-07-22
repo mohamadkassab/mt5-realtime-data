@@ -142,8 +142,7 @@ const SheetsDataTable = () => {
   };
 
   return (
-    <div>
-      <div>
+    <>
         <ConfigurationList
           sheets={sheets}
           onInserting={onInserting}
@@ -154,8 +153,7 @@ const SheetsDataTable = () => {
           setSelectedSheetName={setSelectedSheetName}
           realTimeData={realTimeData}
         />
-      </div>
-    </div>
+    </>
   );
 };
 

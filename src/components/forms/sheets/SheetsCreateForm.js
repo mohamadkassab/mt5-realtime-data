@@ -141,7 +141,7 @@ const SheetsCreateForm = () => {
         setColumns2((prevState)=>{
           return [...prevState, newColumn]
         });
-        setColumns2((prevState)=>{
+        setColumns3((prevState)=>{
           return [...prevState, newColumn]
         });
       }

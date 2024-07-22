@@ -24,6 +24,7 @@ import { SignOut } from "../utils/redux/actions/Auth";
 import LoadingElement from "../components/common/LoadingElement";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import { Stack } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -150,9 +151,9 @@ const DefaultLayout = ({ componentName, children }) => {
     } catch (error) {}
   };
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     setIsConnected(sheetStatus);
-  },[sheetStatus])
+  }, [sheetStatus]);
 
   React.useEffect(() => {
     if (success) {
@@ -198,7 +199,7 @@ const DefaultLayout = ({ componentName, children }) => {
               </Typography>
             </div>
             <div>
-              {componentName === "Sheets"  && (
+              {componentName === "Sheets" && (
                 <Box display="flex" alignItems="center">
                   <Circle isConnected={isConnected} />
                   <Typography
@@ -318,25 +319,29 @@ const DefaultLayout = ({ componentName, children }) => {
         <DrawerHeader />
         {children}
       </Box>
+
       {loading && (
         <LoadingElement isDrawerOpen={open} componentName={componentName} />
       )}
-
-      {showSuccess && (
-        <Snackbar open={true}>
+      <Stack
+        spacing={2}
+        sx={{ position: "fixed", bottom: 20, left: 20, zIndex: 1400 }}
+      >
+        {showSuccess && (
           <Alert severity="success" variant="filled" sx={{ width: "100%" }}>
-            Success
+            SUCCESS
           </Alert>
-        </Snackbar>
-      )}
-
-      {showError && (
-        <Snackbar open={true}>
-          <Alert severity="error" variant="filled" sx={{ width: "100%" }}>
-            Failed
+        )}
+        {showError && (
+          <Alert
+            severity="error"
+            variant="filled"
+            sx={{ width: "100%", bgcolor: "#d9534f" }}
+          >
+            FAILED
           </Alert>
-        </Snackbar>
-      )}
+        )}
+      </Stack>
     </Box>
   );
 };
