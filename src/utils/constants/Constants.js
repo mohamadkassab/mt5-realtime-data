@@ -47,7 +47,7 @@ export const API_MT5COVERAGESYMBOLS = "/users/MT5CoverageSymbols/";
 // API_401_RES
 export const API_401_RES = "Request failed with status code 401";
 
-export const Menu = [
+export const MainMenu = [
   {
     name: "Dashboard",
     path: "/dashboard",

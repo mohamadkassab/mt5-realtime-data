@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ConfigurationList from "../forms/sheets/SheetDataDisplay";
 import { GetSheets, SheetConnectionState } from "../../utils/redux/actions/Sheets";
 
-const SheetsDataTable = () => {
+const SheetsDataTable = (props) => {
   const WS_IP = process.env.REACT_APP_WS_IP;
   const WS_PORT = process.env.REACT_APP_WS_PORT;
   const navigate = useNavigate();
@@ -37,14 +37,28 @@ const SheetsDataTable = () => {
           const message = JSON.parse(event.data);
           if (message && message.type === "updates") {
             const newData = message.data;
-            // console.log(newData)
-            setRealTimeData((prevState) => {
-              const updatedData = { ...prevState };
-              const key = newData?.key;
-              const value = newData?.data?.value;
-              updatedData[key] = value;
-              return updatedData;
-            });
+            const keyParts = newData.key.split(':');
+            // setRealTimeData((prevState) => {
+            //   const updatedData = { ...prevState };
+            //   const key = newData?.key;
+            //   const value = newData?.data?.value;
+            //   updatedData[key] = value;
+            //   return updatedData;
+            // });
+            setRealTimeData((prevState) => ({ 
+                ...prevState,
+              [prevState[newData?.key]] : newData?.data?.value       
+            }));
+            props.setNewNotification((
+              `${keyParts[0]} : ${keyParts[5]} : ${keyParts[7]} : ${newData?.data?.value}`
+            ));
+
+            props.setNotifications((prevState) =>([
+              ...prevState,
+              `${keyParts[0]} : ${keyParts[5]} : ${keyParts[7]} : ${newData?.data?.value}`
+             
+            ]));
+
           }
           else if(message && message.type === "initial_data"){
             const newData = message.data.reduce((acc, item) => {
@@ -55,6 +69,7 @@ const SheetsDataTable = () => {
               ...prevState,
               ...newData
             }));
+           
           }
         } catch (e) {
           console.error("Error processing message:", e);

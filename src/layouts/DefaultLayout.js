@@ -4,19 +4,14 @@ import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
-import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import { Menu, CoreMenu } from "../utils/constants/Constants";
+import { MainMenu, CoreMenu } from "../utils/constants/Constants";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,6 +20,17 @@ import LoadingElement from "../components/common/LoadingElement";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { Stack } from "@mui/material";
+import {
+  Badge,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 
 const drawerWidth = 240;
 
@@ -93,11 +99,12 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-const DefaultLayout = ({ componentName, children }) => {
+const DefaultLayout = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showSuccess, setShowSuccess] = React.useState(false);
   const [showError, setShowError] = React.useState(false);
+  const [showNotifcation, setShowNotifcation] = React.useState(false);
   const [isConnected, setIsConnected] = React.useState(false);
   const [open, setOpen] = React.useState(true);
   const sheetStatus = useSelector((state) => state.sheetStatus);
@@ -105,6 +112,8 @@ const DefaultLayout = ({ componentName, children }) => {
   const success = useSelector((state) => state.success);
   const error = useSelector((state) => state.error);
   const theme = useTheme();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
 
   // Start Online Tag
   const pulse = keyframes`
@@ -133,8 +142,19 @@ const DefaultLayout = ({ componentName, children }) => {
       animation: isConnected ? `${pulse} 1.5s infinite` : "none",
     })
   );
-
   // End Online Tag
+
+  // Start Notification Badge
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const openNotification = Boolean(anchorEl);
+  // End Notification Badge
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -172,13 +192,26 @@ const DefaultLayout = ({ componentName, children }) => {
 
       return () => clearTimeout(errorTimer);
     }
-  }, [success, error]);
+    if (props.newNotification) {
+      setShowNotifcation(true);
+      const notificationtTimer = setTimeout(() => {
+        setShowNotifcation(false);
+      }, 2000);
+
+      return () => clearTimeout(notificationtTimer);
+    }
+  }, [success, error, props.newNotification]);
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", userSelect: "none", cursor: "pointer" }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
-        <Toolbar>
+        <Toolbar
+          sx={{
+            userSelect: "none",
+            cursor: "default",
+          }}
+        >
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -192,14 +225,14 @@ const DefaultLayout = ({ componentName, children }) => {
             <MenuIcon />
           </IconButton>
 
-          <div className="w-full flex items-center justify-between">
+          <div className="w-full flex items-center justify-between select-none cursor-default">
             <div>
               <Typography variant="h6" noWrap component="div">
-                {componentName}
+                {props.componentName}
               </Typography>
             </div>
             <div>
-              {componentName === "Sheets" && (
+              {props.componentName === "Sheets" && (
                 <Box display="flex" alignItems="center">
                   <Circle isConnected={isConnected} />
                   <Typography
@@ -213,6 +246,71 @@ const DefaultLayout = ({ componentName, children }) => {
                   </Typography>
                 </Box>
               )}
+            </div>
+
+            <div className="select-none cursor-default caret-transparent">
+              <IconButton
+                aria-label="notifications"
+                color="inherit"
+                onClick={handleClick}
+              >
+                <Badge badgeContent={props.notifications?.length} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={openNotification}
+                onClose={handleClose}
+                sx={{
+                  userSelect: "none",
+                  caretColor: "transparent",
+                }}
+              >
+                <MenuItem
+                  sx={{
+                    userSelect: "none",
+                    caretColor: "transparent",
+                    cursor: "default",
+                    pointerEvents: "none",
+                    "&:hover": {
+                      backgroundColor: "inherit",
+                    },
+                  }}
+                >
+                  <Typography variant="h6">Notifications</Typography>
+                </MenuItem>
+                {props.notifications?.length === 0 ? (
+                  <MenuItem
+                    sx={{
+                      userSelect: "none",
+                      caretColor: "transparent",
+                      cursor: "default",
+                      pointerEvents: "none",
+                      "&:hover": {
+                        backgroundColor: "inherit",
+                      },
+                    }}
+                  >
+                    No new notifications
+                  </MenuItem>
+                ) : (
+                  <List>
+                    {props.notifications?.map((notification, index) => (
+                      <MenuItem
+                        key={index}
+                        sx={{
+                          cursor: "default",
+                          px: 4
+                        }}
+                        disableRipple
+                      >
+                        <ListItemText primary={notification} />
+                      </MenuItem>
+                    ))}
+                  </List>
+                )}
+              </Menu>
             </div>
           </div>
         </Toolbar>
@@ -228,7 +326,7 @@ const DefaultLayout = ({ componentName, children }) => {
           </IconButton>
         </DrawerHeader>
         <List>
-          {Menu.map((item, index) => (
+          {MainMenu.map((item, index) => (
             <React.Fragment key={index}>
               <ListItem disablePadding sx={{ display: "block" }}>
                 <ListItemButton
@@ -317,11 +415,11 @@ const DefaultLayout = ({ componentName, children }) => {
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
-        {children}
+        {props.children}
       </Box>
 
       {loading && (
-        <LoadingElement isDrawerOpen={open} componentName={componentName} />
+        <LoadingElement isDrawerOpen={open} componentName={props.componentName} />
       )}
       <Stack
         spacing={2}
@@ -339,6 +437,15 @@ const DefaultLayout = ({ componentName, children }) => {
             sx={{ width: "100%", bgcolor: "#d9534f" }}
           >
             FAILED
+          </Alert>
+        )}
+          {showNotifcation && (
+          <Alert
+            severity="info"
+            variant="filled"
+            sx={{ width: "100%" }}
+          >
+            {props.newNotification}
           </Alert>
         )}
       </Stack>

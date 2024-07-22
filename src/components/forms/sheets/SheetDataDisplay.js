@@ -427,7 +427,6 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
               const buyVol = realTimeData[`${buyIdentifier}`] || 0;
               const sellVol = realTimeData[`${sellIdentifier}`] || 0;
               const netVol = buyVol - sellVol;
-              console.log(config)
               return (
                 <React.Fragment key={`coverageConf-${index}`}>
                   <MemoizedTableRow>
