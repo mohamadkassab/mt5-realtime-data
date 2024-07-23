@@ -298,7 +298,7 @@ const DefaultLayout = (props) => {
                   <List>
                     {props.notifications?.map((notification, index) => (
                       <MenuItem
-                        key={index}
+                        key={`notifications-${index}`}
                         sx={{
                           cursor: "default",
                           px: 4
@@ -327,7 +327,7 @@ const DefaultLayout = (props) => {
         </DrawerHeader>
         <List>
           {MainMenu.map((item, index) => (
-            <React.Fragment key={index}>
+            <React.Fragment key={`MainMenu-${index}`}>
               <ListItem disablePadding sx={{ display: "block" }}>
                 <ListItemButton
                   href={item.path}
@@ -359,7 +359,7 @@ const DefaultLayout = (props) => {
         <Divider />
         <List>
           {CoreMenu.map((item, index) => (
-            <React.Fragment key={index}>
+            <React.Fragment key={`CoreMenu-${index}`}>
               <ListItem disablePadding sx={{ display: "block" }}>
                 <ListItemButton
                   href={item.path}

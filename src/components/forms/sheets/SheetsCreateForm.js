@@ -193,9 +193,14 @@ const SheetsCreateForm = () => {
   }, [dispatch]);
 
   // KEEP FORMULAS  UPDATED
+
+  // React.useEffect(() => {
+  //   dispatch(GetMT5SymbolsConfigurationsAndSuffixes());
+  // }, [isSymbolConfIdChange, isManagerIdChange]);
+
   React.useEffect(() => {
     dispatch(GetMT5SymbolsConfigurationsAndSuffixes());
-  }, [isSymbolConfIdChange, isManagerIdChange]);
+  }, [sheetVisibility]);
 
   React.useEffect(() => {
     if (MT5SymbolsConfigurationsAndSuffixes) {

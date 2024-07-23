@@ -304,7 +304,6 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                           background: "#2e7d32",
                           color: "white",
                           fontWeight: "bold",
-                          
                         }}
                       >
                         {`${config.MainSymbol} / ${config.Login}`}
@@ -314,7 +313,6 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                       </TableCell>
                       <TableCell>
                            {toFixedIfNeeded(totalByConf[`${totalTopConfFiltered[index]}`]?.totalSellSymbol || 0 , DECIMAL_POINTS)}
-
                       </TableCell>
                       <TableCell>
                           {toFixedIfNeeded(totalByConf[`${totalTopConfFiltered[index]}`]?.totalNetSymbol || 0 , DECIMAL_POINTS)}
@@ -359,7 +357,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                         (rule.value / 100)
                       );
                       return (
-                        <React.Fragment key={`conf-rule-${ruleIndex}`}>
+                        <React.Fragment key={`conf-rule-value-${ruleIndex}`}>
                           <TableCell>{ruleValue}</TableCell>
                           <TableCell>
                             {toFixedIfNeeded(ruleResult , DECIMAL_POINTS)}
@@ -409,7 +407,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                           ]
                         : 0;
                     return (
-                      <React.Fragment key={`conf-rule-${ruleIndex}`}>
+                      <React.Fragment key={`conf-tbmc-${ruleIndex}`}>
                         <TableCell></TableCell>
                         <TableCell>{toFixedIfNeeded(totalResult , DECIMAL_POINTS)}</TableCell>
                       </React.Fragment>
@@ -428,7 +426,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
               const sellVol = realTimeData[`${sellIdentifier}`] || 0;
               const netVol = buyVol - sellVol;
               return (
-                <React.Fragment key={`coverageConf-${index}`}>
+                <React.Fragment key={`coverage-conf-${index}`}>
                   <MemoizedTableRow>
                     <TableCell>{config.Login}</TableCell>
                     <TableCell>{config.Symbol}</TableCell>
@@ -442,7 +440,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                         (rule.value / 100)
                       );
                       return (
-                        <React.Fragment key={`coverageConfRule-${ruleIndex}`}>
+                        <React.Fragment key={`coverage-conf-rule-${ruleIndex}`}>
                           <TableCell>{ruleValue}</TableCell>
                           <TableCell>
                             {toFixedIfNeeded(ruleResult , DECIMAL_POINTS)}
@@ -485,7 +483,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     totalByManyConfCov.totalResult &&
                     totalByManyConfCov.totalResult[ruleIndex] ? totalByManyConfCov.totalResult[ruleIndex]?.toFixed(2) : 0;
                     return (
-                      <React.Fragment key={`conf-rule-${ruleIndex}`}>
+                      <React.Fragment key={`coverage-conf-rule-value${ruleIndex}`}>
                         <TableCell></TableCell>
                         <TableCell>{toFixedIfNeeded(totalResult , DECIMAL_POINTS)}</TableCell>
                       </React.Fragment>
@@ -522,7 +520,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                 const coveredResult = (totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalResult[ruleIndex] || 0) - (totalByManyConfCov[`${sheet.sheet_id}tbmc`]?.totalResult[ruleIndex] || 0)
 
                 return (
-                  <React.Fragment key={`conf-rule-${ruleIndex}`}>
+                  <React.Fragment key={`coverage-conf-tbmc${ruleIndex}`}>
                     <TableCell></TableCell>
                     <TableCell>{toFixedIfNeeded(coveredResult , DECIMAL_POINTS)}</TableCell>
                   </React.Fragment>
@@ -604,7 +602,7 @@ const ConfigurationList = ({
           {sheets?.map((sheet, index) => (
             <Tab
               label={sheet.sheet_name}
-              key={sheet.sheet_id}
+              key={`sheet-${sheet.sheet_id}`}
               sx={{ fontWeight: 700 }}
             />
           ))}
@@ -622,7 +620,7 @@ const ConfigurationList = ({
         <Box
           role="tabpanel"
           hidden={selectedTab !== index}
-          id={`tabpanel-${index}`}
+          id={`tabpanel-${sheet.sheet_id}`}
           key={index}
         >
           {selectedTab === index && (

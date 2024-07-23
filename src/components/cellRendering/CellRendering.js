@@ -50,7 +50,6 @@ export const symbolCellRender = (data) => {
 
 export const coverageSymbolCellRender = (data) => {
   const cellStyle = { color: "green", fontWeight: "bold" };
-
   return <div style={cellStyle}>{data.value}</div>;
 };
 

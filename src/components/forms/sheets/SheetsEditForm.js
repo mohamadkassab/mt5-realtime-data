@@ -59,6 +59,7 @@ const SheetsEditForm = () => {
   const [columns3, setColumns3] = useState(Sheet3DataColumns);
   const columns = SheetDataColumns;
   const [coverageAndSymbols, setCoverageAndSymbols] = useState([]);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [formData, setFormData] = useState({
     [columns[1].dataField]: "",
     [columns[2].dataField]: true,
@@ -271,9 +272,14 @@ const SheetsEditForm = () => {
   }, [mt5SymbolConfigurations, Managers, sheetToEdit, columns]);
 
   // KEEP FORMULAS  UPDATED
+  
+  // React.useEffect(() => {
+  //   dispatch(GetMT5SymbolsConfigurationsAndSuffixes());
+  // }, [isSymbolConfIdChange, isManagerIdChange]);
+
   React.useEffect(() => {
     dispatch(GetMT5SymbolsConfigurationsAndSuffixes());
-  }, [isSymbolConfIdChange, isManagerIdChange]);
+  }, [sheetVisibility]);
 
   React.useEffect(() => {
     if (MT5SymbolsConfigurationsAndSuffixes) {

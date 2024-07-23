@@ -9,6 +9,7 @@ import {
   Checkbox,
   Box,
   Popper,
+  FormHelperText ,
 } from "@mui/material";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -78,19 +79,18 @@ const Sheets1CreateForm = ({
   };
 
   const updateDataAtIndex = (index, newData, dataField) => {
-    if (dataField === "coverageId") {
-      const newCoverageAndSymbols = [...coverageAndSymbols];
-      newCoverageAndSymbols[index].coverageId = newData;
-      setCoverageAndSymbols(newCoverageAndSymbols);
-    } else {
-      const newCoverageAndSymbols = [...coverageAndSymbols];
-      newCoverageAndSymbols[index] = {
-        ...newCoverageAndSymbols[index],
-        symbols: newData,
-      };
-      setCoverageAndSymbols(newCoverageAndSymbols);
-    }
-  };
+    const newCoverageAndSymbols = coverageAndSymbols.map((item, i) => {
+        if (i === index) {
+            if (dataField === "coverageId") {
+                return { ...item, coverageId: newData, symbols: [] };
+            } else {
+                return { ...item, symbols: newData };
+            }
+        }
+        return item;
+    });
+    setCoverageAndSymbols(newCoverageAndSymbols);
+};
 
   const handleBlur = () => {
     setTouched(true);
@@ -303,7 +303,7 @@ const Sheets1CreateForm = ({
               coverageAndSymbols.map((coverageAccount, rowKey) => {
                 const index = coverageAndSymbols?.length - 1 - rowKey;
                 return (
-                  <div className="flex gap-4 mb-4  items-center" key={index}>
+                  <div className="flex gap-4 mb-4  items-center" key={`coverageAndSymbols-${index}`}>
                     <FormControl
                       sx={{
                         width: "100%",
@@ -365,6 +365,7 @@ const Sheets1CreateForm = ({
                     >
                       <Autocomplete
                         id="outlined-autocomplete"
+                        disableCloseOnSelect
                         options={MT5CoverageSymbols.filter(
                           (symbol) =>
                             symbol.coverage_id ===
@@ -382,8 +383,8 @@ const Sheets1CreateForm = ({
                           );
                           updateDataAtIndex(index, selectedItems);
                         }}
+                        
                         multiple
-                        disableCloseOnSelect
                         renderInput={(params) => (
                           <TextField
                             {...params}

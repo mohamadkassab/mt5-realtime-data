@@ -38,26 +38,23 @@ const SheetsDataTable = (props) => {
           if (message && message.type === "updates") {
             const newData = message.data;
             const keyParts = newData.key.split(':');
-            // setRealTimeData((prevState) => {
-            //   const updatedData = { ...prevState };
-            //   const key = newData?.key;
-            //   const value = newData?.data?.value;
-            //   updatedData[key] = value;
-            //   return updatedData;
-            // });
-            setRealTimeData((prevState) => ({ 
-                ...prevState,
-              [prevState[newData?.key]] : newData?.data?.value       
-            }));
-            props.setNewNotification((
-              `${keyParts[0]} : ${keyParts[5]} : ${keyParts[7]} : ${newData?.data?.value}`
-            ));
 
-            props.setNotifications((prevState) =>([
-              ...prevState,
-              `${keyParts[0]} : ${keyParts[5]} : ${keyParts[7]} : ${newData?.data?.value}`
-             
-            ]));
+            setRealTimeData((prevState) => {
+              const updatedData = { ...prevState };
+              const key = newData?.key;
+              const value = newData?.data?.value;
+              updatedData[key] = value;
+              return updatedData;
+            });
+
+            // props.setNewNotification((
+            //   `${keyParts[0]} : ${keyParts[5]} : ${keyParts[7]} : ${newData?.data?.value}`
+            // ));
+
+            // props.setNotifications((prevState) =>([
+            //   ...prevState,
+            //   `${keyParts[0]} : ${keyParts[5]} : ${keyParts[7]} : ${newData?.data?.value}`           
+            // ]));
 
           }
           else if(message && message.type === "initial_data"){
@@ -69,7 +66,6 @@ const SheetsDataTable = (props) => {
               ...prevState,
               ...newData
             }));
-           
           }
         } catch (e) {
           console.error("Error processing message:", e);
@@ -112,7 +108,6 @@ const SheetsDataTable = (props) => {
     }else{
       dispatch(SheetConnectionState(false));   
      }
-  
   }, [wsRef.current]); 
 
   React.useEffect(() => {
