@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ConfigurationList from "../forms/sheets/SheetDataDisplay";
 import { GetSheets, SheetConnectionState } from "../../utils/redux/actions/Sheets";
+import { jwtDecode } from "jwt-decode";
 
 const SheetsDataTable = (props) => {
   const WS_IP = process.env.REACT_APP_WS_IP;
@@ -17,8 +18,10 @@ const SheetsDataTable = (props) => {
   const [realTimeData, setRealTimeData] = useState({});
   const sheets = useSelector((state) => state.sheets);
   const authorizationToken = localStorage.getItem("ATFXTOKEN");
+  const userId = jwtDecode(authorizationToken).id;
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [selectedSheetId, setSelectedSheetId] = useState(sheets[0]?.sheet_id || 0);
+ 
 
   const connectWebSocket = () => {
     try {
@@ -101,6 +104,19 @@ const SheetsDataTable = (props) => {
   const setSelectedSheetIdfunction = (id) =>{
     setSelectedSheetId(id);
   }
+
+  React.useEffect(() => {
+    setIsInitialLoad(false);
+  }, []); 
+
+  React.useEffect(() => {
+    connectWebSocket();
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, []);
   
   React.useEffect(() => {
     if( wsRef?.current?.readyState === WebSocket.OPEN){
@@ -109,10 +125,6 @@ const SheetsDataTable = (props) => {
       dispatch(SheetConnectionState(false));   
      }
   }, [wsRef.current]); 
-
-  React.useEffect(() => {
-    setIsInitialLoad(false);
-  }, []); 
 
   React.useEffect(() => {
     try{
@@ -129,15 +141,6 @@ const SheetsDataTable = (props) => {
     }
 
   }, [selectedSheetId, wsRef?.current?.readyState, isInitialLoad, sheets]);
-
-  React.useEffect(() => {
-    connectWebSocket();
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-    };
-  }, []);
 
   React.useEffect(() => {
     dispatch(GetSheets());
@@ -162,6 +165,7 @@ const SheetsDataTable = (props) => {
           selectedSheetName={selectedSheetName}
           setSelectedSheetName={setSelectedSheetName}
           realTimeData={realTimeData}
+          userId={userId}
         />
     </>
   );

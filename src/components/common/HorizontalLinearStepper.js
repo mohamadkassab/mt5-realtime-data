@@ -45,7 +45,7 @@ const HorizontalLinearStepper = forwardRef(({ steps, onStepClick }, ref) => {
             <StepLabel onClick={() => handleStepClick(index)}>
               <div
                 className="cursor-pointer transition duration-200 ease-in-out 
-                 hover:font-bold "
+                 hover:bg-primary hover:text-secondary rounded-md px-2"
               >
                 {label}
               </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import {
   FormControl,
@@ -32,15 +32,12 @@ const Sheets1CreateForm = ({
   const Managers = useSelector((state) => state.Managers);
   const [managers, setManagers] = React.useState(Managers);
   const Servers = useSelector((state) => state.Servers);
-  const mt5SymbolConfigurations = useSelector(
-    (state) => state.mt5SymbolConfigurations
-  );
+  const mt5SymbolConfigurations = useSelector((state) => state.mt5SymbolConfigurations);
   const [symbolConfigurations, setSymbolConfigurations] = React.useState([]);
   const mt5CoverageAccounts = useSelector((state) => state.CoverageAccounts);
   const MT5CoverageSymbols = useSelector((state) => state.MT5CoverageSymbols);
   const serverId = formData[columns[3].dataField];
-
-
+ 
   React.useEffect(() => {
     try {
       const filteredManager = Managers.filter(
@@ -244,7 +241,7 @@ const Sheets1CreateForm = ({
           renderOption={(props, option, { selected }) => {
             const { key, ...rest } = props;
             return (
-              <li key={key} {...rest}>
+              <li key={option.id} {...rest}>
                 <Checkbox checked={selected} />
                 {option.symbol}
               </li>

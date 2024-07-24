@@ -9,6 +9,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableFooter
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { DeleteSheet } from "../../../utils/redux/actions/Sheets";
@@ -295,7 +296,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
               const netVol = buyVol - sellVol;
 
               return (
-                <React.Fragment key={`conf-${index}`}>
+                <React.Fragment key={`conf-${index}`}  >
                   {totalTopConfFiltered[index] !== "" && (
                     <MemoizedTableRow key={`total-symbol-conf-${config.MainSymbol}`}>
                       <TableCell ><KeyboardArrowDown onClick={() => showCollapse(totalTopConfFiltered[index]) } sx={{ cursor: 'pointer' }}/></TableCell>
@@ -335,7 +336,10 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                       })}
                     </MemoizedTableRow>
                   )}
-                  {showCollapseRows[index]?.isDisplayed && (<MemoizedTableRow>
+
+
+
+                  {showCollapseRows[index]?.isDisplayed && (<MemoizedTableRow >
                     <TableCell>{config.Login}</TableCell>
                     <TableCell
                       style={
@@ -366,7 +370,8 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                       );
                     })}
                     {/* End display rules values and results */}
-                  </MemoizedTableRow>)}         
+                  </MemoizedTableRow>)} 
+             
                   {/* End rendering dealer configuration */}
                 </React.Fragment>
               );
@@ -496,6 +501,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
             {/* start covered total */}
             <MemoizedTableRow
               key={`total-covered-${sheet.dealer_configurations.MainSymbol}`}
+              className="sticky bottom-0 bg-secondary"
             >
               <TableCell></TableCell>
               <TableCell
@@ -529,6 +535,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
             </MemoizedTableRow>
             {/* End covered total */}
           </TableBody>
+          
         </Table>
       </TableContainer>
     </Box>
@@ -544,6 +551,7 @@ const ConfigurationList = ({
   selectedSheetName,
   setSelectedSheetName,
   realTimeData,
+  userId
 }) => {
   const dispatch = useDispatch();
   const [selectedTab, setSelectedTab] = useState(0);
@@ -611,8 +619,8 @@ const ConfigurationList = ({
 
         <div className="flex gap-4"></div>
         <div className="flex gap-4">
-          <DeleteButton onClick={onDeleting} caption="Delete" />
-          <EditButton onClick={onEditing} />
+          {sheets[selectedTab]?.creator_dealer_id === userId &&  <DeleteButton onClick={onDeleting} caption="Delete" />}
+          {sheets[selectedTab]?.creator_dealer_id === userId &&   <EditButton onClick={onEditing} />}
           <AddButton onClick={onInserting} />
         </div>
       </div>
@@ -626,6 +634,7 @@ const ConfigurationList = ({
           {selectedTab === index && (
             <ConfigurationSheet sheet={sheet} realTimeData={realTimeData} />
           )}
+
         </Box>
       ))}
     </Box>

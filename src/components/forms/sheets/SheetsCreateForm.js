@@ -33,12 +33,8 @@ import InputDialog from "../../common/InputDialog";
 const SheetsCreateForm = () => {
   const dispatch = useDispatch();
   const stepperRef = useRef();
-  const mt5SymbolConfigurations = useSelector(
-    (state) => state.mt5SymbolConfigurations
-  );
-  const MT5SymbolsConfigurationsAndSuffixes = useSelector(
-    (state) => state.MT5SymbolsConfigurationsAndSuffixes
-  );
+  const mt5SymbolConfigurations = useSelector((state) => state.mt5SymbolConfigurations);
+  const MT5SymbolsConfigurationsAndSuffixes = useSelector((state) => state.MT5SymbolsConfigurationsAndSuffixes);
   const Managers = useSelector((state) => state.Managers);
   const mt5CoverageAccounts = useSelector((state) => state.CoverageAccounts);
   const MT5CoverageSymbols = useSelector((state) => state.MT5CoverageSymbols);
@@ -173,34 +169,43 @@ const SheetsCreateForm = () => {
 
   };
 
+  const handleStepClick = (index) => {
+    if(formData[columns[1].dataField]){
+    const newSheetVisibility = sheetVisibility.map((_, i) => i === index);
+    setSheetVisibility(newSheetVisibility);}
+    else{
+      setError("This field is required");
+    }
+  };
+
+
   const checkLastTrueIndex = () => {
     const index = sheetVisibility.indexOf(true);
     const isLast = index === sheetVisibility.length - 1;
     setIsLastSheet(isLast);
   };
 
-  const handleStepClick = (index) => {
-    const newSheetVisibility = sheetVisibility.map((_, i) => i === index);
-    setSheetVisibility(newSheetVisibility);
-  };
 
-  React.useEffect(() => {
+  const getInitialData  =  () =>{
     dispatch(GetServers());
     dispatch(GetManagers());
     dispatch(GetMT5SymbolConfigurations());
     dispatch(GetCoverageAccounts());
     dispatch(GetMT5CoverageSymbols());
+  }
+
+  React.useEffect(() => {
+    // const now = new Date();
+    // const formattedTime = now.toLocaleTimeString() + '.' + now.getMilliseconds();
+    // console.log(`first time ${formattedTime}`);
+    getInitialData();
   }, [dispatch]);
 
   // KEEP FORMULAS  UPDATED
 
-  // React.useEffect(() => {
-  //   dispatch(GetMT5SymbolsConfigurationsAndSuffixes());
-  // }, [isSymbolConfIdChange, isManagerIdChange]);
-
   React.useEffect(() => {
     dispatch(GetMT5SymbolsConfigurationsAndSuffixes());
-  }, [sheetVisibility]);
+  }, [isSymbolConfIdChange, isManagerIdChange]);
 
   React.useEffect(() => {
     if (MT5SymbolsConfigurationsAndSuffixes) {
@@ -239,16 +244,18 @@ const SheetsCreateForm = () => {
   }, [selectedSymbolsData, Managers]);
 
   React.useEffect(() => {
-    setCoverageSymbolsFormulas(
-      transformCoverageData(
-        coverageAndSymbols,
-        mt5CoverageAccounts,
-        MT5CoverageSymbols,
-        [],
-        true,
-        coverageSymbolsFormulas
-      )
-    );
+    if(coverageAndSymbols){
+      setCoverageSymbolsFormulas(
+        transformCoverageData(
+          coverageAndSymbols,
+          mt5CoverageAccounts,
+          MT5CoverageSymbols,
+          [],
+          true,
+          coverageSymbolsFormulas
+        )
+      );
+    }
   }, [coverageAndSymbols]);
 
   // END OF KEEP FORMULAS  UPDATED

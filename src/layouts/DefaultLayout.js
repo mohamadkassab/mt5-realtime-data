@@ -203,7 +203,7 @@ const DefaultLayout = (props) => {
   }, [success, error, props.newNotification]);
 
   return (
-    <Box sx={{ display: "flex", userSelect: "none", cursor: "pointer" }}>
+    <Box sx={{ display: "flex", userSelect: "none" }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar

@@ -76,6 +76,7 @@ const SheetsEditForm = () => {
   const confirmSentece = "Please enter a caption for the new formula";
   const dataName = "formulaCaption";
   const titleInputDialog = "Formula column caption";
+  const [error, setError] = React.useState("");
   const isSymbolConfIdChange = formData[columns[5].dataField];
   const isManagerIdChange = formData[columns[4].dataField];
   const [sheetVisibility, setSheetVisibility] = React.useState([true, false]);
@@ -179,30 +180,30 @@ const SheetsEditForm = () => {
   };
 
   const handleStepClick = (index) => {
+    if(formData[columns[1].dataField]){
     const newSheetVisibility = sheetVisibility.map((_, i) => i === index);
     setSheetVisibility(newSheetVisibility);
+    }   else{
+      setError("This field is required");
+    }
+
   };
 
-
-  React.useEffect(() => {
-    setSheetId(location.state.selectedSheetId);
-  }, []);
-
-  React.useEffect(() => {
+  const getInitialData  = async () =>{
     dispatch(GetServers());
     dispatch(GetManagers());
     dispatch(GetMT5SymbolConfigurations());
     dispatch(GetCoverageAccounts());
     dispatch(GetMT5CoverageSymbols());
+  }
+
+  React.useEffect(() => {
+    getInitialData()
   }, [dispatch]);
 
   React.useEffect(() => {
-   if(coverageAndSymbols === sheetToEdit?.coverages){
-    setIsCoverageFormDataChanged(false);
-   } else{
-    setIsCoverageFormDataChanged(true);
-   }
-  }, [coverageAndSymbols]);
+    setSheetId(location.state.selectedSheetId);
+  }, []);
 
   React.useEffect(() => {
     dispatch(GetSheetToEditIds(sheetId));
@@ -211,6 +212,14 @@ const SheetsEditForm = () => {
   React.useEffect(() => {
     setSheetToEdit(sheetToEditIds);
   }, [sheetToEditIds]);
+
+  React.useEffect(() => {
+   if(coverageAndSymbols === sheetToEdit?.coverages){
+    setIsCoverageFormDataChanged(false);
+   } else{
+    setIsCoverageFormDataChanged(true);
+   }
+  }, [coverageAndSymbols]);
 
   React.useEffect(() => {
     const columnsFormulaLength =
@@ -243,6 +252,9 @@ const SheetsEditForm = () => {
   }, [sheetToEdit]);
 
   React.useEffect(() => {
+if(mt5SymbolConfigurations, Managers, sheetToEdit){
+
+
     const selectedIds = sheetToEdit?.symbol_configuration || [];
     const selectedSymbols = mt5SymbolConfigurations
       .filter((item) => selectedIds.includes(item.id))
@@ -254,7 +266,6 @@ const SheetsEditForm = () => {
     ).map((item) => item.name);
 
     setCoverageAndSymbols(sheetToEdit?.coverages);
-
     setFormData({
       [columns[1].dataField]: sheetToEdit?.sheet_name || "",
       [columns[2].dataField]:
@@ -268,18 +279,15 @@ const SheetsEditForm = () => {
       [columns[8].dataField]: [],
       [columns[9].dataField]: selectedSymbols || [],
       [columns[10].dataField]: selectedManagers || [],
-    });
+    });   
+  }
   }, [mt5SymbolConfigurations, Managers, sheetToEdit, columns]);
 
   // KEEP FORMULAS  UPDATED
   
-  // React.useEffect(() => {
-  //   dispatch(GetMT5SymbolsConfigurationsAndSuffixes());
-  // }, [isSymbolConfIdChange, isManagerIdChange]);
-
   React.useEffect(() => {
     dispatch(GetMT5SymbolsConfigurationsAndSuffixes());
-  }, [sheetVisibility]);
+  }, [isSymbolConfIdChange, isManagerIdChange]);
 
   React.useEffect(() => {
     if (MT5SymbolsConfigurationsAndSuffixes) {
@@ -316,18 +324,22 @@ const SheetsEditForm = () => {
   );
 }}, [isFormDataChanged, selectedSymbolsData, Managers]);
 
-  React.useEffect(() => {
-    setCoverageSymbolsFormulas(
-      transformCoverageData(
-        coverageAndSymbols,
-        MT5CoverageAccounts,
-        MT5CoverageSymbols,
-        sheetToEdit,
-        isCoverageFormDataChanged,
-        coverageSymbolsFormulas
-      )
-    );
+React.useEffect(() => {
+  if(MT5CoverageAccounts && MT5CoverageSymbols){
+      setCoverageSymbolsFormulas(
+        transformCoverageData(
+          coverageAndSymbols,
+          MT5CoverageAccounts,
+          MT5CoverageSymbols,
+          sheetToEdit,
+          isCoverageFormDataChanged,
+          coverageSymbolsFormulas
+        )
+      );
+    }
   }, [coverageAndSymbols, MT5CoverageAccounts, MT5CoverageSymbols, isCoverageFormDataChanged]);
+
+
 
   // END OF KEEP FORMULAS  UPDATED
 
@@ -379,16 +391,18 @@ const SheetsEditForm = () => {
                     />
                   )}
                   {sheetVisibility[0] && (
-                    <MemoizedSheets1CreateForm
+                    <Sheets1CreateForm
                       formData={formData}
                       columns={columns}
                       handleChangeFormData={handleChangeFormData}
                       coverageAndSymbols={coverageAndSymbols}
                       setCoverageAndSymbols={setCoverageAndSymbols}
+                      error={error}
+                      setError={setError}
                     />
                   )}
                   {sheetVisibility[1] && (
-                    <MemoizedSheets2CreateForm
+                    <Sheets2CreateForm
                       columns2={columns2}
                       setColumns2={setColumns2}
                       columns3={columns3}

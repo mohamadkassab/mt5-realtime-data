@@ -29,7 +29,6 @@ export const CreateSheet = (formData) => {
     try {
 
       dispatch({ type: SEL_REQUEST });
-
       const apiIp = process.env.REACT_APP_API_IP;
       const apiPort = process.env.REACT_APP_API_PORT;
       const authorizationToken = localStorage.getItem(ATFXTOKEN);
@@ -161,7 +160,6 @@ export const DeleteSheet = (params) => {
       const authorizationToken = localStorage.getItem(ATFXTOKEN);
       const response = await axios.delete(
         `${apiIp}:${apiPort}${API_DELETE_SHEET}${params}`,
-
         {
           headers: {
             Authorization: `${authorizationToken}`,
@@ -171,7 +169,6 @@ export const DeleteSheet = (params) => {
       );
 
       const status = response.status;
-
       if (status >= 200 && status < 300) {
         dispatch({ type: SEL_SUCCESS });
       } else if (status === 401) {
@@ -201,7 +198,6 @@ export const GetSheetToEditIds = (params) => {
         const apiIp = process.env.REACT_APP_API_IP;
         const apiPort = process.env.REACT_APP_API_PORT;
         const authorizationToken = localStorage.getItem(ATFXTOKEN);
-        
         const response = await axios.get(
           `${apiIp}:${apiPort}${API_GET_SHEETTOEDITIDS}${params}`,
           {
