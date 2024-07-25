@@ -278,8 +278,8 @@ const reducer = produce((draft, action) => {
     case GET_SHEETTOEDITIDS_REQUEST:
       draft.sheetToEditIds= [];
       draft.error = false;
-      if(draft.loadingTimes === 1){ draft.loading = false; }
-      draft.loadingTimes -=1;
+      if(draft.loadingTimes === 0) { draft.loading = true; }
+      draft.loadingTimes +=1;
       break;
     case GET_SHEETTOEDITIDS_SUCCESS:
       draft.sheetToEditIds = action.payload;

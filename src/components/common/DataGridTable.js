@@ -13,6 +13,7 @@ import DataGrid, {
 import IconButton from "@mui/material/IconButton";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
+import { useCallback } from "react";
 
 const DataGridTable = ({
   data,
@@ -22,25 +23,28 @@ const DataGridTable = ({
   onDeleting,
   columns,
 }) => {
-  const columnsDiv = columns.map((item, index) => {
-    const columnProps = {
-      dataField: item.dataField,
-      caption: item.caption,
-      alignment: item.alignment,
-    };
-    if (item.cellRender) {
-      columnProps.cellRender = item.cellRender;
-    }
-    if (item.width) {
-      columnProps.width = item.width;
-    }
-    if (item.groupIndex) {
-      columnProps.groupIndex = item.groupIndex;
-    }
-    if (!item.hideColumn) {
-      return <Column key={index} {...columnProps}></Column>;
-    }
-  });
+  const columnsDiv = useCallback(() =>{
+    columns.map((item, index) => {
+      const columnProps = {
+        dataField: item.dataField,
+        caption: item.caption,
+        alignment: item.alignment,
+      };
+      if (item.cellRender) {
+        columnProps.cellRender = item.cellRender;
+      }
+      if (item.width) {
+        columnProps.width = item.width;
+      }
+      if (item.groupIndex) {
+        columnProps.groupIndex = item.groupIndex;
+      }
+      if (!item.hideColumn) {
+        return <Column key={index} {...columnProps}></Column>;
+      }
+    });
+},[columns]);
+
   return (
     <div id="gridContainer">
       <DataGrid

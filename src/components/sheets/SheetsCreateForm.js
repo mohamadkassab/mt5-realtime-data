@@ -1,55 +1,44 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Typography, Box } from "@mui/material";
-import PrimaryButton from "../../buttons/PrimaryButton";
-import SecondaryButton from "../../buttons/SecondaryButton";
-import { goBackFunc, goNextFunc } from "../../../utils/functions/Functions";
+import PrimaryButton from "../buttons/PrimaryButton";
+import SecondaryButton from "../buttons/SecondaryButton";
+import { goBackFunc, goNextFunc } from "../../utils/functions/Functions";
 import {
   ATFXTOKEN,
   SheetDataColumns,
   Sheet2DataColumns,
   Sheet3DataColumns,
-} from "../../../utils/constants/Constants";
-import { GetSheetToEditIds } from "../../../utils/redux/actions/Sheets";
-import { GetManagers } from "../../../utils/redux/actions/Managers";
-import { GetMT5SymbolConfigurations } from "../../../utils/redux/actions/SymbolConfigurations";
-import { GetCoverageAccounts } from "../../../utils/redux/actions/CoverageAccounts";
-import { GetServers } from "../../../utils/redux/actions/Servers";
-import { GetMT5CoverageSymbols } from "../../../utils/redux/actions/SymbolConfigurations";
-import { useLocation } from "react-router-dom";
-import HorizontalLinearStepper from "../../common/HorizontalLinearStepper";
-import { transformSheetData } from "../../../utils/functions/Functions";
-import { EditSheet } from "../../../utils/redux/actions/Sheets";
-import { GetMT5SymbolsConfigurationsAndSuffixes } from "../../../utils/redux/actions/SymbolConfigurations";
+} from "../../utils/constants/Constants";
+import { GetManagers } from "../../utils/redux/actions/Managers";
+import { GetMT5SymbolConfigurations } from "../../utils/redux/actions/SymbolConfigurations";
+import { GetCoverageAccounts } from "../../utils/redux/actions/CoverageAccounts";
+import { GetServers } from "../../utils/redux/actions/Servers";
+import { GetMT5CoverageSymbols } from "../../utils/redux/actions/SymbolConfigurations";
+import HorizontalLinearStepper from "../common/HorizontalLinearStepper";
+import { transformSheetData } from "../../utils/functions/Functions";
+import { CreateSheet } from "../../utils/redux/actions/Sheets";
+import { GetMT5SymbolsConfigurationsAndSuffixes } from "../../utils/redux/actions/SymbolConfigurations";
 import {
   transformData,
   transformCoverageData,
-} from "../../../utils/functions/Functions";
+} from "../../utils/functions/Functions";
 import Sheets1CreateForm from "./Sheets1CreateForm";
 import Sheets2CreateForm from "./Sheets2CreateForm";
-import AddButton from "../../buttons/AddButton";
-import { cellRenderPercentage } from "../../cellRendering/CellRendering";
+import AddButton from "../buttons/AddButton";
+import { cellRenderPercentage } from "../cellRendering/CellRendering";
 import { jwtDecode } from "jwt-decode";
-import InputDialog from "../../common/InputDialog";
-// End relative variables
+import InputDialog from "../common/InputDialog";
 
-const SheetsEditForm = () => {
-  const MemoizedSheets1CreateForm= React.memo(Sheets1CreateForm)
-  const MemoizedSheets2CreateForm= React.memo(Sheets2CreateForm)
-  const location = useLocation();
-  const [sheetId, setSheetId] = useState({});
-  const [sheetToEdit, setSheetToEdit] = useState({});
+const SheetsCreateForm = () => {
   const dispatch = useDispatch();
   const stepperRef = useRef();
   const mt5SymbolConfigurations = useSelector((state) => state.mt5SymbolConfigurations);
   const MT5SymbolsConfigurationsAndSuffixes = useSelector((state) => state.MT5SymbolsConfigurationsAndSuffixes);
-  const sheetToEditIds = useSelector((state) => state.sheetToEditIds);
   const Managers = useSelector((state) => state.Managers);
-  const MT5CoverageAccounts = useSelector((state) => state.CoverageAccounts);
+  const mt5CoverageAccounts = useSelector((state) => state.CoverageAccounts);
   const MT5CoverageSymbols = useSelector((state) => state.MT5CoverageSymbols);
   const [isLastSheet, setIsLastSheet] = useState(false);
-  const [isFormDataChanged, setIsFormDataChanged] = useState(false);
-  const [isCoverageFormDataChanged, setIsCoverageFormDataChanged] = useState(false);
   const [symbolsFormulas, setSymbolsFormulas] = useState([]);
   const [coverageSymbolsFormulas, setCoverageSymbolsFormulas] = useState([]);
   const [selectedSymbolsData, setSelectedSymbolsData] = useState([]);
@@ -58,8 +47,7 @@ const SheetsEditForm = () => {
   const [columns2, setColumns2] = useState(Sheet2DataColumns);
   const [columns3, setColumns3] = useState(Sheet3DataColumns);
   const columns = SheetDataColumns;
-  const [coverageAndSymbols, setCoverageAndSymbols] = useState([]);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [coverageAndSymbols, setCoverageAndSymbols] = useState("");
   const [formData, setFormData] = useState({
     [columns[1].dataField]: "",
     [columns[2].dataField]: true,
@@ -74,7 +62,7 @@ const SheetsEditForm = () => {
   });
   const steps = ["Managers & Coverages", "Formulas"];
   const confirmSentece = "Please enter a caption for the new formula";
-  const dataName = "formulaCaption";
+  const dataName = "Formula Caption";
   const titleInputDialog = "Formula column caption";
   const [error, setError] = React.useState("");
   const isSymbolConfIdChange = formData[columns[5].dataField];
@@ -84,7 +72,6 @@ const SheetsEditForm = () => {
   const activeStepLabel = activeStepIndex !== -1 ? steps[activeStepIndex] : "";
 
   const handleChangeFormData = (event) => {
-    setIsFormDataChanged(true);
     let updatedFormData = {
       ...formData,
       [event.target.name]: event.target.value,
@@ -110,7 +97,6 @@ const SheetsEditForm = () => {
         [columns[10].dataField]: selectedManagers,
       };
     }
-
     setFormData(updatedFormData);
   };
 
@@ -125,7 +111,10 @@ const SheetsEditForm = () => {
       coverageSymbolsFormulas,
       columns2
     );
-    dispatch(EditSheet(transformedData, sheetId));
+    if (formData[columns[1].dataField] === "") {
+      return;
+    }
+    dispatch(CreateSheet(transformedData));
   };
 
   const handleAddColumn = (columnCaption) => {
@@ -143,10 +132,12 @@ const SheetsEditForm = () => {
           alignment: "left",
           cellRender: (cellData) => cellRenderPercentage(cellData),
         };
+        // setColumns2([...columns2, newColumn]);
+        // setColumns3([...columns3, newColumn]);
         setColumns2((prevState)=>{
           return [...prevState, newColumn]
         });
-        setColumns2((prevState)=>{
+        setColumns3((prevState)=>{
           return [...prevState, newColumn]
         });
       }
@@ -166,125 +157,51 @@ const SheetsEditForm = () => {
   };
 
   const goNext = () => {
-    checkLastTrueIndex();
-    goNextFunc(sheetVisibility, setSheetVisibility);
-    if (stepperRef.current) {
-      stepperRef.current.handleNext();
-    }
-  };
-
-  const checkLastTrueIndex = () => {
-    const index = sheetVisibility.indexOf(true);
-    const isLast = index === sheetVisibility.length - 1;
-    setIsLastSheet(isLast);
-  };
-
-  const handleStepClick = (index) => {
     if(formData[columns[1].dataField]){
-    const newSheetVisibility = sheetVisibility.map((_, i) => i === index);
-    setSheetVisibility(newSheetVisibility);
-    }   else{
+      checkLastTrueIndex();
+      goNextFunc(sheetVisibility, setSheetVisibility);
+      if (stepperRef.current) {
+        stepperRef.current.handleNext();
+      }
+    }else{
       setError("This field is required");
     }
 
   };
 
-  const getInitialData  = async () =>{
+  const handleStepClick = (index) => {
+    if(formData[columns[1].dataField]){
+    const newSheetVisibility = sheetVisibility.map((_, i) => i === index);
+    setSheetVisibility(newSheetVisibility);}
+    else{
+      setError("This field is required");
+    }
+  };
+
+
+  const checkLastTrueIndex = useCallback(() => {
+    const index = sheetVisibility.indexOf(true);
+    const isLast = index === sheetVisibility.length - 1;
+    setIsLastSheet(isLast);
+  },[sheetVisibility]);
+
+
+  const getInitialData = useCallback(() =>{
     dispatch(GetServers());
     dispatch(GetManagers());
     dispatch(GetMT5SymbolConfigurations());
     dispatch(GetCoverageAccounts());
     dispatch(GetMT5CoverageSymbols());
-  }
+  },[]);
 
   React.useEffect(() => {
-    getInitialData()
+    // const now = new Date();
+    // const formattedTime = now.toLocaleTimeString() + '.' + now.getMilliseconds();
+    // console.log(`first time ${formattedTime}`);
+    getInitialData();
   }, [dispatch]);
 
-  React.useEffect(() => {
-    setSheetId(location.state.selectedSheetId);
-  }, []);
-
-  React.useEffect(() => {
-    dispatch(GetSheetToEditIds(sheetId));
-  }, [sheetId]);
-
-  React.useEffect(() => {
-    setSheetToEdit(sheetToEditIds);
-  }, [sheetToEditIds]);
-
-  React.useEffect(() => {
-   if(coverageAndSymbols === sheetToEdit?.coverages){
-    setIsCoverageFormDataChanged(false);
-   } else{
-    setIsCoverageFormDataChanged(true);
-   }
-  }, [coverageAndSymbols]);
-
-  React.useEffect(() => {
-    const columnsFormulaLength =
-    sheetToEdit?.formulas?.[0]?.values?.length ?? 0;
-    const sheet2ColumnsLength = Sheet2DataColumns.length;
-    const sheet3ColumnsLength = Sheet3DataColumns.length;
-    const newColumns = [];
-
-    for (let i = 0; i < columnsFormulaLength; i++) {
-      const newColumn = {
-        dataField: `#${columns2.length + i - (sheet2ColumnsLength - 1)}`,
-        caption: `${sheetToEdit?.formulas[0]?.values[i].col_name}`,
-        allowUpdating: true,
-        dataType: "number",
-        alignment: "left",
-        cellRender: (cellData) => cellRenderPercentage(cellData),
-      };
-      newColumns.push(newColumn);
-    }
-
-    setColumns2((prevColumns) => {
-      if (prevColumns.length > sheet2ColumnsLength) return prevColumns;
-      return [...prevColumns, ...newColumns];
-    });
-
-    setColumns3((prevColumns) => {
-      if (prevColumns.length > sheet3ColumnsLength) return prevColumns;
-      return [...prevColumns, ...newColumns];
-    });
-  }, [sheetToEdit]);
-
-  React.useEffect(() => {
-if(mt5SymbolConfigurations, Managers, sheetToEdit){
-
-
-    const selectedIds = sheetToEdit?.symbol_configuration || [];
-    const selectedSymbols = mt5SymbolConfigurations
-      .filter((item) => selectedIds.includes(item.id))
-      .map((item) => item.symbol);
-
-    const selectedManagersIds = sheetToEdit?.managers || [];
-    const selectedManagers = Managers.filter((item) =>
-      selectedManagersIds.includes(item.id)
-    ).map((item) => item.name);
-
-    setCoverageAndSymbols(sheetToEdit?.coverages);
-    setFormData({
-      [columns[1].dataField]: sheetToEdit?.sheet_name || "",
-      [columns[2].dataField]:
-        sheetToEdit?.visibility !== undefined ? sheetToEdit?.visibility : true,
-      [columns[3].dataField]: sheetToEdit?.server_id || "",
-      [columns[4].dataField]: sheetToEdit?.managers || [],
-      [columns[5].dataField]: sheetToEdit?.symbol_configuration || [],
-      [columns[6].dataField]:
-        sheetToEdit?.dealer_id !== undefined ? sheetToEdit?.dealer_id : 0,
-      [columns[7].dataField]: [],
-      [columns[8].dataField]: [],
-      [columns[9].dataField]: selectedSymbols || [],
-      [columns[10].dataField]: selectedManagers || [],
-    });   
-  }
-  }, [mt5SymbolConfigurations, Managers, sheetToEdit, columns]);
-
-  // KEEP FORMULAS  UPDATED
-  
+  // START KEEP FORMULAS  UPDATED
   React.useEffect(() => {
     dispatch(GetMT5SymbolsConfigurationsAndSuffixes());
   }, [isSymbolConfIdChange, isManagerIdChange]);
@@ -310,36 +227,35 @@ if(mt5SymbolConfigurations, Managers, sheetToEdit){
   }, [selectedSymbols]);
 
   React.useEffect(() => {
-  if(Managers && selectedSymbolsData.length > 0){
-  setSymbolsFormulas(
-    transformData(
-      selectedSymbolsData,
-      Managers,
-      formData[columns[10].dataField],
-      formData[columns[4].dataField],
-      sheetToEdit,
-      isFormDataChanged,
-      symbolsFormulas
-    )
-  );
-}}, [isFormDataChanged, selectedSymbolsData, Managers]);
+    if (Managers && selectedSymbolsData.length > 0) {
+      setSymbolsFormulas(
+        transformData(
+          selectedSymbolsData,
+          Managers,
+          formData[columns[10].dataField],
+          formData[columns[4].dataField],
+          [],
+          true,
+          symbolsFormulas
+        )
+      );
+    }
+  }, [selectedSymbolsData, Managers]);
 
-React.useEffect(() => {
-  if(MT5CoverageAccounts && MT5CoverageSymbols){
+  React.useEffect(() => {
+    if(coverageAndSymbols){
       setCoverageSymbolsFormulas(
         transformCoverageData(
           coverageAndSymbols,
-          MT5CoverageAccounts,
+          mt5CoverageAccounts,
           MT5CoverageSymbols,
-          sheetToEdit,
-          isCoverageFormDataChanged,
+          [],
+          true,
           coverageSymbolsFormulas
         )
       );
     }
-  }, [coverageAndSymbols, MT5CoverageAccounts, MT5CoverageSymbols, isCoverageFormDataChanged]);
-
-
+  }, [coverageAndSymbols]);
 
   // END OF KEEP FORMULAS  UPDATED
 
@@ -370,7 +286,7 @@ React.useEffect(() => {
                 <div className="flex justify-center items-center">
                   <Typography variant="h5">{activeStepLabel}</Typography>
                 </div>
-                <div className="flex justify-end items-center">
+                <div className="flex justify-end items-center select-none cursor-default caret-transparent">
                   {sheetVisibility[1] && (
                     <AddButton
                       onClick={handleShowInputDialog}
@@ -434,4 +350,4 @@ React.useEffect(() => {
   );
 };
 
-export default SheetsEditForm;
+export default SheetsCreateForm;

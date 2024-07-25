@@ -1,11 +1,11 @@
 import React from "react";
 import { DataGrid, Column, Editing, Paging } from "devextreme-react/data-grid";
 import "devextreme/dist/css/dx.light.css";
-import { headerCellRender } from "../../cellRendering/CellRendering";
+import { headerCellRender } from "../cellRendering/CellRendering";
 import {
   Sheet2DataColumns,
   Sheet3DataColumns,
-} from "../../../utils/constants/Constants";
+} from "../../utils/constants/Constants";
 const FormulaDataGridTable = ({
   columns2,
   setColumns2,

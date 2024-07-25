@@ -33,12 +33,12 @@ const InputDialog = ({ title, onSubmit, confirmSentece, dataName }) => {
         aria-labelledby="responsive-dialog-title"
       >
         <DialogTitle id="responsive-dialog-title">
-          <div variant="h4" component="h1">
+          <div variant="h4" component="h1" className="select-none cursor-default caret-transparent">
             {title}
           </div>
         </DialogTitle>
         <DialogContent>
-          <div color="primary" style={{ fontWeight: "bold" }}>
+          <div color="primary" style={{ fontWeight: "bold" }} className="select-none cursor-default caret-transparent">
             {confirmSentece}
             <div className="text-error" style={{ fontWeight: "bold" }}>
               <TextField

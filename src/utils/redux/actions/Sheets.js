@@ -33,7 +33,6 @@ export const CreateSheet = (formData) => {
       const apiPort = process.env.REACT_APP_API_PORT;
       const authorizationToken = localStorage.getItem(ATFXTOKEN);
       const params = formData;
-
       const response = await axios.post(
         `${apiIp}:${apiPort}${API_SHEET}`,
         params,

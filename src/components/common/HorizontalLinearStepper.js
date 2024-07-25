@@ -21,10 +21,6 @@ const HorizontalLinearStepper = forwardRef(({ steps, onStepClick }, ref) => {
     setActiveStep(0);
   };
 
-  React.useEffect(() => {
-    handleReset();
-  }, []);
-
   useImperativeHandle(ref, () => ({
     handleNext,
     handleBack,
@@ -36,16 +32,28 @@ const HorizontalLinearStepper = forwardRef(({ steps, onStepClick }, ref) => {
     }
     setActiveStep(index);
   };
+  
+  React.useEffect(() => {
+    handleReset();
+  }, []);
+
 
   return (
     <Box sx={{ width: "100%" }}>
       <Stepper activeStep={activeStep}>
         {steps.map((label, index) => (
           <Step key={`${label}-${index}`}>
-            <StepLabel onClick={() => handleStepClick(index)}>
+            <StepLabel
+              onClick={() => handleStepClick(index)}
+              sx={{
+                "&:hover": {
+                  cursor: "pointer",
+                },
+              }}
+            >
               <div
                 className="cursor-pointer transition duration-200 ease-in-out 
-                 hover:bg-primary hover:text-secondary rounded-md px-2"
+                  rounded-md px-2 "
               >
                 {label}
               </div>

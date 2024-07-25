@@ -10,7 +10,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { SignIn } from "../../../utils/redux/actions/Auth";
+import { SignIn } from "../../utils/redux/actions/Auth";
 
 const SignInForm = () => {
   const dispatch = useDispatch();
@@ -23,6 +23,13 @@ const SignInForm = () => {
     password: "",
   });
   
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [dispatch, isAuthenticated, navigate]);
+
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (event) => {
@@ -36,16 +43,11 @@ const SignInForm = () => {
     });
   };
 
-  const handler = async (e) => {
+  const handler =  (e) => {
     e.preventDefault();
-    await dispatch(SignIn(formData));
+    dispatch(SignIn(formData));
   };
 
-  React.useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/dashboard");
-    }
-  }, [dispatch, isAuthenticated, navigate]);
 
   return (
     <form onSubmit={handler}>

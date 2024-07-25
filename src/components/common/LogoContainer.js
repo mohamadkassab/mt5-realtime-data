@@ -1,4 +1,5 @@
 import logo from "../../resources/images/logo-lg.png";
+import React from "react";
 
 const LogoContainer = () => {
   return (
@@ -9,4 +10,4 @@ const LogoContainer = () => {
     </div>
   );
 };
-export default LogoContainer;
+export default React.memo(LogoContainer);

@@ -1,9 +1,10 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import ConfigurationList from "../forms/sheets/SheetDataDisplay";
+import ConfigurationList from "./SheetDataDisplay";
 import { GetSheets, SheetConnectionState } from "../../utils/redux/actions/Sheets";
 import { jwtDecode } from "jwt-decode";
+import { useCallback } from "react";
 
 const SheetsDataTable = (props) => {
   const WS_IP = process.env.REACT_APP_WS_IP;
@@ -22,7 +23,6 @@ const SheetsDataTable = (props) => {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [selectedSheetId, setSelectedSheetId] = useState(sheets[0]?.sheet_id || 0);
  
-
   const connectWebSocket = () => {
     try {
       wsRef.current = new WebSocket(`ws://${WS_IP}:${WS_PORT}`);
@@ -61,14 +61,19 @@ const SheetsDataTable = (props) => {
 
           }
           else if(message && message.type === "initial_data"){
-            const newData = message.data.reduce((acc, item) => {
+         
+            const newData = message.data?.reduce((acc, item) => {
               acc[item.key] = item.data.value;
               return acc
-            }, {})
-            setRealTimeData((prevState) =>({
-              ...prevState,
-              ...newData
-            }));
+            }, {});
+            
+            if(newData){
+              setRealTimeData((prevState) =>({
+                ...prevState,
+                ...newData
+              }));
+            }
+       
           }
         } catch (e) {
           console.error("Error processing message:", e);
@@ -103,7 +108,15 @@ const SheetsDataTable = (props) => {
 
   const setSelectedSheetIdfunction = (id) =>{
     setSelectedSheetId(id);
-  }
+  };
+
+  const onEditing = useCallback (() =>{
+    navigate("/editSheet", { state: { selectedSheetId } });
+  }, [selectedSheetId]);
+
+  const onInserting = useCallback (() => {
+    navigate("/createSheet");
+  },[]);
 
   React.useEffect(() => {
     setIsInitialLoad(false);
@@ -145,14 +158,6 @@ const SheetsDataTable = (props) => {
   React.useEffect(() => {
     dispatch(GetSheets());
   }, [dispatch]);
-
-  const onEditing = () => {
-    navigate("/editSheet", { state: { selectedSheetId } });
-  };
-
-  const onInserting = () => {
-    navigate("/createSheet");
-  };
 
   return (
     <>

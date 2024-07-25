@@ -17,7 +17,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-
+import { useCallback } from "react";
 
 const Sheets1CreateForm = ({
   formData,
@@ -38,20 +38,6 @@ const Sheets1CreateForm = ({
   const MT5CoverageSymbols = useSelector((state) => state.MT5CoverageSymbols);
   const serverId = formData[columns[3].dataField];
  
-  React.useEffect(() => {
-    try {
-      const filteredManager = Managers.filter(
-        (manager) => manager.server_id === serverId
-      );
-      const symbols = mt5SymbolConfigurations.filter(
-        (config) => config.server_id === serverId
-      );
-      setManagers(filteredManager);
-      setSymbolConfigurations(symbols.length ? symbols : []);
-    } catch (e) {
-      console.log(e)
-    }
-  }, [Managers, serverId, mt5SymbolConfigurations]);
 
   const handleToggle = (event) => {
     const { name, checked } = event.target;
@@ -63,13 +49,13 @@ const Sheets1CreateForm = ({
     });
   };
 
-  const addCoverageAccount = () => {
+  const addCoverageAccount = useCallback(() => {
     const newData = {
       coverageId: "",
       symbols: [],
     };
     setCoverageAndSymbols((prevData) => [...prevData, newData]);
-  };
+  },[coverageAndSymbols]);
 
   const removeCoverageAccount = (index) => {
     setCoverageAndSymbols(coverageAndSymbols.filter((_, i) => i !== index));
@@ -89,21 +75,36 @@ const Sheets1CreateForm = ({
     setCoverageAndSymbols(newCoverageAndSymbols);
 };
 
-  const handleBlur = () => {
-    setTouched(true);
-    if (!formData[columns[1].dataField]) {
-      setError("This field is required");
-    } else {
-      setError("");
-    }
-  };
+const handleBlur =useCallback( () => {
+  setTouched(true);
+  if (!formData[columns[1].dataField]) {
+    setError("This field is required");
+  } else {
+    setError("");
+  }
+}, [formData[columns[1].dataField]]);
 
-  const handleChange = (e) => {
-    handleChangeFormData(e);
-    if (touched && e.target.value) {
-      setError("");
+
+const handleChange = (e) => {
+  handleChangeFormData(e);
+  if (touched && e.target.value) {
+    setError("");
+  }
+};
+  React.useEffect(() => {
+    try {
+      const filteredManager = Managers.filter(
+        (manager) => manager.server_id === serverId
+      );
+      const symbols = mt5SymbolConfigurations.filter(
+        (config) => config.server_id === serverId
+      );
+      setManagers(filteredManager);
+      setSymbolConfigurations(symbols.length ? symbols : []);
+    } catch (e) {
+      console.log(e)
     }
-  };
+  }, [Managers, serverId, mt5SymbolConfigurations]);
 
   return (
     <>
