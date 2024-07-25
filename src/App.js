@@ -4,6 +4,9 @@ import SignIn from "./pages/SignIn";
 import ControlCenter from "./pages/ControlCenter";
 import ProtectedRoute from "./utils/protectedRoute/ProtectedRoute";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useDispatch } from "react-redux";
+import { checkAuthentication } from "./utils/redux/actions/Auth";
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -21,12 +24,19 @@ const theme = createTheme({
   },
 });
 
+
+
 function App() {
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    dispatch(checkAuthentication());
+  }, []);
+  
   return (
     <ThemeProvider theme={theme}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<SignIn />} />
+          <Route path="/signin" element={<SignIn />} />
           <Route element={<ProtectedRoute />}>
             <Route path="*" element={<ControlCenter />} />
           </Route>

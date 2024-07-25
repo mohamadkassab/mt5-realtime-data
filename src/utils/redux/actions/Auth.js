@@ -11,6 +11,7 @@ import {
   ISAUTHENTICATED_SUCCESS,
   ISAUTHENTICATED_FAILURE,
 } from "../ActionTypes";
+import { jwtDecode } from "jwt-decode";
 
 export const SignIn = (credentials) => {
   return async (dispatch) => {
@@ -74,3 +75,22 @@ export const SignOut = () => {
     }
   };
 };
+
+export const checkAuthentication = () => {
+  return async (dispatch) => {
+    const token = localStorage.getItem(ATFXTOKEN);
+    try {
+      const decodedToken = jwtDecode(token) ?? null;
+      const currentTime = Date.now() / 1000;
+
+      if (decodedToken?.exp > currentTime) {
+        dispatch({ type: ISAUTHENTICATED_SUCCESS });
+      } else {
+        dispatch({ type: ISAUTHENTICATED_FAILURE });
+      }
+    } catch (e) {
+      dispatch({ type: ISAUTHENTICATED_FAILURE });
+    }
+  };
+};
+

@@ -120,7 +120,7 @@ const reducer = produce((draft, action) => {
       draft.loadingTimes +=1;
       break;
     case GET_MANAGER_SUCCESS:
-      draft.Managers = action.payload.map((item) => item);
+      draft.Managers = action.payload;
       draft.error = false;
       if(draft.loadingTimes === 1){ draft.loading = false; }
       draft.loadingTimes -=1;

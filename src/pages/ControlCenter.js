@@ -35,10 +35,10 @@ const ControlCenter = () => {
   });
   return (
     <DefaultLayout componentName={pageName} notifications={notifications} newNotification={newNotification} >
+      {location.pathname === "/dashboard" ? <>Dashboard</> : <></>}
       {location.pathname === "/sheets" ? <SheetsDataTable setNotifications={setNotifications} setNewNotification={setNewNotification}/> : <></>}
       {location.pathname === "/createSheet" ? <SheetsCreateForm /> : <></>}
       {location.pathname === "/editSheet" ? <SheetsEditForm /> : <></>}
-      {location.pathname === "/dashboard" ? <>Dashboard</> : <></>}
     </DefaultLayout>
   );
 };
