@@ -229,11 +229,13 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
           newTotalByManyConfCov[totalByManyConfIdentifier].totalNetSheet +=
             netVol;
 
-          sheet.dealer_configurations.forEach((config, index) => {
+          sheet.COVERAGE_DETAILS.forEach((config, index) => {
+
             if (
               String(config.Login) === loginId &&
-              String(config.symbol) === symbol
+              String(config.Symbol) === symbol
             ) {
+            
               rule0 = parseInt(config.Rules[0]?.value, 10) / 100 || 0;
               rule1 = parseInt(config.Rules[1]?.value, 10) / 100 || 0;
               rule2 = parseInt(config.Rules[2]?.value, 10) / 100 || 0;
@@ -543,11 +545,8 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     )}
                   </TableCell>
                   {rulesName.map((_, ruleIndex) => {
-                    const totalResult =
-                      totalByManyConfCov.totalResult &&
-                      totalByManyConfCov.totalResult[ruleIndex]
-                        ? totalByManyConfCov.totalResult[ruleIndex]?.toFixed(2)
-                        : 0;
+                  const totalResult = totalByManyConfCov?.[`${sheet.sheet_id}tbmc`]?.totalResult?.[ruleIndex] ?? 0;
+
                     return (
                       <React.Fragment
                         key={`coverage-conf-rule-value${ruleIndex}`}
