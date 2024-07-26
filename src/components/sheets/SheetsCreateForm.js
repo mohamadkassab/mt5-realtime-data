@@ -29,9 +29,11 @@ import AddButton from "../buttons/AddButton";
 import { cellRenderPercentage } from "../cellRendering/CellRendering";
 import { jwtDecode } from "jwt-decode";
 import InputDialog from "../common/InputDialog";
+import { useNavigate } from "react-router-dom";
 
 const SheetsCreateForm = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const stepperRef = useRef();
   const mt5SymbolConfigurations = useSelector((state) => state.mt5SymbolConfigurations);
   const MT5SymbolsConfigurationsAndSuffixes = useSelector((state) => state.MT5SymbolsConfigurationsAndSuffixes);
@@ -65,11 +67,14 @@ const SheetsCreateForm = () => {
   const dataName = "Formula Caption";
   const titleInputDialog = "Formula column caption";
   const [error, setError] = React.useState("");
+  const [initialLoading, setInitialLoading] = React.useState(true);
+  const success = useSelector((state) => state.success);
   const isSymbolConfIdChange = formData[columns[5].dataField];
   const isManagerIdChange = formData[columns[4].dataField];
   const [sheetVisibility, setSheetVisibility] = React.useState([true, false]);
   const activeStepIndex = sheetVisibility.findIndex((value) => value === true);
   const activeStepLabel = activeStepIndex !== -1 ? steps[activeStepIndex] : "";
+  const [activeStep, setActiveStep] = React.useState(0);
 
   const handleChangeFormData = (event) => {
     let updatedFormData = {
@@ -169,16 +174,34 @@ const SheetsCreateForm = () => {
 
   };
 
-  const handleStepClick = (index) => {
+  // Start Stepper
+  const handleStepperClick = (index) => {
     if(formData[columns[1].dataField]){
     const newSheetVisibility = sheetVisibility.map((_, i) => i === index);
-    setSheetVisibility(newSheetVisibility);}
+    setSheetVisibility(newSheetVisibility);
+    setActiveStep(index);
+  }
     else{
       setError("This field is required");
     }
   };
 
+  const handleStepperReset = () => {
+    setActiveStep(0);
+  };
 
+  const handleStepperBack = () => {
+    setActiveStep((prevActiveStep) => {
+      return prevActiveStep > 0 ? prevActiveStep - 1 : 0;
+    });
+  };
+
+  const handleStepperNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+  
+
+// End Stepper
   const checkLastTrueIndex = useCallback(() => {
     const index = sheetVisibility.indexOf(true);
     const isLast = index === sheetVisibility.length - 1;
@@ -193,6 +216,17 @@ const SheetsCreateForm = () => {
     dispatch(GetCoverageAccounts());
     dispatch(GetMT5CoverageSymbols());
   },[]);
+
+  React.useEffect(() => {
+    if(!initialLoading){
+      if(success){
+        navigate("/sheets");
+      }
+    }else{
+      setInitialLoading(false);
+    }
+    
+  }, [success]);
 
   React.useEffect(() => {
     // const now = new Date();
@@ -280,7 +314,11 @@ const SheetsCreateForm = () => {
                   <HorizontalLinearStepper
                     ref={stepperRef}
                     steps={steps}
-                    onStepClick={handleStepClick}
+                    handleStepperClick={handleStepperClick}
+                    handleStepperReset={handleStepperReset}
+                    handleStepperBack={handleStepperBack}
+                    handleStepperNext={handleStepperNext}
+                    activeStep={activeStep}
                   />
                 </div>
                 <div className="flex justify-center items-center">

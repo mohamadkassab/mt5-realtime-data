@@ -181,7 +181,7 @@ export const Sheet2DataColumns = [
     alignment: "left",
     allowUpdating:false,
     sortable:true,
-    cellRender: (data) => symbolCellRender(data)
+    // cellRender: (data) => symbolCellRender(data)
     
   },
 ];
@@ -207,7 +207,7 @@ export const Sheet3DataColumns = [
     alignment: "left",
     allowUpdating:false,
     sortable:true,
-    cellRender: (data) => coverageSymbolCellRender(data)
+    // cellRender: (data) => coverageSymbolCellRender(data)
   },
 ];
 

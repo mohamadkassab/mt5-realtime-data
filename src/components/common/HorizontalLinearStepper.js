@@ -4,21 +4,18 @@ import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 
-const HorizontalLinearStepper = forwardRef(({ steps, onStepClick }, ref) => {
-  const [activeStep, setActiveStep] = React.useState(0);
+const HorizontalLinearStepper = forwardRef((props, ref) => {
 
   const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    props.handleStepperNext();
   };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => {
-      return prevActiveStep > 0 ? prevActiveStep - 1 : 0;
-    });
+   props.handleStepperBack();
   };
 
   const handleReset = () => {
-    setActiveStep(0);
+    props.handleStepperReset();
   };
 
   useImperativeHandle(ref, () => ({
@@ -27,10 +24,7 @@ const HorizontalLinearStepper = forwardRef(({ steps, onStepClick }, ref) => {
   }));
 
   const handleStepClick = (index) => {
-    if (onStepClick) {
-      onStepClick(index);
-    }
-    setActiveStep(index);
+    props.handleStepperClick(index);
   };
   
   React.useEffect(() => {
@@ -40,8 +34,8 @@ const HorizontalLinearStepper = forwardRef(({ steps, onStepClick }, ref) => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Stepper activeStep={activeStep}>
-        {steps.map((label, index) => (
+      <Stepper activeStep={props.activeStep}>
+        {props?.steps?.map((label, index) => (
           <Step key={`${label}-${index}`}>
             <StepLabel
               onClick={() => handleStepClick(index)}

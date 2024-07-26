@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SignOut } from "../utils/redux/actions/Auth";
 import LoadingElement from "../components/common/LoadingElement";
 import Snackbar from "@mui/material/Snackbar";
+import { Link } from 'react-router-dom';
 import Alert from "@mui/material/Alert";
 import { Stack } from "@mui/material";
 import {
@@ -330,7 +331,8 @@ const DefaultLayout = (props) => {
             <React.Fragment key={`MainMenu-${index}`}>
               <ListItem disablePadding sx={{ display: "block" }}>
                 <ListItemButton
-                  href={item.path}
+                  component={Link}
+                  to={item.path}
                   sx={{
                     minHeight: 48,
                     justifyContent: open ? "initial" : "center",
@@ -362,7 +364,8 @@ const DefaultLayout = (props) => {
             <React.Fragment key={`CoreMenu-${index}`}>
               <ListItem disablePadding sx={{ display: "block" }}>
                 <ListItemButton
-                  href={item.path}
+                  component={Link}
+                  to={item.path}
                   sx={{
                     minHeight: 48,
                     justifyContent: open ? "initial" : "center",

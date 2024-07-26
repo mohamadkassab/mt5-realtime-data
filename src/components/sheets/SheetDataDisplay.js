@@ -9,7 +9,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TableFooter,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { DeleteSheet } from "../../utils/redux/actions/Sheets";
@@ -38,6 +37,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
   const [totalConfFiltered, setTotalConfFiltered] = useState([]);
   const [totalTopConfFiltered, setTotalTopConfFiltered] = useState([]);
   const [showCollapseRows, setShowCollapseRows] = useState([]);
+  const [formulaUniqueValue, setFormulaUniqueValue] = useState({});
   const MemoizedTableRow = React.memo(TableRow);
 
   const showCollapse = (groupName) => {
@@ -67,8 +67,8 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
 
   // start grouping algorithm
   React.useEffect(() => {
-    const dealer_configurations = sheet?.dealer_configurations;
-    const newArray = dealer_configurations.map((obj, index, arr) => {
+
+    const newArray = sheet?.dealer_configurations?.map((obj, index, arr) => {
       if (index < arr.length - 1) {
         if (
           obj.MainSymbol !== arr[index + 1].MainSymbol ||
@@ -82,7 +82,41 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
       return `${sheet.sheet_id}${obj.MainSymbol}${obj.Login}`;
     });
     setTotalConfFiltered(newArray);
+
   }, [sheet]);
+
+  React.useEffect(() => {
+    const updatedFormulaUniqueValue = {...formulaUniqueValue};
+    totalConfFiltered.forEach((obj, index, arr) => {
+
+      sheet?.dealer_configurations.forEach((item, index)=>{
+        const identfier = `${sheet.sheet_id}${item.MainSymbol}${item.Login}`;
+        if(`${identfier}` === obj){
+          item?.Rules?.forEach((item, ruleIndex) => {
+         if(updatedFormulaUniqueValue[`${identfier}`]){
+            if(updatedFormulaUniqueValue[`${identfier}`][ruleIndex] !== "intitialValue"){
+
+           
+                if (updatedFormulaUniqueValue[`${identfier}`][ruleIndex] !== String(item.value)) {
+                  updatedFormulaUniqueValue[`${identfier}`][ruleIndex] = "mixed";
+                }
+              }else{
+                updatedFormulaUniqueValue[`${identfier}`][ruleIndex] = String(item.value);
+              }
+
+          }else{
+            updatedFormulaUniqueValue[`${identfier}`] = ["intitialValue", "intitialValue", "intitialValue", "intitialValue"];
+            updatedFormulaUniqueValue[`${identfier}`][ruleIndex] = String(item.value);
+          }
+          });
+        }
+ 
+      })
+    });
+
+    setFormulaUniqueValue(updatedFormulaUniqueValue);
+
+  }, [totalConfFiltered]);
 
   React.useEffect(() => {
     let currentIndex = 0;
@@ -302,8 +336,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                 <React.Fragment key={`conf-${index}`}>
                   {totalTopConfFiltered[index] !== "" && (
                     <MemoizedTableRow
-                      key={`total-symbol-conf-${config.MainSymbol}`}
-                    >
+                      key={`total-symbol-conf-${config.MainSymbol}`}>
                       <TableCell>
                         <KeyboardArrowDown
                           onClick={() =>
@@ -319,23 +352,23 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                           fontWeight: "bold",
                         }}
                       >
-                        {`${config.MainSymbol} / ${config.Login}`}
+                        {`Total: ${config.MainSymbol} / ${config.Login}`}
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                         {toFixedIfNeeded(
                           totalByConf[`${totalTopConfFiltered[index]}`]
                             ?.totalBuySymbol || 0,
                           DECIMAL_POINTS
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                         {toFixedIfNeeded(
                           totalByConf[`${totalTopConfFiltered[index]}`]
                             ?.totalSellSymbol || 0,
                           DECIMAL_POINTS
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                         {toFixedIfNeeded(
                           totalByConf[`${totalTopConfFiltered[index]}`]
                             ?.totalNetSymbol || 0,
@@ -349,8 +382,10 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
 
                         return (
                           <React.Fragment key={`conf-rule-${ruleIndex}`}>
-                            <TableCell></TableCell>
-                            <TableCell>
+                            <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
+  {`${formulaUniqueValue[totalTopConfFiltered[index]]?.[ruleIndex] ?? ''}%`}
+</TableCell>
+                            <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                               {toFixedIfNeeded(totalResult, DECIMAL_POINTS)}
                             </TableCell>
                           </React.Fragment>
@@ -363,16 +398,16 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     <MemoizedTableRow>
                       <TableCell>{config.Login}</TableCell>
                       <TableCell
-                        sx={{
-                          fontWeight:
-                            config.SymbolSuffix === config.MainSymbol
-                              ? "bold"
-                              : "normal",
-                          color:
-                            config.SymbolSuffix === config.MainSymbol
-                              ? "green"
-                              : "inherit",
-                        }}
+                        // sx={{
+                        //   fontWeight:
+                        //     config.SymbolSuffix === config.MainSymbol
+                        //       ? "bold"
+                        //       : "normal",
+                        //   color:
+                        //     config.SymbolSuffix === config.MainSymbol
+                        //       ? "green"
+                        //       : "inherit",
+                        // }}
                       >
                         {config.SymbolSuffix}
                       </TableCell>
@@ -424,21 +459,21 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                   >
                     {"Total"}
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                     {toFixedIfNeeded(
                       totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet ||
                         0,
                       DECIMAL_POINTS
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                     {toFixedIfNeeded(
                       totalByManyConf[`${sheet.sheet_id}tbmc`]
                         ?.totalSellSheet || 0,
                       DECIMAL_POINTS
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                     {toFixedIfNeeded(
                       totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet ||
                         0,
@@ -458,7 +493,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                     return (
                       <React.Fragment key={`conf-tbmc-${ruleIndex}`}>
                         <TableCell></TableCell>
-                        <TableCell>
+                        <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                           {toFixedIfNeeded(totalResult, DECIMAL_POINTS)}
                         </TableCell>
                       </React.Fragment>
@@ -480,7 +515,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                   <MemoizedTableRow>
                     <TableCell>{config.Login}</TableCell>
                     <TableCell>{config.Symbol}</TableCell>
-                    <TableCell>
+                    <TableCell >
                       {toFixedIfNeeded(buyVol, DECIMAL_POINTS)}
                     </TableCell>
                     <TableCell>
@@ -523,21 +558,21 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                   >
                     {"Total"}
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                     {toFixedIfNeeded(
                       totalByManyConfCov[`${sheet.sheet_id}tbmc`]
                         ?.totalBuySheet || 0,
                       DECIMAL_POINTS
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                     {toFixedIfNeeded(
                       totalByManyConfCov[`${sheet.sheet_id}tbmc`]
                         ?.totalSellSheet || 0,
                       DECIMAL_POINTS
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                     {toFixedIfNeeded(
                       totalByManyConfCov[`${sheet.sheet_id}tbmc`]
                         ?.totalNetSheet || 0,
@@ -552,7 +587,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                         key={`coverage-conf-rule-value${ruleIndex}`}
                       >
                         <TableCell></TableCell>
-                        <TableCell>
+                        <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                           {toFixedIfNeeded(totalResult, DECIMAL_POINTS)}
                         </TableCell>
                       </React.Fragment>
@@ -577,7 +612,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
               >
                 {"Covered"}
               </TableCell>
-              <TableCell>
+              <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                 {toFixedIfNeeded(
                   (totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalBuySheet ||
                     0) -
@@ -586,7 +621,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                   DECIMAL_POINTS
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                 {toFixedIfNeeded(
                   (totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalSellSheet ||
                     0) -
@@ -595,7 +630,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                   DECIMAL_POINTS
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                 {toFixedIfNeeded(
                   (totalByManyConf[`${sheet.sheet_id}tbmc`]?.totalNetSheet ||
                     0) -
@@ -616,7 +651,7 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                 return (
                   <React.Fragment key={`coverage-conf-tbmc${ruleIndex}`}>
                     <TableCell></TableCell>
-                    <TableCell>
+                    <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                       {toFixedIfNeeded(coveredResult, DECIMAL_POINTS)}
                     </TableCell>
                   </React.Fragment>
