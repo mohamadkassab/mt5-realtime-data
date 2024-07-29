@@ -13,9 +13,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Set up cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          npm install
+          npm ci
 
       - name: Build the app
         env:
@@ -32,21 +44,9 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         if: success()
         run: |
-          powershell -Command "Copy-Item -Path 'build\\*' -Destination 'C:\\nginx\nginx-1.26.0\\apps\\riskman-client\\build' -Recurse -Force"
+          powershell -Command "Copy-Item -Path 'build\\*' -Destination 'C:\\nginx\\nginx-1.26.0\\apps\\riskman-client\\build' -Recurse -Force"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+      # Uncomment if using SSH to deploy
       # - name: Set up SSH
       #   uses: webfactory/ssh-agent@v0.9.0
       #   with:
@@ -56,7 +56,3 @@ jobs:
       #   run: |
       #     ssh-keyscan ${{ secrets.SSH_IP }} >> ~/.ssh/known_hosts
       #     ssh -vvv ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP }} 'cd C:\\nginx\\nginx-1.26.0\\apps\\riskman-client && build_script.sh'
-      
-
-
-    
