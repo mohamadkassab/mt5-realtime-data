@@ -44,7 +44,6 @@ jobs:
           powershell -Command "Copy-Item -Path 'build\\*' -Destination 'C:\\nginx\\nginx-1.26.0\\apps\\riskman-client\\build' -Recurse -Force"
 
 
-      # Uncomment if using SSH to deploy
       # - name: Set up SSH
       #   uses: webfactory/ssh-agent@v0.9.0
       #   with:
