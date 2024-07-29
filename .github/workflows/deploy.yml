@@ -25,9 +25,8 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Install dependencies
+        run: npm ci
         if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          npm ci
 
       - name: Build the app
         env:
@@ -36,15 +35,14 @@ jobs:
           REACT_APP_API_PORT: ${{ secrets.REACT_APP_API_PORT }}
           REACT_APP_WS_IP: ${{ secrets.REACT_APP_WS_IP }}
           REACT_APP_WS_PORT: ${{ secrets.REACT_APP_WS_PORT }}
-        run: |
-          npm run build
+        run: npm run build
 
       - name: Deploy the build
         env:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-        if: success()
         run: |
           powershell -Command "Copy-Item -Path 'build\\*' -Destination 'C:\\nginx\\nginx-1.26.0\\apps\\riskman-client\\build' -Recurse -Force"
+
 
       # Uncomment if using SSH to deploy
       # - name: Set up SSH
