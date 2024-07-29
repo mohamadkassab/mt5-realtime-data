@@ -19,7 +19,7 @@ jobs:
         env:
           cache-name: cache-node-modules
         with:
-          path: C:\Users\${{ runner.user }}\AppData\Local\npm-cache
+          path: C:\Users\Kassab\AppData\Local\npm-cache
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
