@@ -22133,3 +22133,11 @@ input.dx-hidden {
 .dx-gridbase-container>.dx-datagrid-rowsview.dx-scrollable{
   display: block !important; 
 }
+
+* {
+  caret-color: transparent !important;
+}
+
+input, textarea {
+  caret-color: black !important; 
+}

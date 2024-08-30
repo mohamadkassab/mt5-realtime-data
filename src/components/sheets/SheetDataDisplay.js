@@ -383,8 +383,8 @@ const ConfigurationSheet = ({ sheet, realTimeData }) => {
                         return (
                           <React.Fragment key={`conf-rule-${ruleIndex}`}>
                             <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
-  {`${formulaUniqueValue[totalTopConfFiltered[index]]?.[ruleIndex] ?? ''}%`}
-</TableCell>
+                              {`${formulaUniqueValue[totalTopConfFiltered[index]]?.[ruleIndex] ?? ''}%`}
+                            </TableCell>
                             <TableCell sx={{fontWeight: "bold", fontSize: "1.05rem"}}>
                               {toFixedIfNeeded(totalResult, DECIMAL_POINTS)}
                             </TableCell>

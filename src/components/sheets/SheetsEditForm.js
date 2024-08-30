@@ -79,6 +79,7 @@ const SheetsEditForm = () => {
   const [sheetVisibility, setSheetVisibility] = React.useState([true, false]);
   const activeStepIndex = sheetVisibility.findIndex((value) => value === true);
   const activeStepLabel = activeStepIndex !== -1 ? steps[activeStepIndex] : "";
+  const [activeStep, setActiveStep] = React.useState(0);
 
   const handleChangeFormData = (event) => {
     setIsFormDataChanged(true);
@@ -170,15 +171,33 @@ const SheetsEditForm = () => {
     }
   };
 
-  const handleStepClick = (index) => {
+  // Start Stepper
+  const handleStepperClick = (index) => {
     if(formData[columns[1].dataField]){
     const newSheetVisibility = sheetVisibility.map((_, i) => i === index);
     setSheetVisibility(newSheetVisibility);
-    }   else{
+    setActiveStep(index);
+  }
+    else{
       setError("This field is required");
     }
-
   };
+
+  const handleStepperReset = () => {
+    setActiveStep(0);
+  };
+
+  const handleStepperBack = () => {
+    setActiveStep((prevActiveStep) => {
+      return prevActiveStep > 0 ? prevActiveStep - 1 : 0;
+    });
+  };
+
+  const handleStepperNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+  
+// End Stepper
 
   const checkLastTrueIndex = useCallback(() => {
     const index = sheetVisibility.indexOf(true);
@@ -357,7 +376,11 @@ React.useEffect(() => {
                   <HorizontalLinearStepper
                     ref={stepperRef}
                     steps={steps}
-                    onStepClick={handleStepClick}
+                    handleStepperClick={handleStepperClick}
+                    handleStepperReset={handleStepperReset}
+                    handleStepperBack={handleStepperBack}
+                    handleStepperNext={handleStepperNext}
+                    activeStep={activeStep}
                   />
                 </div>
                 <div className="flex justify-center items-center">

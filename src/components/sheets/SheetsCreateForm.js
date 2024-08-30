@@ -200,8 +200,8 @@ const SheetsCreateForm = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
   
-
 // End Stepper
+
   const checkLastTrueIndex = useCallback(() => {
     const index = sheetVisibility.indexOf(true);
     const isLast = index === sheetVisibility.length - 1;
